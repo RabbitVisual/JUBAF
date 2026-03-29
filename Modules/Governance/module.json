@@ -1,0 +1,11 @@
+{
+    "name": "Governance",
+    "alias": "governance",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Governance\\Providers\\GovernanceServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,30 @@
+{
+    "name": "vertex/fieldoutreach",
+    "description": "",
+    "authors": [
+        {
+            "name": "Reinan Rodrigues",
+            "email": "r.rodriguesjs@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\FieldOutreach\\": "app/",
+            "Modules\\FieldOutreach\\Database\\Factories\\": "database/factories/",
+            "Modules\\FieldOutreach\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\FieldOutreach\\Tests\\": "tests/"
+        }
+    }
+}

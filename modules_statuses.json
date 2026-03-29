@@ -1,0 +1,14 @@
+{
+    "HomePage": true,
+    "Admin": true,
+    "MemberPanel": true,
+    "Notifications": true,
+    "Bible": true,
+    "PaymentGateway": true,
+    "Treasury": true,
+    "Events": true,
+    "Church": true,
+    "Governance": true,
+    "CoordinationCouncil": true,
+    "FieldOutreach": true
+}

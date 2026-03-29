@@ -1,0 +1,11 @@
+{
+    "name": "CoordinationCouncil",
+    "alias": "coordinationcouncil",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\CoordinationCouncil\\Providers\\CoordinationCouncilServiceProvider"
+    ],
+    "files": []
+}
