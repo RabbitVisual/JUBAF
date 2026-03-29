@@ -98,7 +98,7 @@ class ExecutiveIntelligenceService
     /**
      * Ranking de inscrições por igreja (eventos publicados com data futura). Resultado em cache.
      *
-     * @return Collection<int, object{name:string,city:?string,state:?string,registrations_count:int}>
+     * @return Collection<int, object{name:string,city:?string,sector:?string,registrations_count:int}>
      */
     public function churchEngagementRanking(): Collection
     {
@@ -109,7 +109,8 @@ class ExecutiveIntelligenceService
             return collect();
         }
 
-        return Cache::remember('admin.executive.church_engagement_rank_v1', self::CACHE_RANKING_TTL, function () {
+        // v2: churches não têm coluna `state` (ver migration); agrupamos por `sector` (visão associativa).
+        return Cache::remember('admin.executive.church_engagement_rank_v2', self::CACHE_RANKING_TTL, function () {
             $now = Carbon::now();
 
             return DB::table('event_registrations as er')
@@ -126,9 +127,9 @@ class ExecutiveIntelligenceService
                 })
                 ->selectRaw('COALESCE(c.id, 0) as church_key')
                 ->selectRaw('COALESCE(NULLIF(TRIM(c.name), ""), "Sem igreja vinculada") as name')
-                ->addSelect('c.city', 'c.state')
+                ->addSelect('c.city', 'c.sector')
                 ->selectRaw('COUNT(er.id) as registrations_count')
-                ->groupBy('church_key', 'name', 'c.city', 'c.state')
+                ->groupBy('church_key', 'name', 'c.city', 'c.sector')
                 ->orderByDesc('registrations_count')
                 ->limit(15)
                 ->get();

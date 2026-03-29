@@ -11,7 +11,14 @@
             <a href="{{ route('admin.diretoria.minutes.index') }}"
                 class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold backdrop-blur hover:bg-white/20">
                 <x-icon name="file-pdf" class="h-4 w-4" />
-                Atas PDF
+                Atas PDF (admin)
+            </a>
+        @endif
+        @if(Route::has('memberpanel.governance.diretoria.minutes.index') && auth()->user()->canAccessAny(['governance_manage', 'governance_view']))
+            <a href="{{ route('memberpanel.governance.diretoria.minutes.index') }}"
+                class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold backdrop-blur hover:bg-white/20">
+                <x-icon name="file-pdf" class="h-4 w-4" />
+                Atas (painel)
             </a>
         @endif
     </div>

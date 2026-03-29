@@ -313,12 +313,14 @@
                 try {
                     const response = await fetch(checkUserUrl, {
                         method: 'POST',
+                        credentials: 'same-origin',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken,
-                            'Accept': 'application/json'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
                         },
-                        body: JSON.stringify({ value, type })
+                        body: JSON.stringify({ value, type }),
                     });
 
                     const data = await response.json();

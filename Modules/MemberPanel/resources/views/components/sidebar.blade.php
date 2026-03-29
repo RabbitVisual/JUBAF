@@ -8,6 +8,7 @@
     $canGovernancePanel = MemberPanelAccess::canUseModule(auth()->user(), MemberPanelAccess::MODULE_GOVERNANCE);
     $canCouncilPanel = MemberPanelAccess::canUseModule(auth()->user(), MemberPanelAccess::MODULE_COUNCIL);
     $canFieldPanel = MemberPanelAccess::canUseModule(auth()->user(), MemberPanelAccess::MODULE_FIELD);
+    $canLiderancaPanel = MemberPanelAccess::canUseModule(auth()->user(), MemberPanelAccess::MODULE_LIDERANCA);
     $canDelegationPanel = MemberPanelAccess::canUseModule(auth()->user(), MemberPanelAccess::MODULE_DELEGATION_UI);
     $hasTreasuryPermission = TreasuryPermission::where('user_id', auth()->id())->first();
     $isTreasuryActive = request()->routeIs('memberpanel.treasury.*');
@@ -108,6 +109,19 @@
                                 </span>
                             </a>
                         </li>
+
+                        @if ($canLiderancaPanel)
+                        <li>
+                            <a href="{{ route('memberpanel.lideranca.index') }}"
+                                class="group relative flex justify-center rounded-sm px-2 py-1.5 {{ request()->routeIs('memberpanel.lideranca*') ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300' }}">
+                                <x-icon name="chart-pie" class="size-5" />
+                                <span
+                                    class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-gray-900 dark:bg-gray-700 px-2 py-1.5 text-xs font-medium text-white whitespace-nowrap group-hover:visible z-50">
+                                    Caravana
+                                </span>
+                            </a>
+                        </li>
+                        @endif
 
 
 
@@ -302,6 +316,20 @@
                     </a>
                 </li>
 
+                @if ($canLiderancaPanel)
+                <li>
+                    <a href="{{ route('memberpanel.lideranca.index') }}"
+                        class="block rounded-lg px-4 py-2 text-sm font-medium {{ request()->routeIs('memberpanel.lideranca*') ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 active' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300' }}">
+                        <span class="flex items-center gap-2">
+                            <span class="shrink-0">
+                                <x-icon name="chart-pie" class="size-5" />
+                            </span>
+                            Caravana / Liderança local
+                        </span>
+                    </a>
+                </li>
+                @endif
+
                 @if ($canChurchesPanel)
                 <!-- Igrejas ASBAF / filiação -->
                 <li x-data="{ open: {{ request()->routeIs('memberpanel.churches*') ? 'true' : 'false' }} }">
@@ -365,6 +393,9 @@
                             </li>
                             <li>
                                 <a href="{{ route('memberpanel.governance.communications.index') }}" class="block rounded-lg px-4 py-2 text-sm font-medium {{ request()->routeIs('memberpanel.governance.communications*') ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Comunicados</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('memberpanel.governance.diretoria.minutes.index') }}" class="block rounded-lg px-4 py-2 text-sm font-medium {{ request()->routeIs('memberpanel.governance.diretoria.*') ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Atas PDF (Diretoria)</a>
                             </li>
                             @endif
                             @if($canCouncilPanel)

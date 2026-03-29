@@ -142,6 +142,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
             Route::post('events/{event}/registrations/{registration}/confirm', [\Modules\Events\App\Http\Controllers\Admin\RegistrationController::class, 'confirm'])->name('registrations.confirm');
             Route::post('events/{event}/registrations/{registration}/cancel', [\Modules\Events\App\Http\Controllers\Admin\RegistrationController::class, 'cancel'])->name('registrations.cancel');
             Route::get('checkin', [\Modules\Events\App\Http\Controllers\Admin\CheckinController::class, 'index'])->name('checkin.index');
+            Route::get('checkin/scanner', [\Modules\Events\App\Http\Controllers\Admin\CheckinController::class, 'scannerFullscreen'])->name('checkin.scanner');
             Route::post('checkin/validate', [\Modules\Events\App\Http\Controllers\Admin\CheckinController::class, 'validateCheckin'])->name('checkin.validate');
         });
 

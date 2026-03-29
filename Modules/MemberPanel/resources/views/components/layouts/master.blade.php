@@ -47,6 +47,8 @@
     <!-- Font Awesome Pro -->
     <link href="{{ asset('vendor/fontawesome-pro/css/all.css') }}" rel="stylesheet">
 
+    @livewireStyles
+
     @stack('styles')
 </head>
 
@@ -168,6 +170,7 @@
         });
     </script>
 
+    @livewireScripts
     @stack('scripts')
 </body>
 

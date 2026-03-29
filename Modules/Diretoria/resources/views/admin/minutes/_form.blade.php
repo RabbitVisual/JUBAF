@@ -15,7 +15,7 @@
         @error('meeting_date')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
     </div>
     <div>
-        <label for="tag" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Etiqueta</label>
+        <label for="tag" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de documento</label>
         <select name="tag" id="tag" required
             class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white sm:text-sm">
             @foreach($tagLabels as $slug => $label)

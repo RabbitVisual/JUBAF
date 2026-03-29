@@ -27,6 +27,7 @@ class EventRegistration extends Model
         'ticket_hash',
         'checked_in_at',
         'paid_at',
+        'payment_reminder_sent_at',
         'notes',
         'discount_code',
         'custom_responses',
@@ -35,14 +36,18 @@ class EventRegistration extends Model
     protected $casts = [
         'total_amount' => 'decimal:2',
         'paid_at' => 'datetime',
+        'payment_reminder_sent_at' => 'datetime',
         'checked_in_at' => 'datetime',
         'custom_responses' => 'array',
     ];
 
     // Status constants
     const STATUS_PENDING = 'pending';
+
     const STATUS_CONFIRMED = 'confirmed';
+
     const STATUS_CANCELLED = 'cancelled';
+
     const STATUS_REFUNDED = 'refunded';
 
     /**

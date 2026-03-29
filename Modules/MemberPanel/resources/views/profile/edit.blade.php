@@ -144,6 +144,17 @@
                                             <option value="uniao_estavel" {{ old('marital_status', $user->marital_status) == 'uniao_estavel' ? 'selected' : '' }}>União Estável</option>
                                         </select>
                                     </div>
+                                    <div class="space-y-1 md:col-span-2">
+                                        <label for="church_id" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-500">Igreja local (ASBAF)</label>
+                                        <select name="church_id" id="church_id" class="modern-input w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 text-gray-900 dark:text-white font-semibold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                            <option value="">— Nenhuma / a definir —</option>
+                                            @foreach ($churches as $church)
+                                                <option value="{{ $church->id }}" {{ (string) old('church_id', $user->church_id) === (string) $church->id ? 'selected' : '' }}>{{ $church->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('church_id') <p class="text-[10px] text-red-500 font-bold mt-1 uppercase">{{ $message }}</p> @enderror
+                                        <p class="text-[11px] text-gray-500 dark:text-slate-400">Obrigatório para líderes de jovens que utilizem o painel de caravana.</p>
+                                    </div>
                                 </div>
                             </div>
                         </section>

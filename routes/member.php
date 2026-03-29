@@ -143,6 +143,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/comunicados/{communication}/editar', [$governance, 'communicationsEdit'])->name('communications.edit');
             Route::put('/comunicados/{communication}', [$governance, 'communicationsUpdate'])->name('communications.update');
             Route::delete('/comunicados/{communication}', [$governance, 'communicationsDestroy'])->name('communications.destroy');
+
+            // Atas PDF — Diretoria (rotas estáticas antes de {board_minute})
+            $diretoriaMinutes = \Modules\Diretoria\Http\Controllers\MemberPanel\BoardMinuteMemberController::class;
+            Route::get('/atas-diretoria', [$diretoriaMinutes, 'index'])->name('diretoria.minutes.index');
+            Route::get('/atas-diretoria/criar', [$diretoriaMinutes, 'create'])->name('diretoria.minutes.create');
+            Route::post('/atas-diretoria', [$diretoriaMinutes, 'store'])->name('diretoria.minutes.store');
+            Route::get('/atas-diretoria/{board_minute}/download', [$diretoriaMinutes, 'download'])->name('diretoria.minutes.download');
+            Route::get('/atas-diretoria/{board_minute}/editar', [$diretoriaMinutes, 'edit'])->name('diretoria.minutes.edit');
+            Route::put('/atas-diretoria/{board_minute}', [$diretoriaMinutes, 'update'])->name('diretoria.minutes.update');
+            Route::delete('/atas-diretoria/{board_minute}', [$diretoriaMinutes, 'destroy'])->name('diretoria.minutes.destroy');
         });
 
         Route::middleware(['memberpanel.module:council'])->prefix('institucional/conselho')->name('council.')->group(function () {
@@ -175,6 +185,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/visitas/{visit}/editar', [$field, 'visitsEdit'])->name('visits.edit');
             Route::put('/visitas/{visit}', [$field, 'visitsUpdate'])->name('visits.update');
             Route::delete('/visitas/{visit}', [$field, 'visitsDestroy'])->name('visits.destroy');
+        });
+
+        Route::middleware(['memberpanel.module:lideranca', 'lideranca.caravan_church'])->group(function () {
+            Route::view('/lideranca', 'liderancapanel::caravan.index')->name('lideranca.index');
         });
     });
 

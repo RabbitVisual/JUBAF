@@ -20,6 +20,8 @@ class MemberPanelAccess
 
     public const MODULE_FIELD = 'field';
 
+    public const MODULE_LIDERANCA = 'lideranca';
+
     /** @var list<string> */
     public static function moduleKeys(): array
     {
@@ -29,6 +31,7 @@ class MemberPanelAccess
             self::MODULE_GOVERNANCE,
             self::MODULE_COUNCIL,
             self::MODULE_FIELD,
+            self::MODULE_LIDERANCA,
             self::MODULE_DELEGATION_UI,
         ];
     }
@@ -41,6 +44,7 @@ class MemberPanelAccess
             self::MODULE_GOVERNANCE => 'Governança — assembleias e comunicados (painel)',
             self::MODULE_COUNCIL => 'Conselho de coordenação (painel)',
             self::MODULE_FIELD => 'Campo / visitas (painel)',
+            self::MODULE_LIDERANCA => 'Caravana / liderança local (painel)',
             self::MODULE_DELEGATION_UI => 'Delegar acessos ao painel (outros utilizadores)',
             default => $key,
         };
@@ -87,6 +91,7 @@ class MemberPanelAccess
             self::MODULE_GOVERNANCE => self::governanceVisible($user),
             self::MODULE_COUNCIL => self::councilVisible($user),
             self::MODULE_FIELD => self::fieldVisible($user),
+            self::MODULE_LIDERANCA => self::liderancaVisible($user),
             self::MODULE_DELEGATION_UI => self::canDelegateGrants($user),
             default => false,
         };
@@ -156,5 +161,14 @@ class MemberPanelAccess
         }
 
         return self::hasActiveGrant($user, self::MODULE_FIELD);
+    }
+
+    protected static function liderancaVisible(User $user): bool
+    {
+        if ($user->isYouthLeader()) {
+            return true;
+        }
+
+        return self::hasActiveGrant($user, self::MODULE_LIDERANCA);
     }
 }

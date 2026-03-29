@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Modules\Church\Models\Church;
 
 class ProfileController extends Controller
 {
@@ -31,8 +32,9 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
+        $churches = Church::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']);
 
-        return view('memberpanel::profile.edit', compact('user'));
+        return view('memberpanel::profile.edit', compact('user', 'churches'));
     }
 
     /**
@@ -60,6 +62,7 @@ class ProfileController extends Controller
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|size:2',
             'zip_code' => 'nullable|string|max:10',
+            'church_id' => ['nullable', 'integer', 'exists:churches,id'],
             'password' => 'nullable|string|min:8|confirmed',
             'photos.*' => 'nullable|image|max:8192', // 8MB limit para fotos modernas
         ]);

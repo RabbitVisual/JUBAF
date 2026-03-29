@@ -52,6 +52,13 @@
                         <x-icon name="newspaper" style="duotone" class="w-4 h-4 mr-2" />
                         Comunicados
                     </a>
+                    @if (Route::has('memberpanel.governance.diretoria.minutes.index'))
+                        <a href="{{ route('memberpanel.governance.diretoria.minutes.index') }}"
+                            class="inline-flex items-center justify-center px-5 py-2.5 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold transition-all">
+                            <x-icon name="file-pdf" style="duotone" class="w-4 h-4 mr-2" />
+                            Atas PDF
+                        </a>
+                    @endif
                     @if ($canManage)
                         <a href="{{ route('memberpanel.governance.assemblies.create') }}"
                             class="inline-flex items-center justify-center px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-violet-500/20">
@@ -63,7 +70,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <a href="{{ route('memberpanel.governance.assemblies.index') }}"
                 class="group bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 p-6 shadow-sm hover:border-violet-200 dark:hover:border-violet-800 transition">
                 <div class="flex items-center justify-between">
@@ -86,6 +93,19 @@
                         class="w-10 h-10 text-indigo-500 opacity-80 group-hover:scale-105 transition" />
                 </div>
             </a>
+            @if (Route::has('memberpanel.governance.diretoria.minutes.index'))
+                <a href="{{ route('memberpanel.governance.diretoria.minutes.index') }}"
+                    class="group bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 p-6 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Atas (Diretoria)</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-slate-400 mt-1">PDFs oficiais</p>
+                        </div>
+                        <x-icon name="file-pdf" style="duotone"
+                            class="w-10 h-10 text-slate-500 opacity-80 group-hover:scale-105 transition" />
+                    </div>
+                </a>
+            @endif
         </div>
     @endcomponent
 @endsection

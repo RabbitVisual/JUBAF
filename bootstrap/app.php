@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \App\Http\Middleware\EnsurePermission::class,
             'memberpanel.module' => \App\Http\Middleware\EnsureMemberPanelModule::class,
             'memberpanel.delegate' => \App\Http\Middleware\EnsureMemberPanelDelegate::class,
+            'lideranca.caravan_church' => \Modules\LiderancaPanel\Http\Middleware\EnsureCaravanChurchProfile::class,
         ]);
         // Webhook canônico de pagamento é POST /api/v1/gateway/webhook/{driver} (rota API, sem CSRF)
         $middleware->validateCsrfTokens(except: []);

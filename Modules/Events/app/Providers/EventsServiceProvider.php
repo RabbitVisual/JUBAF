@@ -2,8 +2,8 @@
 
 namespace Modules\Events\App\Providers;
 
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Events\App\Models\Event;
 use Modules\Events\App\Policies\EventPolicy;
@@ -51,6 +51,7 @@ class EventsServiceProvider extends ServiceProvider
             \Modules\Events\App\Console\Commands\ReleaseExpiredRegistrations::class,
             \Modules\Events\App\Console\SendCertificateAvailableEmailsCommand::class,
             \Modules\Events\App\Console\SendEventReminderEmailsCommand::class,
+            \Modules\Events\App\Console\Commands\NotifyPendingRegistrationPaymentsCommand::class,
         ]);
     }
 
