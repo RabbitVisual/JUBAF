@@ -33,7 +33,7 @@ class RegistrationConfirmedListener
         try {
             FinancialEntry::create([
                 'type' => 'income',
-                'category' => 'Eventos',
+                'category' => 'event',
                 'title' => "Inscrição: {$event->title}",
                 'description' => "Inscrição #{$registration->id} para o evento '{$event->title}'. Participantes: {$registration->participants->count()}",
                 'amount' => $registration->total_amount,

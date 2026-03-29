@@ -12,7 +12,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array<string, array<int, string>>
      */
     protected $listen = [
-        'payment.completed' => [
+        \Modules\PaymentGateway\App\Events\PaymentReceived::class => [
             \Modules\Events\App\Listeners\ConfirmRegistrationOnPaymentCompleted::class,
         ],
         \Modules\Events\App\Events\RegistrationConfirmed::class => [

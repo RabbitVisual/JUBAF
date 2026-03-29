@@ -2,6 +2,7 @@
 
 namespace Modules\PaymentGateway\App\Services;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\PaymentGateway\App\Models\Payment;
 use Modules\PaymentGateway\App\Models\PaymentAuditLog;
@@ -129,7 +130,7 @@ class PaymentService
      *
      * @param  string  $source  webhook, checkout_return, admin, system
      */
-    public function confirmPayment(Payment $payment, string $source = 'system'): void
+    public function confirmPayment(Payment $payment, string $source = 'system', array $auditPayload = []): void
     {
         if ($payment->status === 'completed') {
             return;
@@ -141,9 +142,10 @@ class PaymentService
             'paid_at' => now(),
         ]);
 
-        $this->logAudit($payment, $fromStatus, 'completed', $source);
-
-        PaymentReceived::dispatch($payment);
+        $this->logAudit($payment, $fromStatus, 'completed', $source, $auditPayload);
+        DB::afterCommit(static function () use ($payment): void {
+            PaymentReceived::dispatch($payment);
+        });
     }
 
     /**
@@ -168,17 +170,19 @@ class PaymentService
             'paid_at' => $status === 'completed' ? now() : null,
         ]);
 
-        $this->logAudit($payment, $fromStatus, $status, $source);
+        $this->logAudit($payment, $fromStatus, $status, $source, $gatewayResponse);
 
         if ($status === 'completed') {
-            PaymentReceived::dispatch($payment);
+            DB::afterCommit(static function () use ($payment): void {
+                PaymentReceived::dispatch($payment);
+            });
         }
     }
 
     /**
      * Registra alteração de status para auditoria.
      */
-    protected function logAudit(Payment $payment, ?string $fromStatus, string $toStatus, string $source = 'system'): void
+    protected function logAudit(Payment $payment, ?string $fromStatus, string $toStatus, string $source = 'system', array $payload = []): void
     {
         if (! class_exists(PaymentAuditLog::class)) {
             return;
@@ -191,6 +195,7 @@ class PaymentService
                 'to_status' => $toStatus,
                 'source' => $source,
                 'gateway_transaction_id' => $payment->gateway_transaction_id,
+                'payload' => empty($payload) ? null : $payload,
             ]);
         } catch (\Exception $e) {
             \Log::warning('Payment audit log failed: ' . $e->getMessage());

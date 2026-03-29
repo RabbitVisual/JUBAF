@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\PaymentGateway\App\Models\Payment;
 use Modules\PaymentGateway\App\Services\PaymentService;
+use Modules\PaymentGateway\App\Services\PaymentSettlementService;
 use Modules\PaymentGateway\App\Factories\PaymentGatewayFactory;
 
 class GatewayWebhookController extends Controller
 {
     protected $paymentService;
+    protected $paymentSettlement;
 
-    public function __construct(PaymentService $paymentService)
+    public function __construct(PaymentService $paymentService, PaymentSettlementService $paymentSettlement)
     {
         $this->paymentService = $paymentService;
+        $this->paymentSettlement = $paymentSettlement;
     }
 
     /**
@@ -81,7 +84,15 @@ class GatewayWebhookController extends Controller
 
             if ($payment) {
                 \Log::info("Webhook Stripe: Confirming payment {$payment->transaction_id}");
-                $this->paymentService->confirmPayment($payment, 'webhook');
+                $this->paymentSettlement->settleAsCompleted($payment, 'webhook', [
+                    'driver' => 'stripe',
+                    'event_type' => $type,
+                    'gateway_object_id' => $txnId,
+                    'payload_excerpt' => [
+                        'id' => $txnId,
+                        'type' => $type,
+                    ],
+                ]);
             } else {
                 \Log::warning("Webhook Stripe: Payment not found for txn {$txnId} / internal {$internalId}");
             }
@@ -107,7 +118,20 @@ class GatewayWebhookController extends Controller
             }
 
             if ($payment) {
-                $this->paymentService->checkPaymentStatus($payment, 'webhook');
+                $status = $this->paymentService->checkPaymentStatus($payment, 'webhook');
+                if (($status['status'] ?? null) === 'completed') {
+                    $this->paymentSettlement->settleAsCompleted($payment, 'webhook', [
+                        'driver' => 'mercado_pago',
+                        'topic' => $topic,
+                        'type' => $type,
+                        'gateway_object_id' => (string) $id,
+                        'payload_excerpt' => [
+                            'topic' => $topic,
+                            'type' => $type,
+                            'id' => (string) $id,
+                        ],
+                    ]);
+                }
             }
         }
 

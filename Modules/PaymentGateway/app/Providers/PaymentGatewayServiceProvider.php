@@ -46,7 +46,9 @@ class PaymentGatewayServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            \Modules\PaymentGateway\App\Console\ReconcileCompletedPaymentsCommand::class,
+        ]);
     }
 
     /**

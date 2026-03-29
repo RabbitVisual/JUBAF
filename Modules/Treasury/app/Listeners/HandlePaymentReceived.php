@@ -4,7 +4,6 @@ namespace Modules\Treasury\App\Listeners;
 
 use Modules\PaymentGateway\App\Events\PaymentReceived;
 use Modules\Treasury\App\Models\FinancialEntry;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class HandlePaymentReceived
 {
@@ -23,45 +22,34 @@ class HandlePaymentReceived
     {
         $payment = $event->payment;
 
-        // Check if entry already exists to prevent duplication
-        // Assuming payment_id or transaction_id linkage
-        // Since the FinancialEntry model wasn't provided, assuming standard fields based on context
-        // or a generic creation logic. Ideally, we link via payment_id column.
-
-        // We will assume a 'payment_id' column exists or we store it in description/notes.
-        // Based on previous context, Payment model has financialEntry relationship.
-
-        if ($payment->financialEntry) {
+        // Idempotência forte por payment_id.
+        if (FinancialEntry::query()->where('payment_id', $payment->id)->exists()) {
             return;
         }
 
-        // Event registration income is created only by RegistrationConfirmedListener (single source of truth).
+        // Receita de inscrição de evento é responsabilidade única do RegistrationConfirmedListener.
         if ($payment->payment_type === 'event_registration') {
             return;
         }
 
-
-
         $campaignId = null;
-        $category = 'Doação';
+        $category = 'donation';
 
         // Resolve Campaign from payable relationship
         if ($payment->payable_type === 'Modules\Treasury\App\Models\Campaign') {
             $campaignId = $payment->payable_id;
-            $category = 'Campanha';
+            $category = 'campaign';
         }
 
         // Specific category mapping based on payment_type
         if ($payment->payment_type === 'tithe') {
-            $category = 'Dízimo';
+            $category = 'tithe';
         } elseif ($payment->payment_type === 'offering') {
-            $category = 'Oferta';
-        } elseif ($payment->payment_type === 'event_registration') {
-            $category = 'Evento';
+            $category = 'offering';
         }
 
         FinancialEntry::create([
-            'title' => ($payment->payment_type === 'tithe' ? 'Dízimo' : 'Doação') . ' - ' . ($payment->payer_name ?? 'Anônimo'),
+            'title' => ($payment->payment_type === 'tithe' ? 'Dizimo' : 'Doacao') . ' - ' . ($payment->payer_name ?? 'Anonimo'),
             'description' => $payment->description ?? 'Recebimento via Gateway',
             'amount' => $payment->amount,
             'type' => 'income',
