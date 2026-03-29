@@ -1,0 +1,11 @@
+{
+    "name": "LiderancaPanel",
+    "alias": "liderancapanel",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\LiderancaPanel\\Providers\\LiderancaPanelServiceProvider"
+    ],
+    "files": []
+}

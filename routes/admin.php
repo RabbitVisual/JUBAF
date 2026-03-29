@@ -153,6 +153,18 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
             Route::resource('communications', \Modules\Governance\Http\Controllers\Admin\OfficialCommunicationController::class)->except(['show']);
         });
 
+        Route::middleware(['permission:governance_manage,governance_view'])->prefix('diretoria')->name('diretoria.')->group(function () {
+            Route::get('atas', [\Modules\Diretoria\Http\Controllers\Admin\BoardMinuteController::class, 'index'])->name('minutes.index');
+            Route::get('atas/{board_minute}/download', [\Modules\Diretoria\Http\Controllers\Admin\BoardMinuteController::class, 'download'])->name('minutes.download');
+        });
+        Route::middleware(['permission:governance_manage'])->prefix('diretoria')->name('diretoria.')->group(function () {
+            Route::get('atas/criar', [\Modules\Diretoria\Http\Controllers\Admin\BoardMinuteController::class, 'create'])->name('minutes.create');
+            Route::post('atas', [\Modules\Diretoria\Http\Controllers\Admin\BoardMinuteController::class, 'store'])->name('minutes.store');
+            Route::get('atas/{board_minute}/editar', [\Modules\Diretoria\Http\Controllers\Admin\BoardMinuteController::class, 'edit'])->name('minutes.edit');
+            Route::put('atas/{board_minute}', [\Modules\Diretoria\Http\Controllers\Admin\BoardMinuteController::class, 'update'])->name('minutes.update');
+            Route::delete('atas/{board_minute}', [\Modules\Diretoria\Http\Controllers\Admin\BoardMinuteController::class, 'destroy'])->name('minutes.destroy');
+        });
+
         Route::middleware(['permission:council_manage,council_view'])->prefix('council')->name('council.')->group(function () {
             Route::resource('members', \Modules\CoordinationCouncil\Http\Controllers\Admin\CouncilMemberController::class);
             Route::resource('meetings', \Modules\CoordinationCouncil\Http\Controllers\Admin\CouncilMeetingController::class);

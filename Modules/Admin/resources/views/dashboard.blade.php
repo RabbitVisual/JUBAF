@@ -9,14 +9,19 @@
         ['route' => 'treasury.dashboard.index', 'label' => 'Tesouraria', 'icon' => 'sack-dollar'],
         ['route' => 'admin.events.events.index', 'label' => 'Eventos', 'icon' => 'calendar-days'],
         ['route' => 'admin.notifications.control.dashboard', 'label' => 'Notificações', 'icon' => 'bell'],
+        ['route' => 'admin.diretoria.minutes.index', 'label' => 'Atas PDF', 'icon' => 'file-pdf'],
         ['route' => 'admin.homepage.settings.index', 'label' => 'HomePage', 'icon' => 'house'],
         ['route' => 'admin.bible.plans.index', 'label' => 'Bíblia', 'icon' => 'book-bible'],
         ['route' => 'admin.transactions.index', 'label' => 'Transações', 'icon' => 'credit-card'],
     ];
     foreach ($candidates as $c) {
-        if (\Illuminate\Support\Facades\Route::has($c['route'])) {
-            $quickLinks[] = $c;
+        if (! \Illuminate\Support\Facades\Route::has($c['route'])) {
+            continue;
         }
+        if (($c['route'] ?? '') === 'admin.diretoria.minutes.index' && ! auth()->user()->canAccessAny(['governance_manage', 'governance_view'])) {
+            continue;
+        }
+        $quickLinks[] = $c;
     }
 @endphp
 @extends('admin::components.layouts.master')
@@ -91,6 +96,8 @@
         </div>
     </div>
 
+    @include('admin::dashboard.executive-war-room')
+
     <!-- Acesso Rápido -->
     @if(count($quickLinks) > 0)
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -117,7 +124,7 @@
             <x-icon name="landmark" class="w-5 h-5 text-indigo-500" />
             Institucional (JUBAF)
         </h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div class="grid grid-cols-2 gap-4 text-sm md:grid-cols-3 lg:grid-cols-5">
             <div class="rounded-2xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-100 dark:border-gray-700">
                 <p class="text-gray-500 dark:text-gray-400 font-medium">Atas em rascunho</p>
                 <p class="text-2xl font-black text-gray-900 dark:text-white">{{ $directorateWidgets['draft_minutes'] ?? 0 }}</p>
@@ -125,6 +132,10 @@
             <div class="rounded-2xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-100 dark:border-gray-700">
                 <p class="text-gray-500 dark:text-gray-400 font-medium">Atas publicadas</p>
                 <p class="text-2xl font-black text-gray-900 dark:text-white">{{ $directorateWidgets['published_minutes'] ?? 0 }}</p>
+            </div>
+            <div class="rounded-2xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-100 dark:border-gray-700">
+                <p class="text-gray-500 dark:text-gray-400 font-medium">Atas PDF (Diretoria)</p>
+                <p class="text-2xl font-black text-gray-900 dark:text-white">{{ $directorateWidgets['board_pdf_minutes'] ?? 0 }}</p>
             </div>
             <div class="rounded-2xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-100 dark:border-gray-700">
                 <p class="text-gray-500 dark:text-gray-400 font-medium">Reuniões conselho (mês)</p>
@@ -408,6 +419,39 @@
                 }
             }
         });
+
+        @if(!empty($showExecutiveWarRoom) && isset($executiveChurchRanking) && $executiveChurchRanking->isNotEmpty())
+        const engagementEl = document.getElementById('executiveEngagementChart');
+        if (engagementEl) {
+            const rankLabels = @json($executiveChurchRanking->map(fn ($r) => \Illuminate\Support\Str::limit($r->name, 32))->values());
+            const rankData = @json($executiveChurchRanking->pluck('registrations_count')->values());
+            const ctxEng = engagementEl.getContext('2d');
+            new Chart(ctxEng, {
+                type: 'bar',
+                data: {
+                    labels: rankLabels,
+                    datasets: [{
+                        label: 'Inscrições',
+                        data: rankData,
+                        backgroundColor: 'rgba(56, 189, 248, 0.65)',
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                    },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(148, 163, 184, 0.15)' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } },
+                    },
+                },
+            });
+        }
+        @endif
     });
 </script>
 @endsection

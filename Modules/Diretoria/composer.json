@@ -1,0 +1,9 @@
+{
+    "name": "vertex/diretoria",
+    "description": "Documentos oficiais da diretoria (atas em PDF)",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Diretoria\\": "app/"
+        }
+    }
+}

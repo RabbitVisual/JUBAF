@@ -10,5 +10,7 @@
     "Church": true,
     "Governance": true,
     "CoordinationCouncil": true,
-    "FieldOutreach": true
+    "FieldOutreach": true,
+    "LiderancaPanel": true,
+    "Diretoria": true
 }

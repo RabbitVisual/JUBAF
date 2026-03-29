@@ -1,0 +1,30 @@
+{
+    "name": "vertex/liderancapanel",
+    "description": "",
+    "authors": [
+        {
+            "name": "Reinan Rodrigues",
+            "email": "r.rodriguesjs@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\LiderancaPanel\\": "app/",
+            "Modules\\LiderancaPanel\\Database\\Factories\\": "database/factories/",
+            "Modules\\LiderancaPanel\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\LiderancaPanel\\Tests\\": "tests/"
+        }
+    }
+}

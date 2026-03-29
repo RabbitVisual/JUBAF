@@ -5,7 +5,7 @@
         'homepage' => request()->routeIs('admin.homepage*'),
         'events' => request()->routeIs('admin.events*') || request()->routeIs('admin.events.checkin*'),
         'church' => request()->routeIs('admin.churches*') || request()->routeIs('admin.bible.reports.church-plan'),
-        'institutional' => request()->routeIs('admin.governance.*') || request()->routeIs('admin.council.*') || request()->routeIs('admin.field.*'),
+        'institutional' => request()->routeIs('admin.governance.*') || request()->routeIs('admin.diretoria.*') || request()->routeIs('admin.council.*') || request()->routeIs('admin.field.*'),
     ];
 
     $hasTreasuryPermission = \Modules\Treasury\App\Models\TreasuryPermission::where('user_id', auth()->id())->first();
@@ -148,6 +148,12 @@
                             <x-icon name="bullhorn" style="duotone" class="w-3.5 h-3.5 shrink-0" />
                             Comunicados
                         </a>
+                        @if(\Nwidart\Modules\Facades\Module::isEnabled('Diretoria'))
+                        <a href="{{ route('admin.diretoria.minutes.index') }}" class="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors {{ request()->routeIs('admin.diretoria.*') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300' }}">
+                            <x-icon name="file-pdf" style="duotone" class="w-3.5 h-3.5 shrink-0" />
+                            Atas PDF (Diretoria)
+                        </a>
+                        @endif
                         @endif
                         @if(auth()->user()->canAccessAny(['council_manage', 'council_view']))
                         <a href="{{ route('admin.council.members.index') }}" class="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors {{ request()->routeIs('admin.council.*') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300' }}">

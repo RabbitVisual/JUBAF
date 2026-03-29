@@ -3,10 +3,10 @@
 namespace Modules\Admin\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Modules\Admin\App\Services\ExecutiveIntelligenceService;
 use Nwidart\Modules\Facades\Module;
 
 // Core Models (Using aliases if Model not found to avoid crash, but using direct paths where known)
@@ -108,6 +108,30 @@ class DashboardController extends Controller
                 ->whereYear('visited_at', Carbon::now()->year)
                 ->count();
         }
+        $directorateWidgets['board_pdf_minutes'] = 0;
+        if (Schema::hasTable('diretoria_board_minutes')) {
+            $directorateWidgets['board_pdf_minutes'] = (int) DB::table('diretoria_board_minutes')->count();
+        }
+
+        $user = auth()->user();
+        $showExecutiveWarRoom = $user && (
+            $user->isAdmin()
+            || $user->canAccessAny([
+                'gerenciar_financeiro', 'gerenciar_eventos',
+                'governance_manage', 'governance_view',
+            ])
+        );
+        $hasExecutiveModules = (Module::has('Events') && Module::isEnabled('Events'))
+            || (Module::has('Treasury') && Module::isEnabled('Treasury'));
+
+        $intel = app(ExecutiveIntelligenceService::class);
+        $executiveEventKpis = $showExecutiveWarRoom && $hasExecutiveModules ? $intel->eventFinancialKpis() : [];
+        $executiveChurchRanking = $showExecutiveWarRoom && Module::has('Events') && Module::isEnabled('Events')
+            ? $intel->churchEngagementRanking()
+            : collect();
+        $executiveFundSplit = $showExecutiveWarRoom && Module::has('Treasury') && Module::isEnabled('Treasury')
+            ? $intel->treasuryFundSplit()
+            : null;
 
         // --- 7. Charts Data ---
         // Growth Chart (Last 6 months users)
@@ -153,7 +177,12 @@ class DashboardController extends Controller
             'upcomingEvents',
             'growthChart',
             'financialChart',
-            'directorateWidgets'
+            'directorateWidgets',
+            'showExecutiveWarRoom',
+            'hasExecutiveModules',
+            'executiveEventKpis',
+            'executiveChurchRanking',
+            'executiveFundSplit'
         ));
     }
 }

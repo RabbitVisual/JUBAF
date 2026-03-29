@@ -1,0 +1,11 @@
+{
+    "name": "Diretoria",
+    "alias": "diretoria",
+    "description": "Repositório de atas e documentos da diretoria (PDF).",
+    "keywords": ["governança", "atas", "diretoria"],
+    "priority": 5,
+    "providers": [
+        "Modules\\Diretoria\\Providers\\DiretoriaServiceProvider"
+    ],
+    "files": []
+}
