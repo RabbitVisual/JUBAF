@@ -59,6 +59,17 @@
                     </select>
                 </div>
             @endif
+            @if(isset($sectors) && $sectors->isNotEmpty())
+                <div class="min-w-[12rem] flex-1 sm:max-w-xs">
+                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Setor JUBAF</label>
+                    <select name="jubaf_sector_id" class="{{ $filterClass }}">
+                        <option value="">Todos</option>
+                        @foreach($sectors as $sec)
+                            <option value="{{ $sec->id }}" @selected(($filters['jubaf_sector_id'] ?? '') == $sec->id)>{{ $sec->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
             <div class="min-w-[12rem] flex-1 sm:max-w-xs">
                 <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Competência</label>
                 <select name="skill_id" class="{{ $filterClass }}">
@@ -77,10 +88,17 @@
                     @endforeach
                 </select>
             </div>
-            <div class="flex items-center gap-2 pb-2.5">
-                <input type="hidden" name="searchable_only" value="0">
-                <input type="checkbox" name="searchable_only" value="1" id="searchable_only" class="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 dark:border-slate-600 dark:bg-slate-900" @checked($filters['searchable_only'] ?? false)>
-                <label for="searchable_only" class="text-sm font-medium text-gray-700 dark:text-gray-300">Só pesquisáveis</label>
+            <div class="flex flex-wrap items-center gap-4 pb-2.5">
+                <div class="flex items-center gap-2">
+                    <input type="hidden" name="searchable_only" value="0">
+                    <input type="checkbox" name="searchable_only" value="1" id="searchable_only" class="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 dark:border-slate-600 dark:bg-slate-900" @checked($filters['searchable_only'] ?? false)>
+                    <label for="searchable_only" class="text-sm font-medium text-gray-700 dark:text-gray-300">Só pesquisáveis</label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="hidden" name="validated_skills_only" value="0">
+                    <input type="checkbox" name="validated_skills_only" value="1" id="validated_skills_only" class="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 dark:border-slate-600 dark:bg-slate-900" @checked($filters['validated_skills_only'] ?? false)>
+                    <label for="validated_skills_only" class="text-sm font-medium text-gray-700 dark:text-gray-300">Com competência validada</label>
+                </div>
             </div>
             <div class="flex gap-2">
                 <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700">

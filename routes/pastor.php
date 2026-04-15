@@ -26,4 +26,12 @@ Route::middleware(['auth', 'role:pastor'])->prefix('pastor')->name('pastor.')->g
             Route::get('/{aviso}', [AvisosPainelController::class, 'show'])->name('show');
         });
     }
+
+    if (module_enabled('Financeiro')) {
+        Route::prefix('financeiro')->name('financeiro.')
+            ->middleware(['permission:financeiro.minhas_contas.view'])
+            ->group(function () {
+                require module_path('Financeiro', 'routes/painel-lider.php');
+            });
+    }
 });

@@ -3,6 +3,7 @@
 namespace Modules\Financeiro\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Financeiro\App\Models\FinBankAccount;
 use Modules\Financeiro\App\Models\FinCategory;
 use Modules\Financeiro\App\Models\FinTransaction;
 
@@ -10,6 +11,18 @@ class FinanceiroDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        FinBankAccount::query()->firstOrCreate(
+            ['name' => 'Conta principal JUBAF'],
+            [
+                'institution' => null,
+                'account_type' => FinBankAccount::TYPE_CORRENTE,
+                'currency' => 'BRL',
+                'balance' => 0,
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+
         $rows = [
             [
                 'code' => FinCategory::CODE_REC_INSCRICOES_EVENTOS,

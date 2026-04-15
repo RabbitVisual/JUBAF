@@ -3,6 +3,7 @@
 namespace Modules\Financeiro\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FinCategory extends Model
@@ -29,6 +30,7 @@ class FinCategory extends Model
     protected $table = 'fin_categories';
 
     protected $fillable = [
+        'parent_id',
         'name',
         'code',
         'group_key',
@@ -37,6 +39,7 @@ class FinCategory extends Model
         'sort_order',
         'is_active',
         'is_system',
+        'requires_minute_and_receipt',
     ];
 
     protected function casts(): array
@@ -44,6 +47,7 @@ class FinCategory extends Model
         return [
             'is_active' => 'boolean',
             'is_system' => 'boolean',
+            'requires_minute_and_receipt' => 'boolean',
             'sort_order' => 'integer',
         ];
     }
@@ -61,8 +65,23 @@ class FinCategory extends Model
         };
     }
 
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
     public function transactions(): HasMany
     {
         return $this->hasMany(FinTransaction::class, 'category_id');
+    }
+
+    public function requiresAuditForExpense(): bool
+    {
+        return $this->requires_minute_and_receipt === true;
     }
 }

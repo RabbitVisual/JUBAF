@@ -13,6 +13,7 @@ use Modules\Financeiro\App\Http\Requests\UpdateFinExpenseRequestRequest;
 use Modules\Financeiro\App\Models\FinCategory;
 use Modules\Financeiro\App\Models\FinExpenseRequest;
 use Modules\Financeiro\App\Models\FinTransaction;
+use Modules\Financeiro\App\Services\FinanceiroService;
 
 class ExpenseRequestController extends Controller
 {
@@ -141,7 +142,7 @@ class ExpenseRequestController extends Controller
         return back()->with('success', 'Pedido recusado.');
     }
 
-    public function pay(Request $request, FinExpenseRequest $expense_request): RedirectResponse
+    public function pay(Request $request, FinExpenseRequest $expense_request, FinanceiroService $financeiro): RedirectResponse
     {
         $this->authorize('pay', $expense_request);
 
@@ -157,8 +158,8 @@ class ExpenseRequestController extends Controller
 
         abort_unless($category, 500, 'Sem categoria de despesa configurada.');
 
-        DB::transaction(function () use ($expense_request, $category, $request): void {
-            $tx = FinTransaction::query()->create([
+        DB::transaction(function () use ($expense_request, $category, $request, $financeiro): void {
+            $tx = $financeiro->createManualTransaction([
                 'category_id' => $category->id,
                 'occurred_on' => now()->toDateString(),
                 'amount' => $expense_request->amount,
@@ -167,9 +168,9 @@ class ExpenseRequestController extends Controller
                 'church_id' => null,
                 'description' => 'Reembolso: '.$expense_request->justification,
                 'reference' => 'REQ-'.$expense_request->id,
-                'source' => FinTransaction::SOURCE_MANUAL,
-                'created_by' => $request->user()->id,
-            ]);
+                'status' => FinTransaction::STATUS_PAID,
+                'bank_account_id' => FinanceiroService::defaultBankAccount()?->id,
+            ], $request->user());
 
             $expense_request->update([
                 'status' => FinExpenseRequest::STATUS_PAID,

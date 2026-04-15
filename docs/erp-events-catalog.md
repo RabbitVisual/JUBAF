@@ -9,6 +9,7 @@ Eventos de domínio usados para integração entre módulos (listeners podem not
 | `Modules\Secretaria\App\Events\MinutePublished` | Secretaria | Publicação de ata | `DispatchMinutePublishedIntegrations` |
 | `Modules\Financeiro\App\Events\FinancialObligationGenerated` | Financeiro | Criação de obrigação de cota (`financeiro:generate-obligations`) | `LogFinancialObligationGenerated` |
 | `Modules\Financeiro\App\Events\FinancialObligationPaid` | Financeiro | Pagamento Gateway reconciliado com `fin_obligation_id` no payload | `LogFinancialObligationPaid` |
+| `Modules\Talentos\App\Events\TalentSkillValidated` | Talentos | Líder local grava `validated_at` / `validated_by` no pivot `talent_profile_skill` | `SendTalentSkillValidatedNotification` (Notificações in-app, painel jovens) |
 
 ## Payload Gateway (cotas)
 

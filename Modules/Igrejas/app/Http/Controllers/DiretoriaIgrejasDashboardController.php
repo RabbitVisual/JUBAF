@@ -9,32 +9,34 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Modules\Igrejas\App\Models\Church;
 use Modules\Igrejas\App\Models\ChurchChangeRequest;
+use Modules\Igrejas\App\Repositories\ChurchRepository;
 
 class DiretoriaIgrejasDashboardController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, ChurchRepository $churches): View
     {
         $this->authorize('viewAny', Church::class);
 
         $user = $request->user();
-        $churchBase = Church::query();
-        if ($user) {
-            ErpChurchScope::applyToChurchQuery($churchBase, $user);
-        }
+        abort_unless($user, 403);
 
-        $totalChurches = (clone $churchBase)->count();
-        $activeChurches = (clone $churchBase)->where('is_active', true)->count();
-        $inactiveChurches = max(0, $totalChurches - $activeChurches);
+        $crmStats = $churches->statsForUser($user);
+        $growth = $churches->growthStatsForUser($user);
+
+        $totalChurches = $crmStats['total'];
+        $activeChurches = $crmStats['active'];
+        $inactiveChurches = $crmStats['inactive'];
+        $inadimplenteChurches = $crmStats['inadimplente'];
 
         $recentChurches = Church::query()
-            ->tap(fn ($q) => $user ? ErpChurchScope::applyToChurchQuery($q, $user) : null)
+            ->tap(fn ($q) => ErpChurchScope::applyToChurchQuery($q, $user))
             ->withCount(['users', 'jovensMembers', 'leaders'])
             ->orderByDesc('updated_at')
             ->limit(6)
             ->get();
 
         $topJovensChurches = Church::query()
-            ->tap(fn ($q) => $user ? ErpChurchScope::applyToChurchQuery($q, $user) : null)
+            ->tap(fn ($q) => ErpChurchScope::applyToChurchQuery($q, $user))
             ->withCount('jovensMembers')
             ->orderByDesc('jovens_members_count')
             ->limit(5)
@@ -45,7 +47,7 @@ class DiretoriaIgrejasDashboardController extends Controller
             : 0;
 
         $churchesMissingLeadership = Church::query()
-            ->tap(fn ($q) => $user ? ErpChurchScope::applyToChurchQuery($q, $user) : null)
+            ->tap(fn ($q) => ErpChurchScope::applyToChurchQuery($q, $user))
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('pastor_user_id')->orWhereNull('unijovem_leader_user_id');
@@ -55,7 +57,7 @@ class DiretoriaIgrejasDashboardController extends Controller
             ->get(['id', 'name', 'city', 'pastor_user_id', 'unijovem_leader_user_id']);
 
         $upcomingAnniversaries = Church::query()
-            ->tap(fn ($q) => $user ? ErpChurchScope::applyToChurchQuery($q, $user) : null)
+            ->tap(fn ($q) => ErpChurchScope::applyToChurchQuery($q, $user))
             ->whereNotNull('foundation_date')
             ->where('is_active', true)
             ->orderBy('foundation_date')
@@ -68,6 +70,9 @@ class DiretoriaIgrejasDashboardController extends Controller
             'totalChurches' => $totalChurches,
             'activeChurches' => $activeChurches,
             'inactiveChurches' => $inactiveChurches,
+            'inadimplenteChurches' => $inadimplenteChurches,
+            'growthLast12m' => $growth['last_12m'],
+            'growthPrevious12m' => $growth['previous_12m'],
             'recentChurches' => $recentChurches,
             'topJovensChurches' => $topJovensChurches,
             'pendingRequestsCount' => $pendingRequestsCount,

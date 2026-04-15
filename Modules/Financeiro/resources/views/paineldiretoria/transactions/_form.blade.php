@@ -2,6 +2,7 @@
     /** @var \Modules\Financeiro\App\Models\FinTransaction $transaction */
     $in = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition placeholder:text-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/20';
     $lb = 'mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400';
+    $bankAccounts = $bankAccounts ?? collect();
 @endphp
 <div class="grid w-full gap-6 md:grid-cols-2">
     <div>
@@ -22,9 +23,42 @@
         @error('category_id')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
     </div>
     <div>
-        <label class="{{ $lb }}">Data</label>
+        <label class="{{ $lb }}">Estado</label>
+        <select name="status" required class="{{ $in }}">
+            <option value="{{ \Modules\Financeiro\App\Models\FinTransaction::STATUS_PAID }}" @selected(old('status', $transaction->status) === \Modules\Financeiro\App\Models\FinTransaction::STATUS_PAID)>Pago</option>
+            <option value="{{ \Modules\Financeiro\App\Models\FinTransaction::STATUS_PENDING }}" @selected(old('status', $transaction->status) === \Modules\Financeiro\App\Models\FinTransaction::STATUS_PENDING)>Pendente</option>
+            <option value="{{ \Modules\Financeiro\App\Models\FinTransaction::STATUS_OVERDUE }}" @selected(old('status', $transaction->status) === \Modules\Financeiro\App\Models\FinTransaction::STATUS_OVERDUE)>Atrasado</option>
+        </select>
+        @error('status')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
+    </div>
+    @if($bankAccounts->isNotEmpty())
+        <div>
+            <label class="{{ $lb }}">Conta bancária (saldo)</label>
+            <select name="bank_account_id" class="{{ $in }}">
+                <option value="">— Nenhuma (sem movimentar saldo) —</option>
+                @foreach($bankAccounts as $ba)
+                    <option value="{{ $ba->id }}" @selected((int) old('bank_account_id', $transaction->bank_account_id) === (int) $ba->id)>
+                        {{ $ba->name }} @if($ba->institution)({{ $ba->institution }})@endif — R$ {{ number_format((float) $ba->balance, 2, ',', '.') }}
+                    </option>
+                @endforeach
+            </select>
+            @error('bank_account_id')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
+        </div>
+    @endif
+    <div>
+        <label class="{{ $lb }}">Data do lançamento</label>
         <input type="date" name="occurred_on" value="{{ old('occurred_on', $transaction->occurred_on?->format('Y-m-d')) }}" required class="{{ $in }}">
         @error('occurred_on')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
+    </div>
+    <div>
+        <label class="{{ $lb }}">Vencimento</label>
+        <input type="date" name="due_on" value="{{ old('due_on', $transaction->due_on?->format('Y-m-d')) }}" class="{{ $in }}">
+        @error('due_on')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
+    </div>
+    <div>
+        <label class="{{ $lb }}">Data de pagamento</label>
+        <input type="date" name="paid_on" value="{{ old('paid_on', $transaction->paid_on?->format('Y-m-d')) }}" class="{{ $in }}">
+        @error('paid_on')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
     </div>
     <div>
         <label class="{{ $lb }}">Valor (R$)</label>
@@ -67,6 +101,14 @@
         @error('document_ref')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
     </div>
     <div class="md:col-span-2">
+        <label class="{{ $lb }}">Comprovante (PDF ou imagem)</label>
+        <input type="file" name="comprovante" accept=".pdf,image/jpeg,image/png" class="{{ $in }}">
+        @if($transaction->comprovante_path)
+            <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">Ficheiro actual: <code class="rounded bg-gray-100 px-1 dark:bg-slate-700">{{ \Illuminate\Support\Str::limit($transaction->comprovante_path, 48) }}</code></p>
+        @endif
+        @error('comprovante')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
+    </div>
+    <div class="md:col-span-2">
         <label class="{{ $lb }}">Descrição</label>
         <textarea name="description" rows="3" class="{{ $in }} min-h-[5.5rem]">{{ old('description', $transaction->description) }}</textarea>
         @error('description')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
@@ -82,7 +124,7 @@
                     </option>
                 @endforeach
             </select>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Vincula o lançamento a uma ata publicada ou arquivada (auditoria).</p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Vincula o lançamento a uma ata publicada ou arquivada (auditoria). Obrigatório para despesas extraordinárias.</p>
             @error('secretaria_minute_id')<p class="mt-1.5 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror
         </div>
     @endif

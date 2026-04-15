@@ -1,11 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Igrejas\App\Http\Controllers\CepLookupController;
 use Modules\Igrejas\App\Http\Controllers\DiretoriaChurchChangeRequestController;
 use Modules\Igrejas\App\Http\Controllers\DiretoriaChurchController;
 use Modules\Igrejas\App\Http\Controllers\DiretoriaIgrejasDashboardController;
 
 Route::prefix('igrejas')->name('igrejas.')->group(function () {
+    Route::get('/cep', [CepLookupController::class, 'show'])->name('cep');
     Route::get('/', [DiretoriaIgrejasDashboardController::class, 'index'])->name('dashboard');
     Route::get('/export/csv', [DiretoriaChurchController::class, 'exportCsv'])->name('export.csv');
     Route::get('/pedidos', [DiretoriaChurchChangeRequestController::class, 'index'])->name('requests.index');

@@ -15,7 +15,7 @@
         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Preencha tipo, categoria, data e valor. A referência e a descrição ajudam na auditoria perante a assembleia.</p>
     </div>
 
-    <form action="{{ route('diretoria.financeiro.transactions.store') }}" method="post" class="space-y-6">
+    <form action="{{ route('diretoria.financeiro.transactions.store') }}" method="post" enctype="multipart/form-data" class="space-y-6">
         @csrf
         <div class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <div class="border-b border-gray-100 px-6 py-4 dark:border-slate-700">
@@ -23,7 +23,7 @@
                 <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Campos marcados pelo servidor como obrigatórios.</p>
             </div>
             <div class="p-6">
-                @include('financeiro::paineldiretoria.transactions._form', ['transaction' => $transaction, 'categories' => $categories, 'churches' => $churches, 'minutes' => $minutes ?? collect()])
+                @include('financeiro::paineldiretoria.transactions._form', ['transaction' => $transaction, 'categories' => $categories, 'churches' => $churches, 'bankAccounts' => $bankAccounts ?? collect(), 'minutes' => $minutes ?? collect()])
             </div>
             <div class="flex flex-wrap items-center justify-end gap-3 border-t border-gray-100 bg-gray-50/80 px-6 py-4 dark:border-slate-700 dark:bg-slate-900/40">
                 <a href="{{ route('diretoria.financeiro.transactions.index') }}" class="rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/80 dark:text-gray-300 dark:hover:bg-slate-700">Cancelar</a>

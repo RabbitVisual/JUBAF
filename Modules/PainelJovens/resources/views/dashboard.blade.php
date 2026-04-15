@@ -79,6 +79,62 @@
             </div>
         </div>
 
+        @if (module_enabled('Calendario') && Route::has('jovens.calendario.index'))
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:to-slate-900">
+                    <div class="flex items-center justify-between gap-3">
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white">Eventos em destaque</h2>
+                        <a href="{{ route('jovens.calendario.index') }}" class="text-sm font-semibold text-violet-600 hover:underline dark:text-violet-400">Calendário</a>
+                    </div>
+                    <ul class="mt-4 space-y-3">
+                        @forelse($featuredEvents ?? [] as $ev)
+                            <li>
+                                <a href="{{ route('jovens.calendario.show', $ev) }}" class="group block rounded-xl border border-amber-100/80 bg-white/90 p-4 transition hover:border-violet-300 dark:border-slate-700 dark:bg-slate-800/80 dark:hover:border-violet-600">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <span class="font-semibold text-slate-900 group-hover:text-violet-700 dark:text-white dark:group-hover:text-violet-300">{{ $ev->title }}</span>
+                                        @if($ev->is_featured)
+                                            <span class="shrink-0 rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-900 dark:bg-amber-900/50 dark:text-amber-100">Destaque</span>
+                                        @endif
+                                    </div>
+                                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $ev->starts_at?->timezone(config('app.timezone'))->translatedFormat('d M Y, H:i') }}</p>
+                                </a>
+                            </li>
+                        @empty
+                            <li class="text-sm text-slate-500 dark:text-slate-400">Sem eventos futuros visíveis para a tua conta.</li>
+                        @endforelse
+                    </ul>
+                </div>
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Participação recente</h2>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Histórico de inscrições confirmadas em eventos passados.</p>
+                    <ul class="mt-4 space-y-2 text-sm">
+                        @forelse($pastParticipations ?? [] as $reg)
+                            <li class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2 last:border-0 dark:border-slate-800">
+                                <span class="font-medium text-slate-800 dark:text-slate-200">{{ $reg->event?->title ?? 'Evento' }}</span>
+                                <span class="shrink-0 text-xs text-slate-500">{{ $reg->event?->starts_at?->timezone(config('app.timezone'))->translatedFormat('M Y') }}</span>
+                            </li>
+                        @empty
+                            <li class="text-slate-500 dark:text-slate-400">Ainda sem participações registadas.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+        @endif
+
+        @if (($user->talentProfile?->skills?->isNotEmpty() ?? false))
+            <div class="rounded-2xl border border-violet-200/80 bg-violet-50/50 px-5 py-4 dark:border-violet-900/40 dark:bg-violet-950/20">
+                <p class="text-xs font-bold uppercase tracking-wide text-violet-800 dark:text-violet-300">As tuas competências</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    @foreach($user->talentProfile->skills->take(12) as $sk)
+                        <span class="inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-semibold text-violet-900 shadow-sm ring-1 ring-violet-200 dark:bg-slate-900 dark:text-violet-100 dark:ring-violet-800">{{ $sk->name }}</span>
+                    @endforeach
+                </div>
+                @if (module_enabled('Talentos') && Route::has('jovens.talentos.profile.edit'))
+                    <a href="{{ route('jovens.talentos.profile.edit') }}" class="mt-3 inline-flex text-sm font-semibold text-violet-700 hover:underline dark:text-violet-300">Editar ficha de talentos</a>
+                @endif
+            </div>
+        @endif
+
         {{-- Atalhos --}}
         <div>
             <h2 class="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-4">Recursos e atalhos</h2>

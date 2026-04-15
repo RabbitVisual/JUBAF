@@ -10,9 +10,12 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Modules\Calendario\App\Models\CalendarRegistration;
 use Modules\Financeiro\App\Events\FinancialObligationPaid;
+use Modules\Financeiro\App\Events\PagamentoConfirmado;
 use Modules\Financeiro\App\Models\FinCategory;
 use Modules\Financeiro\App\Models\FinObligation;
+use Modules\Financeiro\App\Models\FinQuotaInvoice;
 use Modules\Financeiro\App\Models\FinTransaction;
+use Modules\Financeiro\App\Services\FinanceiroService;
 use Modules\Gateway\App\Models\GatewayPayment;
 use Modules\Notificacoes\App\Models\Notificacao;
 
@@ -22,7 +25,7 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
 
     public function __construct(public int $gatewayPaymentId) {}
 
-    public function handle(): void
+    public function handle(FinanceiroService $financeiro): void
     {
         $payment = GatewayPayment::query()->find($this->gatewayPaymentId);
         if (! $payment || $payment->status !== GatewayPayment::STATUS_PAID) {
@@ -37,18 +40,34 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
 
         $payload = is_array($payment->raw_last_payload) ? $payment->raw_last_payload : [];
         $obligationId = isset($payload['fin_obligation_id']) ? (int) $payload['fin_obligation_id'] : null;
+        $quotaInvoiceId = isset($payload['fin_quota_invoice_id']) ? (int) $payload['fin_quota_invoice_id'] : null;
         $churchFromPayload = isset($payload['church_id']) ? (int) $payload['church_id'] : null;
 
         $obligation = $obligationId ? FinObligation::query()->find($obligationId) : null;
-        $churchId = $obligation?->church_id ?? ($churchFromPayload ?: null);
+        $quotaInvoice = $quotaInvoiceId ? FinQuotaInvoice::query()->find($quotaInvoiceId) : null;
+
+        $churchId = $obligation?->church_id ?? ($quotaInvoice?->church_id ?? ($churchFromPayload ?: null));
         $scope = $churchId ? FinTransaction::SCOPE_CHURCH : FinTransaction::SCOPE_REGIONAL;
 
-        $category = $this->resolveCategoryForGateway($obligation);
+        $category = $this->resolveCategoryForGateway($obligation, $quotaInvoice);
         if (! $category) {
             return;
         }
 
-        DB::transaction(function () use ($payment, $category, $obligation, $churchId, $scope): void {
+        $obligationForEvent = null;
+        $quotaForEvent = null;
+
+        DB::transaction(function () use (
+            $payment,
+            $category,
+            $obligation,
+            $quotaInvoice,
+            $churchId,
+            $scope,
+            $financeiro,
+            &$obligationForEvent,
+            &$quotaForEvent
+        ): void {
             $meta = [
                 'gateway_payment_id' => $payment->id,
                 'gateway_driver' => $payment->driver,
@@ -57,8 +76,11 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
             if ($obligation) {
                 $meta['fin_obligation_id'] = $obligation->id;
             }
+            if ($quotaInvoice) {
+                $meta['fin_quota_invoice_id'] = $quotaInvoice->id;
+            }
 
-            $tx = FinTransaction::query()->create([
+            $tx = $financeiro->persistGatewayTransaction([
                 'category_id' => $category->id,
                 'occurred_on' => now()->toDateString(),
                 'amount' => $payment->amount,
@@ -70,7 +92,7 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
                 'source' => FinTransaction::SOURCE_GATEWAY,
                 'metadata' => $meta,
                 'created_by' => $payment->user_id,
-            ]);
+            ], FinanceiroService::defaultBankAccount());
 
             $payment->fin_transaction_id = $tx->id;
             $payment->save();
@@ -81,17 +103,29 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
                     'fin_transaction_id' => $tx->id,
                     'paid_at' => now(),
                 ]);
-                event(new FinancialObligationPaid($obligation->fresh(), $tx->fresh()));
+                $obligationForEvent = $obligation->fresh();
+                event(new FinancialObligationPaid($obligationForEvent, $tx->fresh()));
             }
+
+            if ($quotaInvoice && $quotaInvoice->status === FinQuotaInvoice::STATUS_PENDING) {
+                $quotaInvoice->update([
+                    'status' => FinQuotaInvoice::STATUS_PAID,
+                    'fin_transaction_id' => $tx->id,
+                    'paid_at' => now(),
+                ]);
+                $quotaForEvent = $quotaInvoice->fresh();
+            }
+
+            event(new PagamentoConfirmado($tx->fresh(), $payment->fresh(), $obligationForEvent, $quotaForEvent));
         });
 
         $this->finalizePayable($payment->fresh());
         $this->notifyUser($payment);
     }
 
-    private function resolveCategoryForGateway(?FinObligation $obligation): ?FinCategory
+    private function resolveCategoryForGateway(?FinObligation $obligation, ?FinQuotaInvoice $quotaInvoice): ?FinCategory
     {
-        if ($obligation) {
+        if ($obligation || $quotaInvoice) {
             $code = (string) config('financeiro.quota.income_category_code', '');
             if ($code !== '') {
                 $byCode = FinCategory::query()->where('direction', 'in')->where('code', $code)->first();

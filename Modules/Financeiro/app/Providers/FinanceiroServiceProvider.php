@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Financeiro\App\Console\Commands\GenerateFinancialObligationsCommand;
+use Modules\Financeiro\App\Console\Commands\GenerateMonthlyQuotaInvoicesCommand;
+use Modules\Financeiro\App\Console\Commands\MarkFinTransactionsOverdueCommand;
+use Modules\Financeiro\App\Jobs\GerarCotasAssociativasJob;
+use Modules\Financeiro\App\Services\FinanceiroService;
 use Modules\Financeiro\App\Models\FinCategory;
 use Modules\Financeiro\App\Models\FinExpenseRequest;
 use Modules\Financeiro\App\Models\FinObligation;
@@ -50,6 +54,7 @@ class FinanceiroServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(FinanceiroService::class);
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
     }
@@ -61,6 +66,8 @@ class FinanceiroServiceProvider extends ServiceProvider
     {
         $this->commands([
             GenerateFinancialObligationsCommand::class,
+            GenerateMonthlyQuotaInvoicesCommand::class,
+            MarkFinTransactionsOverdueCommand::class,
         ]);
     }
 
@@ -72,6 +79,8 @@ class FinanceiroServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
             $schedule->command('financeiro:generate-obligations')->yearlyOn(3, 1, '6:00');
+            $schedule->job(new GerarCotasAssociativasJob)->monthlyOn(1, '7:00');
+            $schedule->command('financeiro:mark-overdue')->dailyAt('1:00');
         });
     }
 

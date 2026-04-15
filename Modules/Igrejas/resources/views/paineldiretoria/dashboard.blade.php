@@ -52,21 +52,31 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div class="rounded-2xl border border-cyan-100 bg-white p-5 shadow-sm ring-1 ring-cyan-500/5 dark:border-cyan-900/40 dark:bg-slate-800">
             <p class="text-xs font-bold uppercase tracking-wide text-cyan-800/80 dark:text-cyan-400/90">Total</p>
             <p class="mt-2 text-2xl font-bold tabular-nums text-cyan-900 dark:text-cyan-200">{{ $totalChurches }}</p>
             <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Congregações no cadastro</p>
         </div>
         <div class="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm dark:border-emerald-900/40 dark:bg-slate-800">
-            <p class="text-xs font-bold uppercase tracking-wide text-emerald-800/80 dark:text-emerald-400/90">Ativas</p>
+            <p class="text-xs font-bold uppercase tracking-wide text-emerald-800/80 dark:text-emerald-400/90">Ativas (CRM)</p>
             <p class="mt-2 text-2xl font-bold tabular-nums text-emerald-700 dark:text-emerald-300">{{ $activeChurches }}</p>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Visíveis nos fluxos operacionais</p>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Status «ativa»</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-600 dark:bg-slate-800">
             <p class="text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-400">Inativas</p>
             <p class="mt-2 text-2xl font-bold tabular-nums text-slate-800 dark:text-slate-200">{{ $inactiveChurches }}</p>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">A regularizar ou arquivo</p>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Status «inativa»</p>
+        </div>
+        <div class="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm dark:border-amber-900/40 dark:bg-slate-800">
+            <p class="text-xs font-bold uppercase tracking-wide text-amber-800/80 dark:text-amber-400/90">Inadimplentes</p>
+            <p class="mt-2 text-2xl font-bold tabular-nums text-amber-800 dark:text-amber-200">{{ $inadimplenteChurches ?? 0 }}</p>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Acompanhar no Financeiro</p>
+        </div>
+        <div class="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm dark:border-sky-900/40 dark:bg-slate-800 sm:col-span-2 lg:col-span-1">
+            <p class="text-xs font-bold uppercase tracking-wide text-sky-800/80 dark:text-sky-400/90">Novos (12 meses)</p>
+            <p class="mt-2 text-2xl font-bold tabular-nums text-sky-900 dark:text-sky-200">{{ $growthLast12m ?? 0 }}</p>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">vs período anterior: {{ $growthPrevious12m ?? 0 }}</p>
         </div>
     </div>
 

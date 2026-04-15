@@ -35,6 +35,22 @@ class IgrejasServiceProvider extends ServiceProvider
 
         Gate::policy(Church::class, ChurchPolicy::class);
         Gate::policy(ChurchChangeRequest::class, ChurchChangeRequestPolicy::class);
+
+        Gate::define('igrejas.view-global', fn ($user) => ChurchPolicy::canBrowseAllChurches($user));
+        Gate::define('igrejas.manage-sector', function ($user) {
+            if (! $user) {
+                return false;
+            }
+
+            return $user->restrictsChurchDirectoryToSector();
+        });
+        Gate::define('igrejas.manage-own-church', function ($user, ?Church $church = null) {
+            if (! $user || ! $church) {
+                return false;
+            }
+
+            return $user->can('update', $church);
+        });
     }
 
     /**
@@ -137,7 +153,7 @@ class IgrejasServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        Blade::componentNamespace(config('modules.namespace').'\\' . $this->name . '\\View\\Components', $this->nameLower);
+        Blade::componentNamespace(config('modules.namespace').'\\'.$this->name.'\\View\\Components', $this->nameLower);
     }
 
     /**

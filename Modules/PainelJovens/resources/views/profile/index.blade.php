@@ -112,6 +112,53 @@
                     </section>
 
                     <section class="{{ $fbCard }} p-4 sm:p-6">
+                        <h2 class="mb-1 text-xl font-bold text-[#050505] dark:text-white">Censo juventude</h2>
+                        <p class="mb-6 text-[15px] text-[#65676B] dark:text-slate-400">Dados para o mapeamento da Unijovem (estado civil, profissão e redes). Opcional.</p>
+                        @php $jp = $user->jovemPerfil; $sl = $jp?->social_links ?? []; @endphp
+                        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <div class="space-y-1.5">
+                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="marital_status">Estado civil</label>
+                                <input id="marital_status" type="text" name="marital_status" value="{{ old('marital_status', $jp?->marital_status) }}" maxlength="48" placeholder="Ex.: solteiro(a)"
+                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
+                                @error('marital_status')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="profession">Profissão / ocupação</label>
+                                <input id="profession" type="text" name="profession" value="{{ old('profession', $jp?->profession) }}" maxlength="160"
+                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
+                                @error('profession')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="space-y-1.5 md:col-span-2">
+                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="census_bio">Nota para o censo</label>
+                                <textarea id="census_bio" name="census_bio" rows="3" maxlength="2000" placeholder="Breve descrição para a equipa regional (opcional)."
+                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">{{ old('census_bio', $jp?->census_bio) }}</textarea>
+                                @error('census_bio')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="social_instagram">Instagram</label>
+                                <input id="social_instagram" type="text" name="social_instagram" value="{{ old('social_instagram', $sl['instagram'] ?? '') }}"
+                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white" placeholder="@utilizador ou URL">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="social_youtube">YouTube</label>
+                                <input id="social_youtube" type="text" name="social_youtube" value="{{ old('social_youtube', $sl['youtube'] ?? '') }}"
+                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
+                            </div>
+                            <div class="space-y-1.5 md:col-span-2">
+                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="social_outro">Outra rede ou portfólio</label>
+                                <input id="social_outro" type="text" name="social_outro" value="{{ old('social_outro', $sl['outro'] ?? '') }}"
+                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
+                            </div>
+                        </div>
+                        @if(module_enabled('Talentos') && Route::has('jovens.talentos.profile.edit'))
+                            <p class="mt-6 text-sm text-[#65676B] dark:text-slate-400">
+                                Competências e disponibilidade para equipas regionais:
+                                <a href="{{ route('jovens.talentos.profile.edit') }}" class="font-semibold text-[#1877F2] hover:underline dark:text-violet-400">Banco de talentos</a>
+                            </p>
+                        @endif
+                    </section>
+
+                    <section class="{{ $fbCard }} p-4 sm:p-6">
                         <h2 class="mb-4 text-lg font-bold text-[#050505] dark:text-white">Contacto de emergência</h2>
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div class="space-y-1.5">

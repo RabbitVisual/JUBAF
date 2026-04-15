@@ -2,6 +2,7 @@
 
 namespace Modules\Igrejas\App\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -10,10 +11,15 @@ class JubafSector extends Model
 {
     protected $table = 'jubaf_sectors';
 
+    public const SCOPE_GEOGRAPHIC = 'geographic';
+
+    public const SCOPE_ADMINISTRATIVE = 'administrative';
+
     protected $fillable = [
         'name',
         'slug',
         'description',
+        'scope_kind',
         'sort_order',
         'is_active',
     ];
@@ -55,6 +61,6 @@ class JubafSector extends Model
 
     public function users(): HasMany
     {
-        return $this->hasMany(\App\Models\User::class, 'jubaf_sector_id');
+        return $this->hasMany(User::class, 'jubaf_sector_id');
     }
 }

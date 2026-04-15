@@ -110,7 +110,13 @@
                 <div>
                     <p class="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Saldo (mês)</p>
                     <p class="mt-2 text-2xl font-bold tabular-nums text-slate-900 dark:text-white">R$ {{ number_format($balance, 2, ',', '.') }}</p>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Receitas − despesas</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Receitas − despesas no mês</p>
+                    @if(($totalBankBalance ?? 0) != 0.0)
+                        <p class="mt-2 text-[11px] font-semibold text-slate-600 dark:text-slate-300">Contas bancárias (activas): <span class="tabular-nums">R$ {{ number_format($totalBankBalance, 2, ',', '.') }}</span></p>
+                    @endif
+                    @if(($quotaInvoiceOverdue ?? 0) > 0)
+                        <p class="mt-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">Inadimplência (cotas mensais): {{ $quotaInvoiceOverdue }} fatura(s)</p>
+                    @endif
                 </div>
                 <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
                     <x-icon name="scale-balanced" class="h-5 w-5" style="duotone" />
@@ -130,6 +136,87 @@
             </div>
         </div>
     </div>
+
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white">Receitas vs despesas (6 meses)</h2>
+            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Totais por mês civil (lançamentos contabilizados).</p>
+            <div class="mt-4 h-64 w-full">
+                <canvas id="finChartBar" aria-label="Gráfico de barras receitas e despesas"></canvas>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white">Despesas por grupo do plano (mês)</h2>
+            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Distribuição das saídas no mês corrente.</p>
+            <div class="mt-4 flex h-64 items-center justify-center">
+                @if(empty($pieLabels))
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Sem despesas registadas neste mês.</p>
+                @else
+                    <canvas id="finChartPie" class="max-h-64 w-full" aria-label="Gráfico de despesas por grupo"></canvas>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const barEl = document.getElementById('finChartBar');
+                if (barEl && typeof Chart !== 'undefined') {
+                    new Chart(barEl, {
+                        type: 'bar',
+                        data: {
+                            labels: @json($chartBarLabels ?? []),
+                            datasets: [
+                                {
+                                    label: 'Receitas',
+                                    data: @json($chartBarIn ?? []),
+                                    backgroundColor: 'rgba(16, 185, 129, 0.65)',
+                                    borderRadius: 6,
+                                },
+                                {
+                                    label: 'Despesas',
+                                    data: @json($chartBarOut ?? []),
+                                    backgroundColor: 'rgba(244, 63, 94, 0.65)',
+                                    borderRadius: 6,
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { stacked: false, ticks: { color: '#64748b' } },
+                                y: { beginAtZero: true, ticks: { color: '#64748b' } },
+                            },
+                            plugins: { legend: { labels: { color: '#475569' } } },
+                        },
+                    });
+                }
+                const pieEl = document.getElementById('finChartPie');
+                if (pieEl && typeof Chart !== 'undefined') {
+                    new Chart(pieEl, {
+                        type: 'doughnut',
+                        data: {
+                            labels: @json($pieLabels ?? []),
+                            datasets: [{
+                                data: @json($pieData ?? []),
+                                backgroundColor: [
+                                    '#10b981', '#14b8a6', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#f97316', '#94a3b8',
+                                ],
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom', labels: { color: '#475569', boxWidth: 12 } } },
+                        },
+                    });
+                }
+            });
+        </script>
+    @endpush
 
     @if(!empty($gatewayEnabled) && $gatewayEnabled)
         <div class="rounded-2xl border border-cyan-200/80 bg-linear-to-r from-cyan-50 to-white p-5 shadow-sm dark:border-cyan-900/40 dark:from-cyan-950/40 dark:to-slate-800">

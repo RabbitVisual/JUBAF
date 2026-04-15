@@ -61,6 +61,14 @@ Route::prefix('lideres')->name('lideres.')->middleware(['auth', 'role:lider', 'l
             });
     }
 
+    if (module_enabled('Financeiro')) {
+        Route::prefix('financeiro')->name('financeiro.')
+            ->middleware(['permission:financeiro.minhas_contas.view'])
+            ->group(function () {
+                require module_path('Financeiro', 'routes/painel-lider.php');
+            });
+    }
+
     if (module_enabled('Secretaria')) {
         Route::prefix('secretaria')->name('secretaria.')->middleware(['permission:secretaria.minutes.view'])->group(function () {
             require module_path('Secretaria', 'routes/painel-operacional.php');

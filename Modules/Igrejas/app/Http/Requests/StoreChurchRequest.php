@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 use Modules\Igrejas\App\Models\Church;
+use Modules\Igrejas\App\Rules\CnpjValid;
 
 class StoreChurchRequest extends FormRequest
 {
@@ -29,6 +30,11 @@ class StoreChurchRequest extends FormRequest
             $this->merge(['cnpj' => $digits !== '' ? $digits : null]);
         }
 
+        if ($this->filled('postal_code')) {
+            $cep = preg_replace('/\D+/', '', (string) $this->input('postal_code'));
+            $this->merge(['postal_code' => $cep !== '' ? $cep : null]);
+        }
+
         if ($this->user()?->restrictsChurchDirectoryToSector()) {
             $this->merge(['jubaf_sector_id' => $this->user()->jubaf_sector_id]);
         }
@@ -49,18 +55,29 @@ class StoreChurchRequest extends FormRequest
                 'size:14',
                 Rule::requiredIf(fn () => $this->input('kind') === Church::KIND_CHURCH),
                 Rule::unique('igrejas_churches', 'cnpj'),
+                new CnpjValid,
             ],
             'logo' => ['nullable', 'image', 'max:2048'],
             'cover' => ['nullable', 'image', 'max:4096'],
             'name' => ['required', 'string', 'max:255'],
+            'legal_name' => ['nullable', 'string', 'max:255'],
+            'trade_name' => ['nullable', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique(Church::class, 'slug')],
             'sector' => ['nullable', 'string', 'max:120'],
             'jubaf_sector_id' => $sectorRule,
             'foundation_date' => ['nullable', 'date'],
             'cooperation_status' => ['nullable', 'string', Rule::in(Church::cooperationStatuses())],
+            'crm_status' => ['nullable', 'string', Rule::in(Church::crmStatuses())],
             'pastor_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'unijovem_leader_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'city' => ['nullable', 'string', 'max:120'],
+            'state' => ['nullable', 'string', 'max:8'],
+            'country' => ['nullable', 'string', 'max:8'],
+            'postal_code' => ['nullable', 'string', 'max:16'],
+            'street' => ['nullable', 'string', 'max:255'],
+            'number' => ['nullable', 'string', 'max:32'],
+            'complement' => ['nullable', 'string', 'max:120'],
+            'district' => ['nullable', 'string', 'max:120'],
             'address' => ['nullable', 'string', 'max:500'],
             'phone' => ['nullable', 'string', 'max:40'],
             'email' => ['nullable', 'email', 'max:255'],

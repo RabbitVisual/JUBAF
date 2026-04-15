@@ -52,8 +52,7 @@ class ChurchPolicy
             return false;
         }
 
-        // Pastor: supervisão com leitura apenas (PLANOJUBAF / Escopo).
-        return $user->hasAnyRole(['lider', 'jovens']);
+        return $user->hasAnyRole(['lider', 'jovens', 'pastor']);
     }
 
     public function viewAny(User $user): bool
@@ -93,11 +92,11 @@ class ChurchPolicy
 
     public function update(User $user, Church $church): bool
     {
-        if (! $user->can('igrejas.edit')) {
-            return false;
-        }
-
         if (static::canBrowseAllChurches($user)) {
+            if (! $user->can('igrejas.edit')) {
+                return false;
+            }
+
             if ($user->restrictsChurchDirectoryToSector()) {
                 return $user->canAccessChurchInSectorScope($church);
             }

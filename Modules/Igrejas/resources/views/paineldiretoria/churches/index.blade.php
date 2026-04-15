@@ -46,18 +46,28 @@
         <form method="get" class="flex flex-wrap items-end gap-4">
             <div class="min-w-[12rem] flex-1 sm:max-w-xs">
                 <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Pesquisar</label>
-                <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Nome, cidade, e-mail…" class="{{ $filterClass }}">
+                <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Nome, cidade, e-mail…" class="{{ $filterClass }}"
+                    @input.debounce.600ms="$el.form.requestSubmit()">
             </div>
             <div class="min-w-[10rem] flex-1 sm:max-w-[12rem]">
                 <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Cidade</label>
                 <input type="text" name="city" value="{{ $filters['city'] ?? '' }}" placeholder="Filtrar…" class="{{ $filterClass }}">
             </div>
             <div class="min-w-[10rem]">
-                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Estado</label>
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Ativa (sistema)</label>
                 <select name="active" class="{{ $filterClass }}" onchange="this.form.submit()">
                     <option value="">Todas</option>
                     <option value="1" @selected(($filters['active'] ?? '') === '1')>Ativas</option>
                     <option value="0" @selected(($filters['active'] ?? '') === '0')>Inativas</option>
+                </select>
+            </div>
+            <div class="min-w-[10rem]">
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">CRM</label>
+                <select name="crm_status" class="{{ $filterClass }}" onchange="this.form.submit()">
+                    <option value="">Todos</option>
+                    @foreach(\Modules\Igrejas\App\Models\Church::crmStatuses() as $st)
+                        <option value="{{ $st }}" @selected(($filters['crm_status'] ?? '') === $st)>{{ $st }}</option>
+                    @endforeach
                 </select>
             </div>
             @if(isset($jubafSectors) && $jubafSectors->isNotEmpty())
@@ -104,7 +114,7 @@
                         <th class="px-4 py-3.5">Cidade</th>
                         <th class="px-4 py-3.5">Líderes</th>
                         <th class="px-4 py-3.5">Jovens</th>
-                        <th class="px-4 py-3.5">Estado</th>
+                        <th class="px-4 py-3.5">CRM</th>
                         <th class="px-4 py-3.5 text-right">Ações</th>
                     </tr>
                 </thead>
@@ -117,10 +127,13 @@
                             <td class="px-4 py-3.5 tabular-nums text-gray-700 dark:text-gray-300">{{ $c->leaders_count }}</td>
                             <td class="px-4 py-3.5 tabular-nums text-gray-700 dark:text-gray-300">{{ $c->jovens_members_count }}</td>
                             <td class="px-4 py-3.5">
-                                @if($c->is_active)
-                                    <span class="inline-flex rounded-lg bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-900 ring-1 ring-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-100 dark:ring-emerald-800/50">Ativa</span>
+                                @php $crm = $c->crm_status ?? ($c->is_active ? \Modules\Igrejas\App\Models\Church::CRM_ATIVA : \Modules\Igrejas\App\Models\Church::CRM_INATIVA); @endphp
+                                @if($crm === \Modules\Igrejas\App\Models\Church::CRM_ATIVA)
+                                    <span class="inline-flex rounded-lg bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-900 ring-1 ring-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-100 dark:ring-emerald-800/50">ativa</span>
+                                @elseif($crm === \Modules\Igrejas\App\Models\Church::CRM_INADIMPLENTE)
+                                    <span class="inline-flex rounded-lg bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-900 ring-1 ring-amber-200 dark:bg-amber-900/40 dark:text-amber-100 dark:ring-amber-800/50">inadimplente</span>
                                 @else
-                                    <span class="inline-flex rounded-lg bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-800 dark:bg-slate-700 dark:text-slate-200">Inativa</span>
+                                    <span class="inline-flex rounded-lg bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-800 dark:bg-slate-700 dark:text-slate-200">inativa</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3.5 text-right space-x-2">

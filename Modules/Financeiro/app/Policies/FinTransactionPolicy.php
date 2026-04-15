@@ -28,7 +28,7 @@ class FinTransactionPolicy
             return false;
         }
 
-        if ($finTransaction->isFromGateway()) {
+        if ($finTransaction->isLocked()) {
             return false;
         }
 
@@ -41,7 +41,7 @@ class FinTransactionPolicy
             return false;
         }
 
-        if ($finTransaction->isFromGateway()) {
+        if ($finTransaction->isLocked()) {
             return false;
         }
 

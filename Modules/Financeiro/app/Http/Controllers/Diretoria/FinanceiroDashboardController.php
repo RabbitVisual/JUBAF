@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 use Modules\Avisos\App\Models\Aviso;
 use Modules\Blog\App\Models\BlogPost;
+use Modules\Financeiro\App\Models\FinBankAccount;
 use Modules\Financeiro\App\Models\FinCategory;
 use Modules\Financeiro\App\Models\FinExpenseRequest;
+use Modules\Financeiro\App\Models\FinQuotaInvoice;
 use Modules\Financeiro\App\Models\FinTransaction;
 use Modules\Igrejas\App\Models\Church;
 
@@ -165,6 +167,59 @@ class FinanceiroDashboardController extends Controller
         $momInPct = $priorIn > 0 ? round((($in - $priorIn) / $priorIn) * 100, 1) : null;
         $momOutPct = $priorOut > 0 ? round((($out - $priorOut) / $priorOut) * 100, 1) : null;
 
+        $totalBankBalance = (float) FinBankAccount::query()->where('is_active', true)->sum('balance');
+
+        $chartBarLabels = [];
+        $chartBarIn = [];
+        $chartBarOut = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $mStart = Carbon::now()->subMonthsNoOverflow($i)->startOfMonth();
+            $mEnd = Carbon::now()->subMonthsNoOverflow($i)->endOfMonth();
+            $chartBarLabels[] = $mStart->translatedFormat('M');
+            $chartBarIn[] = (float) (clone $txBase)
+                ->where('direction', 'in')
+                ->whereBetween('occurred_on', [$mStart->toDateString(), $mEnd->toDateString()])
+                ->sum('amount');
+            $chartBarOut[] = (float) (clone $txBase)
+                ->where('direction', 'out')
+                ->whereBetween('occurred_on', [$mStart->toDateString(), $mEnd->toDateString()])
+                ->sum('amount');
+        }
+
+        $pieLabels = [];
+        $pieData = [];
+        $pieRaw = FinTransaction::query()
+            ->where('fin_transactions.direction', 'out')
+            ->whereBetween('fin_transactions.occurred_on', [$start->toDateString(), $end->toDateString()])
+            ->join('fin_categories', 'fin_categories.id', '=', 'fin_transactions.category_id');
+        if ($user) {
+            ErpChurchScope::applyToFinTransactionQuery($pieRaw, $user);
+        }
+        $pieRows = $pieRaw
+            ->selectRaw('COALESCE(fin_categories.group_key, ?) as gk, SUM(fin_transactions.amount) as total', ['outros'])
+            ->groupBy('gk')
+            ->orderByDesc('total')
+            ->limit(8)
+            ->get();
+        foreach ($pieRows as $row) {
+            $pieLabels[] = FinCategory::groupLabel($row->gk);
+            $pieData[] = (float) $row->total;
+        }
+
+        $quotaInvoiceOverdue = 0;
+        if (class_exists(FinQuotaInvoice::class)) {
+            $qInv = FinQuotaInvoice::query()->where('status', FinQuotaInvoice::STATUS_PENDING);
+            if ($user) {
+                ErpChurchScope::applyToFinQuotaInvoiceQuery($qInv, $user);
+            }
+            $quotaInvoiceOverdue = (int) $qInv
+                ->where(function ($w) {
+                    $w->whereDate('due_on', '<', now()->toDateString())
+                        ->orWhere('billing_month', '<', now()->format('Y-m'));
+                })
+                ->count();
+        }
+
         return view('financeiro::paineldiretoria.dashboard', [
             'layout' => 'paineldiretoria::components.layouts.app',
             'routePrefix' => 'diretoria.financeiro',
@@ -197,6 +252,13 @@ class FinanceiroDashboardController extends Controller
             'gatewayMonthPaidTotal' => $gatewayMonthPaidTotal,
             'gatewayPendingCount' => $gatewayPendingCount,
             'dashboardMonthLabel' => Carbon::now()->translatedFormat('F \d\e Y'),
+            'totalBankBalance' => $totalBankBalance,
+            'chartBarLabels' => $chartBarLabels,
+            'chartBarIn' => $chartBarIn,
+            'chartBarOut' => $chartBarOut,
+            'pieLabels' => $pieLabels,
+            'pieData' => $pieData,
+            'quotaInvoiceOverdue' => $quotaInvoiceOverdue,
         ]);
     }
 

@@ -89,6 +89,7 @@ class RolesPermissionsSeeder extends Seeder
         $this->seedPermission('financeiro.categories.manage');
         $this->seedPermission('financeiro.obligations.view');
         $this->seedPermission('financeiro.obligations.manage');
+        $this->seedPermission('financeiro.minhas_contas.view');
 
         $this->seedPermission('gateway.dashboard.view');
         $this->seedPermission('gateway.payments.view');
@@ -127,9 +128,27 @@ class RolesPermissionsSeeder extends Seeder
 
         $superAdmin->syncPermissions($allNames);
 
+        $financeiroReadOnly = [
+            'financeiro.dashboard.view',
+            'financeiro.transactions.view',
+            'financeiro.expense_requests.view',
+            'financeiro.reports.view',
+            'financeiro.categories.view',
+            'financeiro.obligations.view',
+        ];
+
         $presidentePerms = array_values(array_filter(
             $allNames,
-            fn (string $n) => ! in_array($n, ['admin.*', 'usuarios.manage', 'sistema.config', 'gateway.accounts.manage'], true)
+            function (string $n) use ($financeiroReadOnly) {
+                if (in_array($n, ['admin.*', 'usuarios.manage', 'sistema.config', 'gateway.accounts.manage'], true)) {
+                    return false;
+                }
+                if (str_starts_with($n, 'financeiro.') && ! in_array($n, $financeiroReadOnly, true)) {
+                    return false;
+                }
+
+                return true;
+            }
         ));
         $presidente->syncPermissions($presidentePerms);
 
@@ -227,10 +246,12 @@ class RolesPermissionsSeeder extends Seeder
         $tesoureiro1->syncPermissions($tesoureiroPerms);
         $tesoureiro2->syncPermissions($tesoureiroPerms);
 
-        $pastorPerms = array_values(array_filter(
+        $pastorBase = array_values(array_filter(
             $allNames,
-            fn (string $n) => str_ends_with($n, '.view') || $n === 'carousel.view'
+            fn (string $n) => (str_ends_with($n, '.view') || $n === 'carousel.view')
+                && ! str_starts_with($n, 'financeiro.')
         ));
+        $pastorPerms = array_values(array_unique(array_merge($pastorBase, ['financeiro.minhas_contas.view'])));
         $pastor->syncPermissions($pastorPerms);
 
         $permissionsLider = [
@@ -243,6 +264,7 @@ class RolesPermissionsSeeder extends Seeder
             'talentos.profile.edit',
             'igrejas.requests.submit',
             'igrejas.jovens.provision',
+            'financeiro.minhas_contas.view',
         ];
         $lider->syncPermissions(Permission::whereIn('name', $permissionsLider)->pluck('name')->toArray());
 

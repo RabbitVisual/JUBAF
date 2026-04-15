@@ -28,6 +28,14 @@
                         Diretório
                     </a>
                 @endcan
+                @can('paineljovens.census.view')
+                    @if(Route::has('diretoria.talentos.census.index'))
+                        <a href="{{ route('diretoria.talentos.census.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white/80 px-4 py-2.5 text-sm font-semibold text-gray-800 backdrop-blur-sm transition hover:border-violet-200 hover:bg-white dark:border-slate-600 dark:bg-slate-800/80 dark:text-white dark:hover:border-violet-700">
+                            <x-icon name="map" class="h-4 w-4 text-violet-600 dark:text-violet-400" style="duotone" />
+                            Censo regional
+                        </a>
+                    @endif
+                @endcan
                 @can('create', \Modules\Talentos\App\Models\TalentAssignment::class)
                     <a href="{{ route('diretoria.talentos.assignments.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-600/25 transition hover:bg-violet-700">
                         <x-icon name="plus" class="h-4 w-4" style="solid" />

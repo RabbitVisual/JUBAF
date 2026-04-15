@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -24,6 +25,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (class_exists(\Modules\Igrejas\App\Events\IgrejaAtualizada::class)
+            && class_exists(\Modules\Notificacoes\App\Listeners\SendChurchCrmAlerts::class)) {
+            Event::listen(
+                \Modules\Igrejas\App\Events\IgrejaAtualizada::class,
+                \Modules\Notificacoes\App\Listeners\SendChurchCrmAlerts::class
+            );
+        }
+
         Gate::define('igrejasProvisionYouth', function (?User $user) {
             return $user && $user->can('igrejas.jovens.provision') && (bool) $user->church_id;
         });

@@ -89,6 +89,25 @@ final class ErpChurchScope
     }
 
     /**
+     * Faturas mensais de cotas: apenas igrejas do setor do VP.
+     *
+     * @param  Builder<\Modules\Financeiro\App\Models\FinQuotaInvoice>  $query
+     */
+    public static function applyToFinQuotaInvoiceQuery(Builder $query, User $user): void
+    {
+        if (! self::userRestrictsToSector($user)) {
+            return;
+        }
+
+        $sid = $user->jubaf_sector_id;
+        $query->whereIn('church_id', function ($sub) use ($sid) {
+            $sub->select('id')
+                ->from('igrejas_churches')
+                ->where('jubaf_sector_id', $sid);
+        });
+    }
+
+    /**
      * Lista de IDs de igrejas no setor do utilizador (vazio se não aplicável).
      *
      * @return list<int>|null

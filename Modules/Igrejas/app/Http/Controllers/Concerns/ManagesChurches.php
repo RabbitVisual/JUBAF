@@ -5,14 +5,22 @@ namespace Modules\Igrejas\App\Http\Controllers\Concerns;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Support\ErpChurchScope;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Modules\Calendario\App\Models\CalendarEvent;
+use Modules\Financeiro\App\Models\FinTransaction;
 use Modules\Igrejas\App\Http\Requests\StoreChurchRequest;
 use Modules\Igrejas\App\Http\Requests\UpdateChurchRequest;
 use Modules\Igrejas\App\Models\Church;
+use Modules\Igrejas\App\Models\ChurchChangeRequest;
 use Modules\Igrejas\App\Models\JubafSector;
-use Modules\Igrejas\App\Services\ChurchLeadershipSync;
+use Modules\Igrejas\App\Repositories\ChurchRepository;
+use Modules\Igrejas\App\Services\ChurchService;
+use Modules\Secretaria\App\Models\Minute;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 trait ManagesChurches
@@ -23,10 +31,20 @@ trait ManagesChurches
 
     abstract protected function panelLayout(): string;
 
+    protected function churchRepository(): ChurchRepository
+    {
+        return app(ChurchRepository::class);
+    }
+
+    protected function churchService(): ChurchService
+    {
+        return app(ChurchService::class);
+    }
+
     /**
      * Dados extra para a vista index (ex.: estatísticas no painel admin).
      *
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, Church>  $churches
+     * @param  LengthAwarePaginator<int, Church>  $churches
      * @return array<string, mixed>
      */
     protected function indexExtraData(Request $request, $churches, array $filters): array
@@ -54,8 +72,8 @@ trait ManagesChurches
         }
     }
 
-    /** @return \Illuminate\Support\Collection<int, Church> */
-    protected function churchesForParentSelect(?Church $exclude = null): \Illuminate\Support\Collection
+    /** @return Collection<int, Church> */
+    protected function churchesForParentSelect(?Church $exclude = null): Collection
     {
         $q = Church::query()
             ->where('kind', Church::KIND_CHURCH)
@@ -76,11 +94,11 @@ trait ManagesChurches
      * @return array<string, mixed>
      */
     /**
-     * @return \Illuminate\Support\Collection<int, JubafSector>
+     * @return Collection<int, JubafSector>
      */
-    protected function jubafSectorsForForm(): \Illuminate\Support\Collection
+    protected function jubafSectorsForForm(): Collection
     {
-        if (! \Illuminate\Support\Facades\Schema::hasTable('jubaf_sectors')) {
+        if (! Schema::hasTable('jubaf_sectors')) {
             return collect();
         }
 
@@ -90,10 +108,11 @@ trait ManagesChurches
     protected function auditChurchSnapshot(Church $church): array
     {
         $keys = [
-            'id', 'name', 'slug', 'kind', 'parent_church_id', 'cnpj', 'logo_path', 'cover_path',
-            'sector', 'jubaf_sector_id', 'foundation_date', 'cooperation_status',
+            'id', 'uuid', 'name', 'legal_name', 'trade_name', 'slug', 'kind', 'parent_church_id', 'cnpj', 'logo_path', 'cover_path',
+            'sector', 'jubaf_sector_id', 'foundation_date', 'cooperation_status', 'crm_status',
             'pastor_user_id', 'unijovem_leader_user_id',
-            'city', 'address', 'phone', 'email',
+            'city', 'state', 'country', 'postal_code', 'street', 'number', 'complement', 'district',
+            'address', 'phone', 'email',
             'asbaf_notes', 'is_active', 'joined_at', 'metadata',
         ];
 
@@ -102,49 +121,19 @@ trait ManagesChurches
 
     protected function applyChurchListFilters(Request $request, Builder $q): void
     {
-        if ($request->filled('search')) {
-            $s = $request->string('search');
-            $q->where(function ($qq) use ($s) {
-                $qq->where('name', 'like', '%'.$s.'%')
-                    ->orWhere('city', 'like', '%'.$s.'%')
-                    ->orWhere('email', 'like', '%'.$s.'%');
-            });
-        }
-
-        if ($request->filled('active')) {
-            $q->where('is_active', $request->boolean('active'));
-        }
-
-        if ($request->filled('city')) {
-            $q->where('city', 'like', '%'.$request->string('city').'%');
-        }
-
-        if ($request->filled('sector')) {
-            $q->where('sector', 'like', '%'.$request->string('sector').'%');
-        }
-
-        if ($request->filled('jubaf_sector_id')) {
-            $q->where('jubaf_sector_id', (int) $request->input('jubaf_sector_id'));
-        }
-
-        if ($request->filled('cooperation_status')) {
-            $q->where('cooperation_status', $request->string('cooperation_status'));
-        }
+        $this->churchRepository()->applyListFilters($request, $q);
     }
 
     public function index(Request $request)
     {
         $this->authorize('viewAny', Church::class);
 
-        $q = Church::query()->withCount(['users', 'jovensMembers', 'leaders']);
-        if ($request->user()) {
-            ErpChurchScope::applyToChurchQuery($q, $request->user());
-        }
-        $this->applyChurchListFilters($request, $q);
+        $user = $request->user();
+        abort_unless($user, 403);
 
-        $churches = $q->orderBy('name')->paginate(20)->withQueryString();
+        $churches = $this->churchRepository()->paginateForUser($user, $request, 20);
 
-        $filters = $request->only(['search', 'active', 'city', 'sector', 'jubaf_sector_id', 'cooperation_status']);
+        $filters = $request->only(['search', 'active', 'city', 'sector', 'jubaf_sector_id', 'cooperation_status', 'crm_status']);
 
         return view($this->viewPrefix().'.index', array_merge([
             'churches' => $churches,
@@ -186,13 +175,7 @@ trait ManagesChurches
         $church = new Church;
         $this->mergeChurchMediaFromRequest($request, $church, $data);
 
-        $church = Church::create($data);
-        $church->refresh();
-        ChurchLeadershipSync::syncFromChurch($church);
-
-        if ($church->jubaf_sector_id) {
-            event(new \Modules\Igrejas\App\Events\ChurchSectorAssigned($church, null));
-        }
+        $church = $this->churchService()->createChurch($data);
 
         AuditLog::log(
             'igrejas.church.create',
@@ -219,9 +202,15 @@ trait ManagesChurches
         $membersQuery = $church->users()->with('roles')->orderBy('name');
         $members = $membersQuery->paginate(25)->withQueryString();
 
+        $localLeadership = $church->users()
+            ->with('roles')
+            ->whereHas('roles', fn ($q) => $q->whereIn('name', ['pastor', 'lider']))
+            ->orderBy('name')
+            ->get();
+
         $upcomingEvents = collect();
-        if (\Illuminate\Support\Facades\Schema::hasTable('calendar_events')) {
-            $upcomingEvents = \Modules\Calendario\App\Models\CalendarEvent::query()
+        if (Schema::hasTable('calendar_events')) {
+            $upcomingEvents = CalendarEvent::query()
                 ->where('church_id', $church->id)
                 ->where('starts_at', '>=', now()->startOfDay())
                 ->orderBy('starts_at')
@@ -230,13 +219,13 @@ trait ManagesChurches
         }
 
         $financeSummary = null;
-        if (\Illuminate\Support\Facades\Schema::hasTable('fin_transactions')) {
+        if (Schema::hasTable('fin_transactions')) {
             $financeSummary = [
-                'in_sum' => (float) \Modules\Financeiro\App\Models\FinTransaction::query()
+                'in_sum' => (float) FinTransaction::query()
                     ->where('church_id', $church->id)
                     ->where('direction', 'in')
                     ->sum('amount'),
-                'out_sum' => (float) \Modules\Financeiro\App\Models\FinTransaction::query()
+                'out_sum' => (float) FinTransaction::query()
                     ->where('church_id', $church->id)
                     ->where('direction', 'out')
                     ->sum('amount'),
@@ -244,14 +233,27 @@ trait ManagesChurches
         }
 
         $pendingRequestsCount = $church->changeRequests()
-            ->where('status', \Modules\Igrejas\App\Models\ChurchChangeRequest::STATUS_SUBMITTED)
+            ->where('status', ChurchChangeRequest::STATUS_SUBMITTED)
             ->count();
+
+        $cotasSummary = $church->cotasSummary();
+        $secretariaDocumentsCount = $church->secretariaDocumentsCount();
+        $secretariaMinutesCount = 0;
+        if (Schema::hasTable('secretaria_minutes')) {
+            $secretariaMinutesCount = Minute::query()
+                ->where('church_id', $church->id)
+                ->count();
+        }
 
         return view($this->viewPrefix().'.show', [
             'church' => $church,
             'members' => $members,
+            'localLeadership' => $localLeadership,
             'upcomingEvents' => $upcomingEvents,
             'financeSummary' => $financeSummary,
+            'cotasSummary' => $cotasSummary,
+            'secretariaDocumentsCount' => $secretariaDocumentsCount,
+            'secretariaMinutesCount' => $secretariaMinutesCount,
             'pendingRequestsCount' => $pendingRequestsCount,
             'routePrefix' => $this->routePrefix(),
             'layout' => $this->panelLayout(),
@@ -331,17 +333,10 @@ trait ManagesChurches
         }
 
         $oldSnapshot = $this->auditChurchSnapshot($church);
-        $previousSectorId = $church->jubaf_sector_id;
 
         $this->mergeChurchMediaFromRequest($request, $church, $data);
 
-        $church->update($data);
-        $church->refresh();
-        ChurchLeadershipSync::syncFromChurch($church);
-
-        if ($church->wasChanged('jubaf_sector_id')) {
-            event(new \Modules\Igrejas\App\Events\ChurchSectorAssigned($church, $previousSectorId));
-        }
+        $church = $this->churchService()->updateChurch($church, $data);
 
         AuditLog::log(
             'igrejas.church.update',
@@ -404,25 +399,23 @@ trait ManagesChurches
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $columns = ['name', 'slug', 'sector', 'cooperation_status', 'city', 'phone', 'email', 'is_active', 'joined_at', 'foundation_date'];
+        $columns = ['name', 'legal_name', 'trade_name', 'slug', 'sector', 'cooperation_status', 'crm_status', 'city', 'phone', 'email', 'is_active', 'joined_at', 'foundation_date'];
 
         return response()->streamDownload(function () use ($columns, $request) {
             $out = fopen('php://output', 'w');
             fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($out, $columns);
-            $q = Church::query();
-            if (auth()->check()) {
-                ErpChurchScope::applyToChurchQuery($q, auth()->user());
-            }
-            $this->applyChurchListFilters($request, $q);
-            foreach ($q->orderBy('name')->cursor() as $c) {
+            $user = auth()->user();
+            abort_unless($user, 403);
+            $q = $this->churchRepository()->exportQuery($user, $request);
+            foreach ($q->cursor() as $c) {
                 $row = [];
                 foreach ($columns as $col) {
                     $row[] = match ($col) {
                         'is_active' => $c->is_active ? '1' : '0',
                         'joined_at' => $c->joined_at?->format('Y-m-d') ?? '',
                         'foundation_date' => $c->foundation_date?->format('Y-m-d') ?? '',
-                        default => $c->{$col} ?? '',
+                        default => ($c->{$col} ?? '') === null ? '' : (string) $c->{$col},
                     };
                 }
                 fputcsv($out, $row);

@@ -6,7 +6,7 @@
 @php
     $inputClass = 'rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-400/20';
     $labelClass = 'mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400';
-    $hasFilters = filled($filters['from'] ?? null) || filled($filters['to'] ?? null) || filled($filters['direction'] ?? null) || filled($filters['church_id'] ?? null) || filled($filters['scope'] ?? null) || filled($filters['source'] ?? null) || filled($filters['category_id'] ?? null);
+    $hasFilters = filled($filters['from'] ?? null) || filled($filters['to'] ?? null) || filled($filters['direction'] ?? null) || filled($filters['church_id'] ?? null) || filled($filters['scope'] ?? null) || filled($filters['source'] ?? null) || filled($filters['category_id'] ?? null) || filled($filters['status'] ?? null);
 @endphp
 <div class="mx-auto max-w-7xl space-y-8 pb-10">
     @include('financeiro::paineldiretoria.partials.subnav', ['active' => 'transactions'])
@@ -99,6 +99,15 @@
                     <option value="adjustment" @selected(($filters['source'] ?? '') === 'adjustment')>Ajuste</option>
                 </select>
             </div>
+            <div class="min-w-[10rem]">
+                <label class="{{ $labelClass }}">Estado</label>
+                <select name="status" class="w-full {{ $inputClass }}">
+                    <option value="">Todos</option>
+                    <option value="paid" @selected(($filters['status'] ?? '') === 'paid')>Pago</option>
+                    <option value="pending" @selected(($filters['status'] ?? '') === 'pending')>Pendente</option>
+                    <option value="overdue" @selected(($filters['status'] ?? '') === 'overdue')>Atrasado</option>
+                </select>
+            </div>
             <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 dark:bg-slate-700 dark:hover:bg-slate-600">
                 <x-icon name="filter" class="h-4 w-4 opacity-90" style="duotone" />
                 Aplicar
@@ -112,6 +121,7 @@
                 <thead>
                     <tr class="bg-gray-50/90 text-left text-xs font-bold uppercase tracking-wide text-gray-500 dark:bg-slate-900/90 dark:text-gray-400">
                         <th class="px-5 py-3.5">Data</th>
+                        <th class="px-5 py-3.5">Estado</th>
                         <th class="px-5 py-3.5">Categoria</th>
                         <th class="px-5 py-3.5">Âmbito</th>
                         <th class="px-5 py-3.5">Igreja</th>
@@ -125,6 +135,9 @@
                     @forelse($transactions as $t)
                         <tr class="transition hover:bg-emerald-50/40 dark:hover:bg-slate-900/50">
                             <td class="whitespace-nowrap px-5 py-3.5 text-gray-700 dark:text-gray-300">{{ $t->occurred_on->format('d/m/Y') }}</td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-flex rounded-lg bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-800 dark:bg-slate-900 dark:text-slate-200">{{ \Modules\Financeiro\App\Models\FinTransaction::statusLabel($t->status) }}</span>
+                            </td>
                             <td class="px-5 py-3.5 font-medium text-gray-900 dark:text-white">{{ $t->category?->name ?? '—' }}</td>
                             <td class="px-5 py-3.5 text-gray-600 dark:text-gray-400">
                                 <span class="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-800 dark:bg-slate-900/80 dark:text-slate-200">{{ $t->scopeLabel() }}</span>
@@ -162,7 +175,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-5 py-16 text-center">
+                            <td colspan="9" class="px-5 py-16 text-center">
                                 <div class="mx-auto flex max-w-md flex-col items-center">
                                     <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 text-gray-400 dark:bg-slate-700 dark:text-gray-500">
                                         <x-icon name="list" class="h-7 w-7" style="duotone" />

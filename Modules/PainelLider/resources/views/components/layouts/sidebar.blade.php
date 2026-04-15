@@ -97,11 +97,31 @@
                 @endif
                 @if(module_enabled('Talentos') && Route::has('lideres.talentos.profile.edit') && auth()->user()?->can('talentos.profile.edit'))
                 <li>
-                    <a href="{{ route('lideres.talentos.profile.edit') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('lideres.talentos.*') ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-800 dark:hover:text-violet-200' }}">
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('lideres.talentos.*') ? 'bg-white/15' : 'bg-violet-100/80 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300' }}">
-                            <x-module-icon module="Talentos" class="w-5 h-5 {{ request()->routeIs('lideres.talentos.*') ? 'text-white' : 'text-violet-700 dark:text-violet-300' }}" style="duotone" />
+                    <a href="{{ route('lideres.talentos.profile.edit') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('lideres.talentos.profile.*') ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-800 dark:hover:text-violet-200' }}">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('lideres.talentos.profile.*') ? 'bg-white/15' : 'bg-violet-100/80 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300' }}">
+                            <x-module-icon module="Talentos" class="w-5 h-5 {{ request()->routeIs('lideres.talentos.profile.*') ? 'text-white' : 'text-violet-700 dark:text-violet-300' }}" style="duotone" />
                         </span>
                         <span class="text-sm font-semibold leading-tight text-left">Banco de talentos</span>
+                    </a>
+                </li>
+                @endif
+                @if(module_enabled('Talentos') && Route::has('lideres.talentos.validation.index') && auth()->user()?->can('paineljovens.talentos.validate'))
+                <li>
+                    <a href="{{ route('lideres.talentos.validation.index') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('lideres.talentos.validation.*') ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-800 dark:hover:text-emerald-200' }}">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('lideres.talentos.validation.*') ? 'bg-white/15' : 'bg-emerald-100/80 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' }}">
+                            <x-icon name="check-double" class="w-5 h-5 {{ request()->routeIs('lideres.talentos.validation.*') ? 'text-white' : 'text-emerald-700 dark:text-emerald-300' }}" style="duotone" />
+                        </span>
+                        <span class="text-sm font-semibold leading-tight text-left">Validar talentos</span>
+                    </a>
+                </li>
+                @endif
+                @if(Route::has('lideres.juventude.metrics') && auth()->user()?->can('paineljovens.dashboard.metrics'))
+                <li>
+                    <a href="{{ route('lideres.juventude.metrics') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('lideres.juventude.*') ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-800 dark:hover:text-teal-200' }}">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('lideres.juventude.*') ? 'bg-white/15' : 'bg-teal-100/80 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300' }}">
+                            <x-icon name="chart-simple" class="w-5 h-5 {{ request()->routeIs('lideres.juventude.*') ? 'text-white' : 'text-teal-700 dark:text-teal-300' }}" style="duotone" />
+                        </span>
+                        <span class="text-sm font-semibold leading-tight text-left">Juventude (métricas)</span>
                     </a>
                 </li>
                 @endif

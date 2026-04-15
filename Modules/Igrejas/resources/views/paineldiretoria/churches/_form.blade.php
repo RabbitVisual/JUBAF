@@ -58,6 +58,18 @@
         <input type="text" id="name" name="name" value="{{ old('name', $church->name) }}" required class="{{ $fieldClass }}">
         @error('name')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
     </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+            <label for="legal_name" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Razão social</label>
+            <input type="text" id="legal_name" name="legal_name" value="{{ old('legal_name', $church->legal_name) }}" class="{{ $fieldClass }}" placeholder="Opcional — predefinido pelo nome">
+            @error('legal_name')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label for="trade_name" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Nome fantasia</label>
+            <input type="text" id="trade_name" name="trade_name" value="{{ old('trade_name', $church->trade_name) }}" class="{{ $fieldClass }}" placeholder="Opcional — exibição pública">
+            @error('trade_name')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+        </div>
+    </div>
     <div>
         <label for="slug" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Slug (URL)</label>
         <input type="text" id="slug" name="slug" value="{{ old('slug', $church->slug) }}" class="{{ $fieldClass }} font-mono text-xs sm:text-sm" placeholder="gerado-automaticamente-se-vazio">
@@ -91,6 +103,16 @@
             </select>
             @error('cooperation_status')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
+        <div>
+            <label for="crm_status" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Situação CRM</label>
+            <select id="crm_status" name="crm_status" class="{{ $fieldClass }}">
+                @foreach(\Modules\Igrejas\App\Models\Church::crmStatuses() as $st)
+                    <option value="{{ $st }}" @selected(old('crm_status', $church->crm_status ?? \Modules\Igrejas\App\Models\Church::CRM_ATIVA) === $st)>{{ $st }}</option>
+                @endforeach
+            </select>
+            @error('crm_status')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">«Inadimplente» mantém a igreja ativa para contacto, com alerta financeiro.</p>
+        </div>
     </div>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
@@ -122,20 +144,98 @@
             @error('unijovem_leader_user_id')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
     </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-            <label for="city" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Cidade</label>
-            <input type="text" id="city" name="city" value="{{ old('city', $church->city) }}" class="{{ $fieldClass }}">
-            @error('city')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+    <div class="rounded-xl border border-gray-200/80 p-4 dark:border-slate-700" x-data="{
+        cepUrl: {{ json_encode(route('diretoria.igrejas.cep')) }},
+        cepLoading: false,
+        cepErr: '',
+        async buscarCep() {
+            this.cepErr = '';
+            const el = document.getElementById('postal_code');
+            if (!el) return;
+            const cep = (el.value || '').replace(/\D/g, '');
+            if (cep.length !== 8) { this.cepErr = 'Informe 8 dígitos.'; return; }
+            this.cepLoading = true;
+            try {
+                const u = new URL(this.cepUrl, window.location.origin);
+                u.searchParams.set('cep', cep);
+                const r = await fetch(u.toString(), { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+                const j = await r.json();
+                if (!r.ok) throw new Error(j.message || 'CEP não encontrado');
+                if (j.street) document.getElementById('street').value = j.street;
+                if (j.district) document.getElementById('district').value = j.district;
+                if (j.city) document.getElementById('city').value = j.city;
+                if (j.state) document.getElementById('state').value = j.state;
+            } catch (e) {
+                this.cepErr = e.message || 'Falha ao consultar CEP.';
+            } finally {
+                this.cepLoading = false;
+            }
+        }
+    }">
+        <p class="text-sm font-semibold text-gray-900 dark:text-white">Endereço (CEP Brasil)</p>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Preencha o CEP e use «Buscar» (ViaCEP). Campos estruturados alimentam relatórios e integrações.</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+            <div class="min-w-[10rem] flex-1">
+                <label for="postal_code" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">CEP</label>
+                <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code', $church->postal_code) }}" maxlength="12" inputmode="numeric" class="{{ $fieldClass }} font-mono" placeholder="00000000">
+                @error('postal_code')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+            <div class="flex items-end">
+                <button type="button" @click="buscarCep()" :disabled="cepLoading" class="inline-flex items-center rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-900 disabled:opacity-50 dark:bg-slate-600 dark:hover:bg-slate-500">
+                    <span x-show="!cepLoading">Buscar CEP</span>
+                    <span x-show="cepLoading" x-cloak>A buscar…</span>
+                </button>
+            </div>
         </div>
+        <p class="mt-2 text-xs text-red-600 dark:text-red-400" x-text="cepErr" x-show="cepErr"></p>
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+                <label for="street" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Logradouro</label>
+                <input type="text" id="street" name="street" value="{{ old('street', $church->street) }}" class="{{ $fieldClass }}">
+                @error('street')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="number" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Número</label>
+                <input type="text" id="number" name="number" value="{{ old('number', $church->number) }}" class="{{ $fieldClass }}">
+                @error('number')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="complement" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Complemento</label>
+                <input type="text" id="complement" name="complement" value="{{ old('complement', $church->complement) }}" class="{{ $fieldClass }}">
+                @error('complement')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="district" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Bairro</label>
+                <input type="text" id="district" name="district" value="{{ old('district', $church->district) }}" class="{{ $fieldClass }}">
+                @error('district')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="city" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Cidade</label>
+                <input type="text" id="city" name="city" value="{{ old('city', $church->city) }}" class="{{ $fieldClass }}">
+                @error('city')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="state" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">UF</label>
+                <input type="text" id="state" name="state" value="{{ old('state', $church->state) }}" maxlength="8" class="{{ $fieldClass }} uppercase">
+                @error('state')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="country" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">País</label>
+                <input type="text" id="country" name="country" value="{{ old('country', $church->country ?? 'BR') }}" maxlength="8" class="{{ $fieldClass }} uppercase">
+                @error('country')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
             <label for="phone" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Telefone</label>
             <input type="text" id="phone" name="phone" value="{{ old('phone', $church->phone) }}" class="{{ $fieldClass }}">
             @error('phone')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
+        <div></div>
     </div>
     <div>
-        <label for="address" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Endereço</label>
+        <label for="address" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Endereço (texto livre / legado)</label>
         <input type="text" id="address" name="address" value="{{ old('address', $church->address) }}" class="{{ $fieldClass }}">
         @error('address')<p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
     </div>

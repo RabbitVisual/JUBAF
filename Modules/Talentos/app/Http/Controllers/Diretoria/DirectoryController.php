@@ -8,19 +8,25 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Modules\Igrejas\App\Models\Church;
+use Modules\Igrejas\App\Models\JubafSector;
 use Modules\Talentos\App\Models\TalentArea;
 use Modules\Talentos\App\Models\TalentProfile;
 use Modules\Talentos\App\Models\TalentSkill;
+use Modules\Talentos\App\Services\BancoTalentosSearchService;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DirectoryController extends Controller
 {
+    public function __construct(
+        protected BancoTalentosSearchService $directorySearch
+    ) {}
+
     public function index(Request $request): View
     {
         $this->authorize('viewAny', TalentProfile::class);
 
         $q = $this->baseDirectoryQuery();
-        $this->applyDirectoryFilters($q, $request);
+        $this->directorySearch->applyDirectoryFilters($q, $request, $request->user());
 
         $profiles = $q->paginate(24)->withQueryString();
 
@@ -31,7 +37,8 @@ class DirectoryController extends Controller
             'skills' => TalentSkill::query()->orderBy('name')->get(),
             'areas' => TalentArea::query()->orderBy('name')->get(),
             'churches' => module_enabled('Igrejas') ? Church::query()->orderBy('name')->get() : collect(),
-            'filters' => $request->only(['church_id', 'skill_id', 'area_id', 'searchable_only', 'q']),
+            'filters' => $request->only(['church_id', 'jubaf_sector_id', 'skill_id', 'area_id', 'searchable_only', 'validated_skills_only', 'q']),
+            'sectors' => module_enabled('Igrejas') ? JubafSector::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get() : collect(),
         ]);
     }
 
@@ -61,7 +68,7 @@ class DirectoryController extends Controller
         $filename = 'talentos-diretorio-'.now()->format('Y-m-d').'.csv';
 
         $q = $this->baseDirectoryQuery();
-        $this->applyDirectoryFilters($q, $request);
+        $this->directorySearch->applyDirectoryFilters($q, $request, $request->user());
 
         return response()->streamDownload(function () use ($q) {
             $out = fopen('php://output', 'w');
@@ -99,48 +106,5 @@ class DirectoryController extends Controller
             ->join('users', 'users.id', '=', 'talent_profiles.user_id')
             ->orderBy('users.name')
             ->select('talent_profiles.*');
-    }
-
-    /**
-     * @param  Builder<TalentProfile>  $q
-     */
-    protected function applyDirectoryFilters(Builder $q, Request $request): void
-    {
-        if ($request->filled('church_id') && module_enabled('Igrejas')) {
-            $q->where('users.church_id', $request->integer('church_id'));
-        }
-
-        if ($request->filled('skill_id')) {
-            $skillId = $request->integer('skill_id');
-            $q->whereExists(function ($sub) use ($skillId) {
-                $sub->selectRaw('1')
-                    ->from('talent_profile_skill')
-                    ->whereColumn('talent_profile_skill.talent_profile_id', 'talent_profiles.id')
-                    ->where('talent_profile_skill.talent_skill_id', $skillId);
-            });
-        }
-
-        if ($request->filled('area_id')) {
-            $areaId = $request->integer('area_id');
-            $q->whereExists(function ($sub) use ($areaId) {
-                $sub->selectRaw('1')
-                    ->from('talent_profile_area')
-                    ->whereColumn('talent_profile_area.talent_profile_id', 'talent_profiles.id')
-                    ->where('talent_profile_area.talent_area_id', $areaId);
-            });
-        }
-
-        if ($request->boolean('searchable_only')) {
-            $q->where('talent_profiles.is_searchable', true);
-        }
-
-        $term = trim((string) $request->input('q', ''));
-        if ($term !== '') {
-            $like = '%'.addcslashes($term, '%_\\').'%';
-            $q->where(function ($w) use ($like) {
-                $w->where('users.name', 'like', $like)
-                    ->orWhere('users.email', 'like', $like);
-            });
-        }
     }
 }

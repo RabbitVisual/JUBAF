@@ -12,8 +12,16 @@ use Illuminate\Support\Str;
 
 class Church extends Model
 {
+    use Concerns\HasCotas;
+    use Concerns\HasDocumentos;
     use HasFactory;
     use SoftDeletes;
+
+    public const CRM_ATIVA = 'ativa';
+
+    public const CRM_INATIVA = 'inativa';
+
+    public const CRM_INADIMPLENTE = 'inadimplente';
 
     public const COOPERATION_ATIVA = 'ativa';
 
@@ -28,7 +36,10 @@ class Church extends Model
     protected $table = 'igrejas_churches';
 
     protected $fillable = [
+        'uuid',
         'name',
+        'legal_name',
+        'trade_name',
         'slug',
         'kind',
         'parent_church_id',
@@ -39,9 +50,17 @@ class Church extends Model
         'jubaf_sector_id',
         'foundation_date',
         'cooperation_status',
+        'crm_status',
         'pastor_user_id',
         'unijovem_leader_user_id',
         'city',
+        'state',
+        'country',
+        'postal_code',
+        'street',
+        'number',
+        'complement',
+        'district',
         'address',
         'phone',
         'email',
@@ -64,8 +83,23 @@ class Church extends Model
     protected static function booted(): void
     {
         static::creating(function (Church $church) {
+            if (empty($church->uuid)) {
+                $church->uuid = (string) Str::uuid();
+            }
             if (empty($church->slug)) {
                 $church->slug = static::uniqueSlugFromName($church->name);
+            }
+            if (empty($church->legal_name)) {
+                $church->legal_name = $church->name;
+            }
+            if (empty($church->trade_name)) {
+                $church->trade_name = $church->name;
+            }
+            if (empty($church->crm_status)) {
+                $church->crm_status = ! empty($church->is_active) ? self::CRM_ATIVA : self::CRM_INATIVA;
+            }
+            if (empty($church->country)) {
+                $church->country = 'BR';
             }
         });
 
@@ -75,6 +109,12 @@ class Church extends Model
                 if ($name) {
                     $church->sector = $name;
                 }
+            }
+
+            if ($church->isDirty('crm_status') && $church->crm_status !== null) {
+                $church->is_active = in_array($church->crm_status, [self::CRM_ATIVA, self::CRM_INADIMPLENTE], true);
+            } elseif ($church->isDirty('is_active') && ! $church->isDirty('crm_status')) {
+                $church->crm_status = $church->is_active ? self::CRM_ATIVA : self::CRM_INATIVA;
             }
         });
     }
@@ -149,6 +189,30 @@ class Church extends Model
         }
 
         return $query->where('sector', $sector);
+    }
+
+    public function scopeCrmStatus($query, ?string $status)
+    {
+        if ($status === null || $status === '') {
+            return $query;
+        }
+
+        return $query->where('crm_status', $status);
+    }
+
+    /** @return list<string> */
+    public static function crmStatuses(): array
+    {
+        return [
+            self::CRM_ATIVA,
+            self::CRM_INATIVA,
+            self::CRM_INADIMPLENTE,
+        ];
+    }
+
+    public function displayName(): string
+    {
+        return (string) ($this->trade_name ?: $this->legal_name ?: $this->name);
     }
 
     public static function cooperationStatuses(): array

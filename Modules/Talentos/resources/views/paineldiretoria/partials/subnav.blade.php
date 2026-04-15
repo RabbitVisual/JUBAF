@@ -1,6 +1,6 @@
 {{--
     Navegação interna Talentos (Painel Diretoria).
-    @var string $active dashboard|directory|assignments
+    @var string $active dashboard|directory|assignments|census
 --}}
 @php
     $active = $active ?? 'dashboard';
@@ -24,6 +24,14 @@
                 <x-icon name="users" class="h-4 w-4 shrink-0 opacity-90" style="duotone" />
                 Diretório
             </a>
+        @endcan
+        @can('paineljovens.census.view')
+            @if(Route::has('diretoria.talentos.census.index'))
+                <a href="{{ route('diretoria.talentos.census.index') }}" class="{{ $linkBase }} {{ $active === 'census' ? $linkActive : $linkIdle }}">
+                    <x-icon name="map" class="h-4 w-4 shrink-0 opacity-90" style="duotone" />
+                    Censo
+                </a>
+            @endif
         @endcan
         @can('viewAny', \Modules\Talentos\App\Models\TalentAssignment::class)
             <a href="{{ route('diretoria.talentos.assignments.index') }}" class="{{ $linkBase }} {{ $active === 'assignments' ? $linkActive : $linkIdle }}">
