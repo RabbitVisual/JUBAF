@@ -125,9 +125,12 @@
                     <a href="{{ route('homepage') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
                         Início
                     </a>
-                    <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg text-sm font-semibold text-blue-700 dark:text-blue-400 bg-blue-50/90 dark:bg-blue-950/50">
-                        Blog
-                    </a>
+                    <div class="flex flex-col items-end">
+                        <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg text-sm font-semibold text-blue-700 dark:text-blue-400 bg-blue-50/90 dark:bg-blue-950/50">
+                            Blog
+                        </a>
+                        <span class="hidden md:block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 pr-1">Comunicação da liderança</span>
+                    </div>
                 </nav>
 
                 <div class="flex items-center gap-2 sm:gap-3">

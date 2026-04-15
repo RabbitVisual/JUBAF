@@ -187,10 +187,18 @@
                 @php
                     $footerOrg = \App\Models\SystemConfig::get('homepage_footer_org_line', 'JUBAF — Juventude Batista Feirense');
                 @endphp
+                @php
+                    $institutionalCnpj = \App\Models\SystemConfig::get('homepage_institutional_cnpj', '');
+                @endphp
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                    <p class="flex items-center gap-2 text-center">
-                        <x-icon name="copyright" style="duotone" class="w-4 h-4" />
-                        {{ date('Y') }} {{ $footerOrg }}. Todos os direitos reservados.
+                    <p class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-center">
+                        <span class="inline-flex items-center justify-center gap-2">
+                            <x-icon name="copyright" style="duotone" class="w-4 h-4" />
+                            {{ date('Y') }} {{ $footerOrg }}. Todos os direitos reservados.
+                        </span>
+                        @if ($institutionalCnpj !== '')
+                            <span class="text-xs text-gray-400 dark:text-gray-500">CNPJ {{ $institutionalCnpj }}</span>
+                        @endif
                     </p>
                     <p class="text-center md:text-right">
                         {{ \App\Support\SiteBranding::siteTagline() }}

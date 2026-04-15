@@ -10,8 +10,8 @@
         "@alpinejs/focus": "^3.15.8",
         "@heroicons/react": "^2.2.0",
         "@preline/carousel": "^3.2.3",
-        "apexcharts": "^4.7.0",
         "alpinejs": "^3.15.5",
+        "apexcharts": "^4.7.0",
         "chart.js": "^4.5.1",
         "compressorjs": "^1.2.1",
         "datatables.net-dt": "^2.3.4",
@@ -21,6 +21,7 @@
         "idb": "^8.0.3",
         "jquery": "^3.7.1",
         "jquery-mask-plugin": "^1.14.16",
+        "laravel-echo": "^2.3.4",
         "localforage": "^1.10.0",
         "playwright": "^1.58.2",
         "preline": "^3.2.3",
@@ -30,6 +31,7 @@
         "sortablejs": "^1.15.6"
     },
     "devDependencies": {
+        "@tailwindcss/typography": "^0.5.19",
         "@tailwindcss/vite": "^4.2.0",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",

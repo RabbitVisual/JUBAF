@@ -105,7 +105,7 @@
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
         <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-            <div class="space-y-8 lg:col-span-8">
+            <div class="space-y-8 lg:col-span-8 max-w-[52rem] lg:mx-auto xl:mx-0 xl:max-w-none">
                 @include('blog::public.partials.article-main')
             </div>
             <aside class="lg:col-span-4" aria-label="Barra lateral">

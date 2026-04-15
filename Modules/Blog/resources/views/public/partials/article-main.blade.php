@@ -101,7 +101,7 @@
 @endif
 
 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:p-10">
-    <div class="blog-post-body prose prose-lg prose-blue max-w-none dark:prose-invert
+    <div class="blog-post-body prose prose-lg prose-slate max-w-none dark:prose-invert
         prose-headings:scroll-mt-28 prose-headings:font-bold prose-headings:tracking-tight
         prose-headings:text-slate-900 dark:prose-headings:text-white
         prose-h2:mt-10 prose-h2:border-b prose-h2:border-slate-200 dark:prose-h2:border-slate-600 prose-h2:pb-2

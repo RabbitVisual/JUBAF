@@ -2,24 +2,26 @@
 
 namespace Modules\Blog\App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Str;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 /**
  * @property string $title
  * @property string $slug
  * @property string $content
  * @property string $status
- * @property \Carbon\Carbon|null $published_at
+ * @property Carbon|null $published_at
  * @property int $category_id
  * @property int $author_id
  * @property int $views_count
  * @property int $likes_count
  * @property int $shares_count
- * @property-read \Modules\Blog\App\Models\BlogCategory $category
- * @property-read \App\Models\User $author
+ * @property-read BlogCategory $category
+ * @property-read User $author
  */
 class BlogPost extends Model
 {
@@ -81,6 +83,14 @@ class BlogPost extends Model
             if ($post->isDirty('title') && empty($post->slug)) {
                 $post->slug = Str::slug($post->title);
             }
+        });
+
+        static::saved(function () {
+            Cache::forget('blog.public.featured');
+        });
+
+        static::deleted(function () {
+            Cache::forget('blog.public.featured');
         });
     }
 
@@ -175,8 +185,8 @@ class BlogPost extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('title', 'like', "%{$search}%")
-              ->orWhere('content', 'like', "%{$search}%")
-              ->orWhere('excerpt', 'like', "%{$search}%");
+                ->orWhere('content', 'like', "%{$search}%")
+                ->orWhere('excerpt', 'like', "%{$search}%");
         });
     }
 
@@ -185,7 +195,7 @@ class BlogPost extends Model
      */
     public function getExcerptAttribute($value)
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             return $value;
         }
 
@@ -199,6 +209,7 @@ class BlogPost extends Model
     {
         $words = str_word_count(strip_tags($this->content));
         $minutes = ceil($words / 200); // Average reading speed: 200 words per minute
+
         return max(1, $minutes);
     }
 
@@ -257,12 +268,12 @@ class BlogPost extends Model
             ->where('viewed_at', '>', now()->subDay())
             ->exists();
 
-        if (!$recentView) {
+        if (! $recentView) {
             $this->views()->create([
                 'ip_address' => $ipAddress ?: request()->ip(),
                 'user_agent' => $userAgent ?: request()->userAgent(),
                 'user_id' => $userId ?: auth()->id(),
-                'viewed_at' => now()
+                'viewed_at' => now(),
             ]);
 
             $this->increment('views_count');

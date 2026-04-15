@@ -7,6 +7,7 @@ use App\Support\ErpChurchScope;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Modules\Igrejas\App\Models\Church;
 
 class ChurchRepository
@@ -112,5 +113,48 @@ class ChurchRepository
         $this->applyListFilters($request, $q);
 
         return $q->orderBy('name');
+    }
+
+    /**
+     * Agregados para o portal público (sem utilizador). Apenas contagens — sem identificação de congregações (LGPD).
+     *
+     * @return array{total_active: int, churches: int, congregations: int, crm_ativas: int}
+     */
+    public function publicAssociationStats(): array
+    {
+        $base = Church::query()->where('is_active', true);
+
+        return [
+            'total_active' => (clone $base)->count(),
+            'churches' => (clone $base)->where('kind', Church::KIND_CHURCH)->count(),
+            'congregations' => (clone $base)->where('kind', Church::KIND_CONGREGATION)->count(),
+            'crm_ativas' => (clone $base)->where('crm_status', Church::CRM_ATIVA)->count(),
+        ];
+    }
+
+    /**
+     * Contagens por UF (apenas agregados). Estados vazios são ignorados.
+     *
+     * @return list<array{state: string, count: int}>
+     */
+    public function publicCountByState(int $limit = 27): array
+    {
+        $q = Church::query()
+            ->where('is_active', true)
+            ->whereNotNull('state')
+            ->where('state', '!=', '');
+
+        $stateExpr = 'UPPER(TRIM(state))';
+
+        $rows = $q->selectRaw($stateExpr.' as state, COUNT(*) as c')
+            ->groupBy(DB::raw($stateExpr))
+            ->orderByDesc('c')
+            ->limit($limit)
+            ->get();
+
+        return $rows->map(fn ($r) => [
+            'state' => (string) $r->state,
+            'count' => (int) $r->c,
+        ])->all();
     }
 }

@@ -72,19 +72,25 @@
                             Mapa de Privilégios
                         </label>
                         <a href="{{ route($permissionsRoutePrefix.'.index') }}" class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-black uppercase tracking-widest bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-lg ring-1 ring-indigo-100 dark:ring-indigo-800/50 transition-all">
-                            Gesto de Permissões →
+                            Gestão de Permissões →
                         </a>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto border border-gray-100 dark:border-slate-700 rounded-2xl p-4 bg-gray-50/30 dark:bg-slate-900/20 custom-scrollbar">
+                    <div class="mb-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <label for="rbac-perm-filter" class="text-[10px] font-bold uppercase tracking-wider text-slate-500 shrink-0">Filtrar</label>
+                        <input type="search" id="rbac-perm-filter" autocomplete="off" placeholder="Módulo ou nome técnico (ex. financeiro.view)…"
+                            class="w-full text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-1.5 font-mono text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/30" />
+                    </div>
+                    <div id="rbac-matrix" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[min(70vh,560px)] overflow-y-auto border border-gray-100 dark:border-slate-700 rounded-xl p-3 bg-gray-50/30 dark:bg-slate-900/20 custom-scrollbar text-xs">
                         @foreach($permissions as $module => $modulePermissions)
                         @php
                             $moduleDisplay = str_replace(['-', '_'], ' ', $module);
                             $moduleDisplay = ucwords($moduleDisplay);
                             $hasAll = collect($modulePermissions)->every(fn($p) => $role->hasPermissionTo($p['name']));
+                            $searchBlob = strtolower($module.' '.$moduleDisplay.' '.collect($modulePermissions)->pluck('name')->implode(' '));
                         @endphp
-                            <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 group shadow-sm">
-                                <div class="flex items-center justify-between mb-4 border-b border-gray-50 dark:border-slate-700/50 pb-3">
-                                    <h4 class="text-xs font-black text-gray-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
+                            <div data-rbac-module data-search="{{ e($searchBlob) }}" class="rbac-module-card bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-3 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 group shadow-sm">
+                                <div class="flex items-center justify-between mb-2 border-b border-gray-50 dark:border-slate-700/50 pb-2">
+                                    <h4 class="text-[11px] font-black text-gray-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
                                         <div class="p-1.5 {{ $hasAll ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' }} rounded-lg group-hover:scale-110 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
@@ -94,16 +100,16 @@
                                     </h4>
                                     <span class="text-[10px] font-black {{ $hasAll ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' : 'text-gray-400 bg-gray-50 dark:bg-slate-900/50' }} px-2 py-0.5 rounded-lg ring-1 ring-black/5">{{ count($modulePermissions) }} privilégios</span>
                                 </div>
-                                <div class="grid grid-cols-1 gap-2">
+                                <div class="grid grid-cols-1 gap-1">
                                     @foreach($modulePermissions as $permission)
                                         @php $isSet = $role->hasPermissionTo($permission['name']); @endphp
-                                        <label class="flex items-start gap-3 cursor-pointer {{ $isSet ? 'bg-indigo-50/30 dark:bg-indigo-900/10' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50' }} p-2 rounded-lg transition-all group/perm relative ring-1 {{ $isSet ? 'ring-indigo-100 dark:ring-indigo-900/30' : 'ring-transparent hover:ring-gray-100' }}">
-                                            <input type="checkbox" name="permissions[]" value="{{ $permission['id'] }}" id="perm_{{ $permission['id'] }}" {{ $isSet ? 'checked' : '' }} class="w-4 h-4 mt-0.5 text-indigo-600 bg-gray-100 border-gray-300 rounded-lg focus:ring-indigo-500/20 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 transition-all cursor-pointer">
+                                        <label class="flex items-start gap-2 cursor-pointer {{ $isSet ? 'bg-indigo-50/30 dark:bg-indigo-900/10' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50' }} p-1.5 rounded-md transition-all group/perm relative ring-1 {{ $isSet ? 'ring-indigo-100 dark:ring-indigo-900/30' : 'ring-transparent hover:ring-gray-100' }}">
+                                            <input type="checkbox" name="permissions[]" value="{{ $permission['id'] }}" id="perm_{{ $permission['id'] }}" {{ $isSet ? 'checked' : '' }} class="w-3.5 h-3.5 mt-0.5 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500/20 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-1 dark:bg-slate-700 dark:border-slate-600 transition-all cursor-pointer">
                                             <div class="flex-1 min-w-0">
-                                                <span class="text-xs font-bold {{ $isSet ? 'text-indigo-700 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300' }} group-hover/perm:text-indigo-600 dark:group-hover/perm:text-indigo-400 transition-colors block">
+                                                <span class="text-[11px] font-semibold {{ $isSet ? 'text-indigo-700 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300' }} group-hover/perm:text-indigo-600 dark:group-hover/perm:text-indigo-400 transition-colors block">
                                                     {{ $permission['display_name'] ?? $permission['name'] }}
                                                 </span>
-                                                <p class="text-[9px] text-gray-400 dark:text-gray-500 font-mono mt-0.5 break-all opacity-0 group-hover/perm:opacity-100 transition-opacity">{{ $permission['name'] }}</p>
+                                                <p class="text-[9px] text-gray-400 dark:text-gray-500 font-mono mt-0.5 break-all">{{ $permission['name'] }}</p>
                                             </div>
                                         </label>
                                     @endforeach
@@ -128,6 +134,18 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.getElementById('rbac-perm-filter')?.addEventListener('input', function (e) {
+    const q = (e.target.value || '').toLowerCase().trim();
+    document.querySelectorAll('[data-rbac-module]').forEach(function (el) {
+        const hay = (el.getAttribute('data-search') || '').toLowerCase();
+        el.classList.toggle('hidden', q !== '' && !hay.includes(q));
+    });
+});
+</script>
+@endpush
 
 @push('styles')
 <style>

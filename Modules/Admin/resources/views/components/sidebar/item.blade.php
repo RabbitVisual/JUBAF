@@ -19,13 +19,14 @@
     @php
         $indent = ! empty($item['indent']);
         $routeName = $item['route'] ?? '';
+        $routeParams = $item['route_params'] ?? [];
         $simpleSub = in_array($tone, ['orange_sub', 'slate_sub'], true);
     @endphp
     @if ($simpleSub && ! $indent)
-        <a href="{{ Route::has($routeName) ? route($routeName) : '#' }}"
+        <a href="{{ Route::has($routeName) ? route($routeName, $routeParams) : '#' }}"
             class="block px-3 py-2 rounded-lg text-sm {{ $rowTone }}">{{ $item['label'] ?? '' }}</a>
     @else
-        <a href="{{ Route::has($routeName) ? route($routeName) : '#' }}"
+        <a href="{{ Route::has($routeName) ? route($routeName, $routeParams) : '#' }}"
             class="{{ $indent ? 'flex items-center gap-2 ml-4 pl-3 border-l-2 border-emerald-200 dark:border-emerald-900 py-1.5 text-xs font-medium rounded-r-lg transition-colors ' : 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ' }}{{ $rowTone }}">
             @if ($indent)
                 @if (! empty($item['icon']['name']))

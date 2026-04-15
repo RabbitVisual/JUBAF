@@ -309,6 +309,15 @@ final class AdminNavigationBuilder
                     ],
                     [
                         'type' => 'link',
+                        'requires_route' => 'admin.ops.index',
+                        'route' => 'admin.ops.index',
+                        'label' => 'Ops (sistema)',
+                        'tone' => 'red',
+                        'icon' => ['name' => 'gauge-high', 'style' => 'duotone'],
+                        'active' => ['admin.ops.*'],
+                    ],
+                    [
+                        'type' => 'link',
                         'requires_route' => 'admin.audit.index',
                         'route' => 'admin.audit.index',
                         'label' => 'Logs de Auditoria',
@@ -336,8 +345,9 @@ final class AdminNavigationBuilder
                     ],
                     [
                         'type' => 'link',
-                        'requires_route' => 'admin.config.index',
-                        'route' => 'admin.config.index',
+                        'requires_route' => 'admin.config.page',
+                        'route' => 'admin.config.page',
+                        'route_params' => ['section' => 'general'],
                         'label' => 'Configurações',
                         'tone' => 'slate',
                         'icon' => ['name' => 'gear', 'style' => 'duotone'],
@@ -350,7 +360,7 @@ final class AdminNavigationBuilder
                         'label' => 'Controle de Acesso',
                         'tone' => 'slate',
                         'icon' => ['name' => 'shield-halved', 'style' => 'duotone'],
-                        'active' => ['admin.roles.*', 'admin.permissions.*', 'admin.seguranca.*'],
+                        'active' => ['admin.roles.*', 'admin.permissions.*', 'admin.seguranca.*', 'admin.ops.*'],
                         'children' => array_values(array_filter([
                             Route::has('admin.seguranca.hub') ? [
                                 'type' => 'link',

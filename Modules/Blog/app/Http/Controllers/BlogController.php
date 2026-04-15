@@ -4,10 +4,12 @@ namespace Modules\Blog\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Blog\App\Models\BlogPost;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Modules\Blog\App\Models\BlogCategory;
-use Modules\Blog\App\Models\BlogTag;
 use Modules\Blog\App\Models\BlogComment;
+use Modules\Blog\App\Models\BlogPost;
+use Modules\Blog\App\Models\BlogTag;
 
 class BlogController extends Controller
 {
@@ -15,8 +17,8 @@ class BlogController extends Controller
      * Dados reutilizáveis para a coluna lateral do blog (listagens e artigo).
      *
      * @param  string|null  $constrainSearchTo  Quando definido (ex.: página de busca), as últimas publicações na sidebar
-     *                                           respeitam o mesmo termo — evita misturar títulos fora dos resultados.
-     * @return array{latestPostsSidebar: \Illuminate\Support\Collection, popularTagsSidebar: \Illuminate\Support\Collection, sidebarCategories: \Illuminate\Support\Collection}
+     *                                          respeitam o mesmo termo — evita misturar títulos fora dos resultados.
+     * @return array{latestPostsSidebar: Collection, popularTagsSidebar: Collection, sidebarCategories: Collection}
      */
     private function publicBlogSidebar(?BlogPost $excludePost = null, ?string $constrainSearchTo = null): array
     {
@@ -67,13 +69,15 @@ class BlogController extends Controller
 
         $posts = $query->paginate(12);
 
-        // Posts em destaque
-        $featuredPosts = BlogPost::published()
-            ->featured()
-            ->with(['category', 'author'])
-            ->orderBy('published_at', 'desc')
-            ->limit(3)
-            ->get();
+        // Posts em destaque (cache alinhado a invalidação no modelo)
+        $featuredPosts = Cache::remember('blog.public.featured', 300, function () {
+            return BlogPost::published()
+                ->featured()
+                ->with(['category', 'author'])
+                ->orderBy('published_at', 'desc')
+                ->limit(3)
+                ->get();
+        });
 
         // Categorias para menu
         $categories = BlogCategory::active()
@@ -181,7 +185,7 @@ class BlogController extends Controller
     {
         $post = BlogPost::published()->findOrFail($postId);
 
-        if (!$post->allow_comments) {
+        if (! $post->allow_comments) {
             return redirect()->back()->with('error', 'Comentários não são permitidos neste post.');
         }
 
@@ -199,12 +203,12 @@ class BlogController extends Controller
         $validated['user_agent'] = $request->userAgent();
 
         // Se é uma resposta, verificar se o comentário pai pertence ao mesmo post
-        if (!empty($validated['parent_id'])) {
+        if (! empty($validated['parent_id'])) {
             $parentComment = BlogComment::where('id', $validated['parent_id'])
                 ->where('post_id', $post->id)
                 ->first();
 
-            if (!$parentComment) {
+            if (! $parentComment) {
                 return redirect()->back()->with('error', 'Comentário pai inválido.');
             }
         }

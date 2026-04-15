@@ -3,11 +3,14 @@
 namespace Modules\Calendario\App\Models;
 
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Modules\Avisos\App\Models\Aviso;
 use Modules\Blog\App\Models\BlogPost;
@@ -113,6 +116,14 @@ class CalendarEvent extends Model
             if (empty($e->preview_token)) {
                 $e->preview_token = Str::random(48);
             }
+        });
+
+        static::saved(function () {
+            Cache::forget('homepage.portal.upcoming_events');
+        });
+
+        static::deleted(function () {
+            Cache::forget('homepage.portal.upcoming_events');
         });
     }
 
@@ -229,7 +240,7 @@ class CalendarEvent extends Model
         return in_array((int) $this->church_id, $user->affiliatedChurchIds(), true);
     }
 
-    public function isRegistrationPeriodOpen(?\Carbon\CarbonInterface $at = null): bool
+    public function isRegistrationPeriodOpen(?CarbonInterface $at = null): bool
     {
         if (! $this->registration_open) {
             return false;
@@ -286,9 +297,9 @@ class CalendarEvent extends Model
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, static>
+     * @return Collection<int, static>
      */
-    public static function localChurchEventsOverlapping(\Carbon\CarbonInterface $startsAt, \Carbon\CarbonInterface $endsAt)
+    public static function localChurchEventsOverlapping(CarbonInterface $startsAt, CarbonInterface $endsAt)
     {
         return static::query()
             ->whereNotNull('church_id')

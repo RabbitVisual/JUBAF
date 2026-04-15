@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\AuditLog;
 use App\Models\SystemConfig;
+use App\Support\JubafRoleRegistry;
 use Illuminate\Support\Facades\Artisan;
 
 class SystemConfigService
@@ -23,6 +24,13 @@ class SystemConfigService
 
             $grouped[$config->group][] = $config;
         }
+
+        ksort($grouped);
+
+        foreach ($grouped as &$items) {
+            usort($items, fn (SystemConfig $a, SystemConfig $b) => strcmp((string) $a->key, (string) $b->key));
+        }
+        unset($items);
 
         return $grouped;
     }
@@ -185,6 +193,18 @@ class SystemConfigService
                 'type' => 'string',
                 'group' => 'recaptcha',
                 'description' => 'Score mínimo aceito (0.0 a 1.0). Recomendado: 0.5',
+            ],
+            'gateway.default_driver' => [
+                'value' => (string) config('gateway.default_driver', 'mercadopago'),
+                'type' => 'string',
+                'group' => 'gateway',
+                'description' => '[Gateway] Provedor de pagamento em linha por defeito',
+            ],
+            'gateway.default_currency' => [
+                'value' => (string) config('gateway.default_currency', 'BRL'),
+                'type' => 'string',
+                'group' => 'gateway',
+                'description' => '[Gateway] Moeda por defeito (ISO 4217, ex.: BRL)',
             ],
             // Configurações Google Maps
             'google_maps.api_key' => [
@@ -448,6 +468,24 @@ class SystemConfigService
                 'group' => 'homepage',
                 'description' => 'Subtítulo do bloco de newsletter',
             ],
+            'homepage_institutional_cnpj' => [
+                'value' => '',
+                'type' => 'string',
+                'group' => 'homepage',
+                'description' => 'CNPJ institucional (exibido no rodapé público)',
+            ],
+            'homepage_portal_igrejas_enabled' => [
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'homepage',
+                'description' => 'Mostrar bloco de igrejas associadas (dados agregados) na homepage',
+            ],
+            'homepage_portal_eventos_enabled' => [
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'homepage',
+                'description' => 'Mostrar próximos eventos públicos na homepage',
+            ],
             'integrations_notify_on_devotional_published' => [
                 'value' => '0',
                 'type' => 'boolean',
@@ -459,6 +497,40 @@ class SystemConfigService
                 'type' => 'boolean',
                 'group' => 'integrations',
                 'description' => 'Restringir widget de chat à página inicial (quando suportado)',
+            ],
+
+            // Módulos / site público
+            'carousel_enabled' => [
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'modules',
+                'description' => '[Homepage] Carrossel de imagens na página inicial pública.',
+            ],
+
+            // Painéis Admin, Diretoria e RBAC (Permissão)
+            'admin.impersonation_enabled' => [
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'panels_access',
+                'description' => '[Admin — segurança] Permitir personificação de utilizadores (rotas protegidas; só super-admin). Desligue se a política interna proibir.',
+            ],
+            'permisao.show_rbac_banner' => [
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'panels_access',
+                'description' => '[Permissões / RBAC] Mostrar a faixa «Utilizadores → Funções → Permissões» nos ecrãs de gestão da diretoria.',
+            ],
+            'chat.agent_extra_roles' => [
+                'value' => '',
+                'type' => 'string',
+                'group' => 'roles',
+                'description' => '[Chat] Papéis extra que podem ser agentes de suporte (escolha na página Papéis e agentes).',
+            ],
+            'avisos.publish_extra_roles' => [
+                'value' => '',
+                'type' => 'string',
+                'group' => 'roles',
+                'description' => '[Avisos] Papéis extra autorizados a publicar avisos institucionais.',
             ],
 
             // Notificações, Evolution API, Financeiro (quotas), Igrejas — espelhado no .env
@@ -673,6 +745,30 @@ class SystemConfigService
     }
 
     /**
+     * Gateway — driver e moeda por defeito (cria linhas em falta; não sobrescreve valores já gravados).
+     */
+    public function ensureGatewayConfigs(): void
+    {
+        $defaults = $this->getDefaultConfigs();
+        foreach (['gateway.default_driver', 'gateway.default_currency'] as $key) {
+            if (SystemConfig::where('key', $key)->exists()) {
+                continue;
+            }
+            $meta = $defaults[$key] ?? null;
+            if ($meta === null) {
+                continue;
+            }
+            SystemConfig::create([
+                'key' => $key,
+                'value' => $meta['value'],
+                'type' => $meta['type'],
+                'group' => 'gateway',
+                'description' => $meta['description'],
+            ]);
+        }
+    }
+
+    /**
      * Ensure Mail configs exist (sync with .env)
      */
     public function ensureMailConfigs(): void
@@ -761,6 +857,102 @@ class SystemConfigService
                     'type' => $meta['type'],
                     'group' => $meta['group'],
                     'description' => $meta['description'],
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Painéis (Admin / Diretoria / RBAC), carrossel na homepage e chaves relacionadas.
+     */
+    public function ensurePanelsAccessAndModulesDefaults(): void
+    {
+        $defaults = $this->getDefaultConfigs();
+
+        foreach ($defaults as $key => $meta) {
+            if (($meta['group'] ?? '') !== 'panels_access') {
+                continue;
+            }
+            if (! SystemConfig::where('key', $key)->exists()) {
+                SystemConfig::create([
+                    'key' => $key,
+                    'value' => $meta['value'],
+                    'type' => $meta['type'],
+                    'group' => $meta['group'],
+                    'description' => $meta['description'],
+                ]);
+            }
+        }
+
+        $carouselMeta = $defaults['carousel_enabled'] ?? null;
+        $carousel = SystemConfig::where('key', 'carousel_enabled')->first();
+        if ($carousel) {
+            $carousel->group = 'modules';
+            if ($carouselMeta && (trim((string) $carousel->description) === '' || $carousel->description === 'Habilita carrossel na homepage')) {
+                $carousel->description = $carouselMeta['description'];
+            }
+            $carousel->save();
+        } elseif ($carouselMeta) {
+            SystemConfig::create([
+                'key' => 'carousel_enabled',
+                'value' => $carouselMeta['value'],
+                'type' => $carouselMeta['type'],
+                'group' => 'modules',
+                'description' => $carouselMeta['description'],
+            ]);
+        }
+    }
+
+    /**
+     * Papéis — rótulos/ajuda editáveis, agentes de chat e publicadores de avisos; remove chave legada do painel.
+     */
+    public function ensureRolesAndLabelsConfigs(): void
+    {
+        SystemConfig::where('key', 'access.legacy_co_admin_diretoria')->delete();
+
+        $defaults = $this->getDefaultConfigs();
+
+        foreach (['chat.agent_extra_roles', 'avisos.publish_extra_roles'] as $key) {
+            $row = SystemConfig::where('key', $key)->first();
+            if ($row && $row->group !== 'roles') {
+                $row->group = 'roles';
+                $row->save();
+            }
+            if (! SystemConfig::where('key', $key)->exists()) {
+                $meta = $defaults[$key] ?? null;
+                if ($meta !== null) {
+                    SystemConfig::create([
+                        'key' => $key,
+                        'value' => $meta['value'],
+                        'type' => $meta['type'],
+                        'group' => 'roles',
+                        'description' => $meta['description'],
+                    ]);
+                }
+            }
+        }
+
+        foreach (JubafRoleRegistry::roleSlugsForPanelLabels() as $slug) {
+            $labelKey = 'role.display.'.$slug;
+            if (! SystemConfig::where('key', $labelKey)->exists()) {
+                SystemConfig::create([
+                    'key' => $labelKey,
+                    'value' => (string) config('jubaf_roles.labels.'.$slug, ''),
+                    'type' => 'string',
+                    'group' => 'roles',
+                    'description' => 'Nome exibido no painel para o papel «'.$slug.'»',
+                ]);
+            }
+
+            $helpKey = 'role.help.'.$slug;
+            if (! SystemConfig::where('key', $helpKey)->exists()) {
+                $help = config('jubaf_roles.descriptions.'.$slug);
+                SystemConfig::create([
+                    'key' => $helpKey,
+                    'value' => $help ? (string) $help : '',
+                    'type' => 'text',
+                    'group' => 'roles',
+                    'description' => 'Texto de ajuda (opcional) para «'.$slug.'»',
                 ]);
             }
         }
@@ -970,14 +1162,19 @@ class SystemConfigService
      */
     protected function envKeyForConfigKey(string $key): ?string
     {
-        if ($key === 'system.name') {
-            return 'APP_NAME';
+        $direct = [
+            'system.name' => 'APP_NAME',
+            'security.session_timeout' => 'SESSION_LIFETIME',
+        ];
+        if (isset($direct[$key])) {
+            return $direct[$key];
         }
 
         $prefixes = [
             'mail.',
             'recaptcha.',
             'google_maps.',
+            'gateway.',
             'broadcast.',
             'pusher.',
             'notificacoes.',

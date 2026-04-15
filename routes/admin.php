@@ -10,9 +10,21 @@ use App\Http\Controllers\Admin\CarouselController;
 use App\Http\Controllers\Admin\DevotionalController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\SystemConfigController;
+use App\Http\Controllers\Admin\SystemOpsController;
 use App\Http\Controllers\Admin\UpdateController;
 use Illuminate\Support\Facades\Route;
 use Modules\Avisos\App\Http\Controllers\Admin\AvisosAdminController;
+use Modules\Blog\App\Http\Controllers\Admin\BlogAdminController;
+use Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController;
+use Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController;
+use Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController;
+use Modules\Blog\App\Http\Controllers\BlogIntegrationController;
+use Modules\Chat\App\Http\Controllers\Admin\ChatAdminController;
+use Modules\Chat\App\Http\Controllers\Api\ChatApiController;
+use Modules\Homepage\App\Http\Controllers\Admin\HomepageAdminController;
+use Modules\Homepage\App\Http\Controllers\Admin\HomepageContactAdminController;
+use Modules\Homepage\App\Http\Controllers\Admin\HomepageNewsletterAdminController;
+use Modules\Notificacoes\App\Http\Controllers\Admin\NotificacoesAdminController;
 use Modules\Permisao\App\Http\Controllers\AccessHubController;
 use Modules\Permisao\App\Http\Controllers\PermissionManagementController;
 use Modules\Permisao\App\Http\Controllers\RoleManagementController;
@@ -41,16 +53,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/carousel/reorder', [CarouselController::class, 'reorder'])->name('carousel.reorder');
 
         if (module_enabled('Homepage')) {
-            Route::get('/homepage', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageAdminController::class, 'index'])->name('homepage.index');
-            Route::put('/homepage', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageAdminController::class, 'update'])->name('homepage.update');
-            Route::post('/homepage/toggle-section', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageAdminController::class, 'toggleSection'])->name('homepage.toggle-section');
-            Route::get('/homepage/contacts', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageContactAdminController::class, 'index'])->name('homepage.contacts.index');
-            Route::get('/homepage/contacts/{id}', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageContactAdminController::class, 'show'])->name('homepage.contacts.show')->whereNumber('id');
-            Route::delete('/homepage/contacts/{id}', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageContactAdminController::class, 'destroy'])->name('homepage.contacts.destroy')->whereNumber('id');
-            Route::get('/homepage/newsletter', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageNewsletterAdminController::class, 'index'])->name('homepage.newsletter.index');
-            Route::get('/homepage/newsletter/compose', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageNewsletterAdminController::class, 'create'])->name('homepage.newsletter.create');
-            Route::post('/homepage/newsletter/send', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageNewsletterAdminController::class, 'send'])->name('homepage.newsletter.send');
-            Route::delete('/homepage/newsletter/{id}', [\Modules\Homepage\App\Http\Controllers\Admin\HomepageNewsletterAdminController::class, 'destroy'])->name('homepage.newsletter.destroy')->whereNumber('id');
+            Route::get('/homepage', [HomepageAdminController::class, 'index'])->name('homepage.index');
+            Route::put('/homepage', [HomepageAdminController::class, 'update'])->name('homepage.update');
+            Route::post('/homepage/toggle-section', [HomepageAdminController::class, 'toggleSection'])->name('homepage.toggle-section');
+            Route::get('/homepage/contacts', [HomepageContactAdminController::class, 'index'])->name('homepage.contacts.index');
+            Route::get('/homepage/contacts/{id}', [HomepageContactAdminController::class, 'show'])->name('homepage.contacts.show')->whereNumber('id');
+            Route::delete('/homepage/contacts/{id}', [HomepageContactAdminController::class, 'destroy'])->name('homepage.contacts.destroy')->whereNumber('id');
+            Route::get('/homepage/newsletter', [HomepageNewsletterAdminController::class, 'index'])->name('homepage.newsletter.index');
+            Route::get('/homepage/newsletter/compose', [HomepageNewsletterAdminController::class, 'create'])->name('homepage.newsletter.create');
+            Route::post('/homepage/newsletter/send', [HomepageNewsletterAdminController::class, 'send'])->name('homepage.newsletter.send');
+            Route::delete('/homepage/newsletter/{id}', [HomepageNewsletterAdminController::class, 'destroy'])->name('homepage.newsletter.destroy')->whereNumber('id');
             Route::resource('board-members', BoardMemberController::class)->except(['show']);
             Route::post('devotionals/fetch-scripture', [DevotionalController::class, 'fetchScripture'])->name('devotionals.fetch-scripture');
             Route::get('devotionals/bible-books', [DevotionalController::class, 'bibleBooks'])->name('devotionals.bible-books');
@@ -61,43 +73,43 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         if (module_enabled('Blog')) {
             Route::prefix('blog')->name('blog.')->group(function () {
                 Route::prefix('categorias')->name('categories.')->group(function () {
-                    Route::get('/', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'index'])->name('index');
-                    Route::get('/create', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'create'])->name('create');
-                    Route::post('/', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'store'])->name('store');
-                    Route::get('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'show'])->name('show');
-                    Route::get('/{id}/edit', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'edit'])->name('edit');
-                    Route::put('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'update'])->name('update');
-                    Route::delete('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'destroy'])->name('destroy');
-                    Route::post('/{id}/toggle-status', [\Modules\Blog\App\Http\Controllers\Admin\BlogCategoriesAdminController::class, 'toggleStatus'])->name('toggle-status');
+                    Route::get('/', [BlogCategoriesAdminController::class, 'index'])->name('index');
+                    Route::get('/create', [BlogCategoriesAdminController::class, 'create'])->name('create');
+                    Route::post('/', [BlogCategoriesAdminController::class, 'store'])->name('store');
+                    Route::get('/{id}', [BlogCategoriesAdminController::class, 'show'])->name('show');
+                    Route::get('/{id}/edit', [BlogCategoriesAdminController::class, 'edit'])->name('edit');
+                    Route::put('/{id}', [BlogCategoriesAdminController::class, 'update'])->name('update');
+                    Route::delete('/{id}', [BlogCategoriesAdminController::class, 'destroy'])->name('destroy');
+                    Route::post('/{id}/toggle-status', [BlogCategoriesAdminController::class, 'toggleStatus'])->name('toggle-status');
                 });
 
                 Route::prefix('tags')->name('tags.')->group(function () {
-                    Route::get('/', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'index'])->name('index');
-                    Route::get('/create', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'create'])->name('create');
-                    Route::post('/', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'store'])->name('store');
-                    Route::get('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'show'])->name('show')->whereNumber('id');
-                    Route::get('/{id}/edit', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'edit'])->name('edit');
-                    Route::put('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'update'])->name('update');
-                    Route::delete('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'destroy'])->name('destroy');
-                    Route::post('/clean-unused', [\Modules\Blog\App\Http\Controllers\Admin\BlogTagsAdminController::class, 'cleanUnused'])->name('clean-unused');
+                    Route::get('/', [BlogTagsAdminController::class, 'index'])->name('index');
+                    Route::get('/create', [BlogTagsAdminController::class, 'create'])->name('create');
+                    Route::post('/', [BlogTagsAdminController::class, 'store'])->name('store');
+                    Route::get('/{id}', [BlogTagsAdminController::class, 'show'])->name('show')->whereNumber('id');
+                    Route::get('/{id}/edit', [BlogTagsAdminController::class, 'edit'])->name('edit');
+                    Route::put('/{id}', [BlogTagsAdminController::class, 'update'])->name('update');
+                    Route::delete('/{id}', [BlogTagsAdminController::class, 'destroy'])->name('destroy');
+                    Route::post('/clean-unused', [BlogTagsAdminController::class, 'cleanUnused'])->name('clean-unused');
                 });
 
                 Route::prefix('comentarios')->name('comments.')->group(function () {
-                    Route::get('/', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'index'])->name('index');
-                    Route::get('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'show'])->name('show');
-                    Route::post('/{id}/aprovar', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'approve'])->name('approve');
-                    Route::post('/{id}/rejeitar', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'reject'])->name('reject');
-                    Route::delete('/{id}', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'destroy'])->name('destroy');
-                    Route::post('/bulk/aprovar', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'bulkApprove'])->name('bulk.approve');
-                    Route::post('/bulk/rejeitar', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'bulkReject'])->name('bulk.reject');
-                    Route::delete('/bulk/excluir', [\Modules\Blog\App\Http\Controllers\Admin\BlogCommentsAdminController::class, 'bulkDelete'])->name('bulk.delete');
+                    Route::get('/', [BlogCommentsAdminController::class, 'index'])->name('index');
+                    Route::get('/{id}', [BlogCommentsAdminController::class, 'show'])->name('show');
+                    Route::post('/{id}/aprovar', [BlogCommentsAdminController::class, 'approve'])->name('approve');
+                    Route::post('/{id}/rejeitar', [BlogCommentsAdminController::class, 'reject'])->name('reject');
+                    Route::delete('/{id}', [BlogCommentsAdminController::class, 'destroy'])->name('destroy');
+                    Route::post('/bulk/aprovar', [BlogCommentsAdminController::class, 'bulkApprove'])->name('bulk.approve');
+                    Route::post('/bulk/rejeitar', [BlogCommentsAdminController::class, 'bulkReject'])->name('bulk.reject');
+                    Route::delete('/bulk/excluir', [BlogCommentsAdminController::class, 'bulkDelete'])->name('bulk.delete');
                 });
 
-                Route::post('/generate-monthly-report', [\Modules\Blog\App\Http\Controllers\BlogIntegrationController::class, 'generateMonthlyReport'])->name('generate-monthly-report');
-                Route::post('/upload-image', [\Modules\Blog\App\Http\Controllers\Admin\BlogAdminController::class, 'uploadEditorImage'])->name('upload-image');
-                Route::post('/redact-image', [\Modules\Blog\App\Http\Controllers\Admin\BlogAdminController::class, 'redactImage'])->name('redact-image');
+                Route::post('/generate-monthly-report', [BlogIntegrationController::class, 'generateMonthlyReport'])->name('generate-monthly-report');
+                Route::post('/upload-image', [BlogAdminController::class, 'uploadEditorImage'])->name('upload-image');
+                Route::post('/redact-image', [BlogAdminController::class, 'redactImage'])->name('redact-image');
 
-                Route::resource('/', \Modules\Blog\App\Http\Controllers\Admin\BlogAdminController::class)->names([
+                Route::resource('/', BlogAdminController::class)->names([
                     'index' => 'index',
                     'create' => 'create',
                     'store' => 'store',
@@ -110,25 +122,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         }
 
         if (module_enabled('Notificacoes')) {
-            Route::post('notificacoes/mark-all-read', [\Modules\Notificacoes\App\Http\Controllers\Admin\NotificacoesAdminController::class, 'markAllAsRead'])->name('notificacoes.markAllAsRead');
-            Route::post('notificacoes/{id}/read', [\Modules\Notificacoes\App\Http\Controllers\Admin\NotificacoesAdminController::class, 'markAsRead'])->name('notificacoes.markAsRead');
-            Route::resource('notificacoes', \Modules\Notificacoes\App\Http\Controllers\Admin\NotificacoesAdminController::class)->except(['edit', 'update']);
+            Route::post('notificacoes/mark-all-read', [NotificacoesAdminController::class, 'markAllAsRead'])->name('notificacoes.markAllAsRead');
+            Route::post('notificacoes/{id}/read', [NotificacoesAdminController::class, 'markAsRead'])->name('notificacoes.markAsRead');
+            Route::resource('notificacoes', NotificacoesAdminController::class)->except(['edit', 'update']);
         }
 
         if (module_enabled('Chat')) {
             Route::prefix('chat')->name('chat.')->group(function () {
-                Route::get('/', [\Modules\Chat\App\Http\Controllers\Admin\ChatAdminController::class, 'index'])->name('index');
-                Route::get('/config', [\Modules\Chat\App\Http\Controllers\Admin\ChatAdminController::class, 'config'])->name('config');
-                Route::put('/config', [\Modules\Chat\App\Http\Controllers\Admin\ChatAdminController::class, 'updateConfig'])->name('config.update');
-                Route::get('/{id}', [\Modules\Chat\App\Http\Controllers\Admin\ChatAdminController::class, 'show'])->name('show');
-                Route::post('/{id}/assign', [\Modules\Chat\App\Http\Controllers\Admin\ChatAdminController::class, 'assign'])->name('assign');
-                Route::post('/{id}/close', [\Modules\Chat\App\Http\Controllers\Admin\ChatAdminController::class, 'close'])->name('close');
+                Route::get('/', [ChatAdminController::class, 'index'])->name('index');
+                Route::get('/config', [ChatAdminController::class, 'config'])->name('config');
+                Route::put('/config', [ChatAdminController::class, 'updateConfig'])->name('config.update');
+                Route::get('/{id}', [ChatAdminController::class, 'show'])->name('show');
+                Route::post('/{id}/assign', [ChatAdminController::class, 'assign'])->name('assign');
+                Route::post('/{id}/close', [ChatAdminController::class, 'close'])->name('close');
 
                 Route::prefix('api')->name('api.')->group(function () {
-                    Route::get('/session/{sessionId}/messages', [\Modules\Chat\App\Http\Controllers\Api\ChatApiController::class, 'getMessages'])->name('session.messages');
-                    Route::post('/session/{sessionId}/message', [\Modules\Chat\App\Http\Controllers\Api\ChatApiController::class, 'sendMessage'])->name('session.message');
-                    Route::post('/session/{sessionId}/typing', [\Modules\Chat\App\Http\Controllers\Api\ChatApiController::class, 'sendTypingIndicator'])->name('session.typing');
-                    Route::post('/session/{sessionId}/read', [\Modules\Chat\App\Http\Controllers\Api\ChatApiController::class, 'markAsRead'])->name('session.read');
+                    Route::get('/session/{sessionId}/messages', [ChatApiController::class, 'getMessages'])->name('session.messages');
+                    Route::post('/session/{sessionId}/message', [ChatApiController::class, 'sendMessage'])->name('session.message');
+                    Route::post('/session/{sessionId}/typing', [ChatApiController::class, 'sendTypingIndicator'])->name('session.typing');
+                    Route::post('/session/{sessionId}/read', [ChatApiController::class, 'markAsRead'])->name('session.read');
                 });
             });
         }
@@ -174,10 +186,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::delete('/permissions/{permission}', [PermissionManagementController::class, 'destroy'])->name('permissions.destroy');
 
         Route::get('/config', [SystemConfigController::class, 'index'])->name('config.index');
+        Route::get('/config/page/{section}', [SystemConfigController::class, 'page'])->name('config.page');
         Route::put('/config', [SystemConfigController::class, 'update'])->name('config.update');
         Route::post('/config/initialize', [SystemConfigController::class, 'initialize'])->name('config.initialize');
         Route::post('/config/branding/upload', [BrandingController::class, 'upload'])->name('config.branding.upload');
         Route::post('/config/branding/restore', [BrandingController::class, 'restore'])->name('config.branding.restore');
+
+        Route::get('/ops', [SystemOpsController::class, 'index'])->name('ops.index');
 
         Route::get('/audit', [AuditLogController::class, 'index'])->name('audit.index');
         if (module_enabled('Gateway')) {

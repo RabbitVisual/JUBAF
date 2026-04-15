@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Church extends Model
@@ -116,6 +117,16 @@ class Church extends Model
             } elseif ($church->isDirty('is_active') && ! $church->isDirty('crm_status')) {
                 $church->crm_status = $church->is_active ? self::CRM_ATIVA : self::CRM_INATIVA;
             }
+        });
+
+        static::saved(function () {
+            Cache::forget('homepage.portal.church_stats');
+            Cache::forget('homepage.portal.church_by_state');
+        });
+
+        static::deleted(function () {
+            Cache::forget('homepage.portal.church_stats');
+            Cache::forget('homepage.portal.church_by_state');
         });
     }
 

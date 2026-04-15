@@ -10,12 +10,18 @@ use App\Models\Devotional;
 use App\Models\HomepageContactMessage;
 use App\Models\HomepageNewsletterSubscriber;
 use App\Models\SystemConfig;
+use App\Support\SiteBranding;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Modules\Bible\App\Services\BibleApiService;
-use Modules\Homepage\App\Support\HomepageDefaults;
+use Modules\Calendario\App\Models\CalendarEvent;
+use Modules\Calendario\App\Services\EventService;
 use Modules\Homepage\App\Support\HomepageBibleDaily;
+use Modules\Homepage\App\Support\HomepageDefaults;
+use Modules\Igrejas\App\Repositories\ChurchRepository;
 
 class HomepageController extends Controller
 {
@@ -72,13 +78,30 @@ class HomepageController extends Controller
             'newsletter_public_enabled' => (bool) SystemConfig::get('homepage_newsletter_public_enabled', true),
             'newsletter_box_title' => SystemConfig::get('homepage_newsletter_box_title', 'Newsletter JUBAF'),
             'newsletter_box_lead' => SystemConfig::get('homepage_newsletter_box_lead', 'Receba novidades da juventude batista feirense na sua caixa de entrada.'),
+            'institutional_cnpj' => SystemConfig::get('homepage_institutional_cnpj', ''),
         ];
 
         $servicosCards = $this->resolveServicosCards();
 
         $bibleDailyBlock = HomepageBibleDaily::resolveForPublic();
 
-        return view('homepage::index', compact('carouselSlides', 'carouselEnabled', 'configs', 'servicosCards', 'bibleDailyBlock'));
+        [$portalChurchStats, $portalChurchByState, $portalUpcomingEvents] = $this->resolvePortalDynamicData();
+
+        if ($portalChurchStats !== null) {
+            $configs['sobre_stat1_value'] = (string) $portalChurchStats['churches'];
+            $configs['sobre_stat1_label'] = SystemConfig::get('homepage_sobre_stat1_label', 'Igrejas associadas');
+        }
+
+        return view('homepage::index', compact(
+            'carouselSlides',
+            'carouselEnabled',
+            'configs',
+            'servicosCards',
+            'bibleDailyBlock',
+            'portalChurchStats',
+            'portalChurchByState',
+            'portalUpcomingEvents'
+        ));
     }
 
     /**
@@ -97,6 +120,37 @@ class HomepageController extends Controller
         }
 
         return $arr;
+    }
+
+    /**
+     * @return array{0: ?array<string, int>, 1: list<array{state: string, count: int}>, 2: Collection<int, CalendarEvent>}
+     */
+    private function resolvePortalDynamicData(): array
+    {
+        $ttl = (int) config('homepage.portal_cache_ttl', 600);
+        if ($ttl < 60) {
+            $ttl = 60;
+        }
+
+        $churchStats = null;
+        $churchByState = [];
+        if (module_enabled('Igrejas') && (bool) SystemConfig::get('homepage_portal_igrejas_enabled', true)) {
+            $churchStats = Cache::remember('homepage.portal.church_stats', $ttl, function () {
+                return app(ChurchRepository::class)->publicAssociationStats();
+            });
+            $churchByState = Cache::remember('homepage.portal.church_by_state', $ttl, function () {
+                return app(ChurchRepository::class)->publicCountByState();
+            });
+        }
+
+        $events = collect();
+        if (module_enabled('Calendario') && (bool) SystemConfig::get('homepage_portal_eventos_enabled', true)) {
+            $events = Cache::remember('homepage.portal.upcoming_events', $ttl, function () {
+                return app(EventService::class)->upcomingPublicFeatured(6);
+            });
+        }
+
+        return [$churchStats, $churchByState, $events];
     }
 
     public function privacidade()
@@ -181,7 +235,7 @@ class HomepageController extends Controller
             'homepage_devotionals_page_lead' => SystemConfig::get('homepage_devotionals_page_lead', ''),
         ];
         $rows = Devotional::query()->publishedOrdered()->paginate(12);
-        $metaTitle = $s['homepage_devotionals_page_title'].' — '.\App\Support\SiteBranding::siteName();
+        $metaTitle = $s['homepage_devotionals_page_title'].' — '.SiteBranding::siteName();
 
         return view('homepage::public.devotionals-index', compact('rows', 's', 'metaTitle'));
     }

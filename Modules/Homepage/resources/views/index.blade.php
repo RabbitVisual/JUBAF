@@ -259,6 +259,8 @@ $descContent = trim($descContent);
                                                                                                                     container-class="container mx-auto px-4 sm:px-6 lg:px-8 py-8" />
                                                                                                                 @endif
 
+                                                                                                                @include('homepage::partials.portal-institutional')
+
                                                                                                                 @if (!empty($bibleDailyBlock) && ($bibleDailyBlock['position'] ?? '') === 'after_hero')
                                                                                                                     @include('homepage::partials.bible-daily-section', ['block' => $bibleDailyBlock])
                                                                                                                 @endif
