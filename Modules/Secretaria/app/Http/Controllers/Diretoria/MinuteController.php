@@ -4,17 +4,18 @@ namespace Modules\Secretaria\App\Http\Controllers\Diretoria;
 
 use App\Http\Controllers\Controller;
 use App\Support\ErpChurchScope;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\Igrejas\App\Models\Church;
 use Modules\Secretaria\App\Http\Controllers\Concerns\RendersSecretariaPanelViews;
 use Modules\Secretaria\App\Models\Meeting;
-use Modules\Secretaria\App\Events\MinutePublished;
 use Modules\Secretaria\App\Models\Minute;
 use Modules\Secretaria\App\Models\MinuteAttachment;
 use Modules\Secretaria\App\Models\MinuteTemplate;
+use Modules\Secretaria\App\Services\AtaWorkflowService;
+use Modules\Secretaria\App\Services\PdfGenerationService;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MinuteController extends Controller
@@ -72,7 +73,7 @@ class MinuteController extends Controller
             $templateBody = $tpl?->body;
         }
 
-        $minute = new Minute(['body' => $templateBody]);
+        $minute = new Minute(['content' => $templateBody]);
 
         return $this->secretariaView('minutes.create', [
             'minute' => $minute,
@@ -89,11 +90,15 @@ class MinuteController extends Controller
             'meeting_id' => ['nullable', 'exists:secretaria_meetings,id'],
             'church_id' => ['nullable', 'exists:igrejas_churches,id'],
             'title' => ['required', 'string', 'max:255'],
-            'body' => ['nullable', 'string'],
+            'content' => ['nullable', 'string'],
             'executive_summary' => ['nullable', 'string', 'max:2000'],
         ]);
         $data['status'] = 'draft';
         $data['created_by_id'] = $request->user()->id;
+        $data['meeting_date'] = $data['meeting_id']
+            ? Meeting::query()->whereKey((int) $data['meeting_id'])->value(DB::raw('DATE(starts_at)'))
+            : null;
+        $data['uuid'] = (string) \Illuminate\Support\Str::uuid();
         $minute = Minute::create($data);
 
         return redirect()->route($this->routePrefix().'.edit', $minute)->with('success', 'Ata em rascunho.');
@@ -103,9 +108,11 @@ class MinuteController extends Controller
     {
         $this->authorize('view', $minute);
         $minute->load(['meeting', 'church', 'creator', 'approvedBy', 'attachments']);
+        $minute->load(['signatures.user']);
 
         return $this->secretariaView('minutes.show', [
             'minute' => $minute,
+            'requiredSignerRoles' => (array) config('secretaria.required_minute_signers', ['presidente', 'secretario-1']),
         ]);
     }
 
@@ -128,7 +135,7 @@ class MinuteController extends Controller
             'meeting_id' => ['nullable', 'exists:secretaria_meetings,id'],
             'church_id' => ['nullable', 'exists:igrejas_churches,id'],
             'title' => ['required', 'string', 'max:255'],
-            'body' => ['nullable', 'string'],
+            'content' => ['nullable', 'string'],
             'executive_summary' => ['nullable', 'string', 'max:2000'],
             'attachments' => ['nullable', 'array', 'max:15'],
             'attachments.*' => ['file', 'max:15360', 'mimes:pdf,doc,docx,jpg,jpeg,png,txt'],
@@ -138,8 +145,11 @@ class MinuteController extends Controller
             'meeting_id' => $data['meeting_id'] ?? null,
             'church_id' => $data['church_id'] ?? null,
             'title' => $data['title'],
-            'body' => $data['body'] ?? null,
+            'content' => $data['content'] ?? null,
             'executive_summary' => $data['executive_summary'] ?? null,
+            'meeting_date' => ! empty($data['meeting_id'])
+                ? Meeting::query()->whereKey((int) $data['meeting_id'])->value(DB::raw('DATE(starts_at)'))
+                : null,
         ]);
 
         $kind = $data['attachment_kind'] ?? MinuteAttachment::KIND_ATTACHMENT;
@@ -194,51 +204,32 @@ class MinuteController extends Controller
         return redirect()->route($this->routePrefix().'.index')->with('success', 'Ata eliminada.');
     }
 
-    public function submit(Minute $minute)
+    public function submit(Minute $minute, AtaWorkflowService $workflowService)
     {
-        $this->authorize('submit', $minute);
-        $minute->update([
-            'status' => 'pending_approval',
-            'submitted_at' => now(),
-        ]);
+        $this->authorize('requestSignatures', $minute);
+        $workflowService->requestSignatures($minute);
 
-        return redirect()->back()->with('success', 'Ata enviada para aprovação do executivo.');
+        return redirect()->back()->with('success', 'Ata enviada para recolha de assinaturas.');
     }
 
-    public function approve(Request $request, Minute $minute)
+    public function sign(Request $request, Minute $minute, AtaWorkflowService $workflowService)
     {
-        $this->authorize('approve', $minute);
-        $minute->update([
-            'status' => 'approved',
-            'approved_by_id' => $request->user()->id,
-            'approved_at' => now(),
+        $this->authorize('sign', $minute);
+        $data = $request->validate([
+            'password' => ['required', 'string', 'min:6'],
         ]);
 
-        return redirect()->back()->with('success', 'Ata aprovada. Pode publicar quando desejar.');
-    }
+        try {
+            $signedMinute = $workflowService->sign($minute, $request->user(), $data['password'], $request);
+        } catch (AuthorizationException $e) {
+            return redirect()->back()->withErrors(['password' => $e->getMessage()]);
+        }
 
-    public function publish(Request $request, Minute $minute)
-    {
-        $this->authorize('publish', $minute);
-        DB::transaction(function () use ($minute) {
-            $publishedAt = now();
-            $protocol = 'ATA-'.$publishedAt->year.'-'.str_pad((string) $minute->id, 5, '0', STR_PAD_LEFT);
-            $minute->update([
-                'status' => 'published',
-                'published_at' => $publishedAt,
-                'locked_at' => $publishedAt,
-                'protocol_number' => $protocol,
-            ]);
-            $minute->refresh();
-            $minute->update([
-                'content_checksum' => $minute->computeContentChecksum(),
-            ]);
-        });
+        $message = $signedMinute->status === 'published'
+            ? 'Assinatura registada e ata publicada com sucesso.'
+            : 'Assinatura registada com sucesso.';
 
-        $fresh = $minute->fresh();
-        event(new MinutePublished($fresh, $request->user()));
-
-        return redirect()->back()->with('success', 'Ata publicada e bloqueada para edição.');
+        return redirect()->back()->with('success', $message);
     }
 
     public function archive(Request $request, Minute $minute)
@@ -251,12 +242,18 @@ class MinuteController extends Controller
         return redirect()->back()->with('success', 'Ata arquivada (somente leitura).');
     }
 
-    public function pdf(Minute $minute)
+    public function pdf(Minute $minute, PdfGenerationService $pdfGenerationService)
     {
         $this->authorize('downloadPdf', $minute);
-        $minute->load(['meeting', 'church', 'creator', 'approvedBy', 'attachments']);
-        $pdf = Pdf::loadView('secretaria::components.minute-pdf', ['minute' => $minute]);
 
-        return $pdf->download('ata-'.$minute->id.'.pdf');
+        if (! $minute->pdf_path || ! Storage::disk('local')->exists($minute->pdf_path)) {
+            $pdfGenerationService->generateAndStore($minute);
+            $minute->refresh();
+        }
+
+        return Storage::disk('local')->download(
+            $minute->pdf_path,
+            'ata-'.$minute->id.'.pdf'
+        );
     }
 }

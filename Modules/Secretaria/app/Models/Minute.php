@@ -5,9 +5,10 @@ namespace Modules\Secretaria\App\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Modules\Igrejas\App\Models\Church;
 
 class Minute extends Model
@@ -17,10 +18,12 @@ class Minute extends Model
     protected $fillable = [
         'meeting_id',
         'church_id',
+        'uuid',
         'title',
         'protocol_number',
-        'body',
+        'content',
         'executive_summary',
+        'meeting_date',
         'status',
         'created_by_id',
         'submitted_at',
@@ -28,12 +31,15 @@ class Minute extends Model
         'approved_at',
         'published_at',
         'locked_at',
+        'document_hash',
+        'pdf_path',
         'content_checksum',
     ];
 
     protected function casts(): array
     {
         return [
+            'meeting_date' => 'date',
             'submitted_at' => 'datetime',
             'approved_at' => 'datetime',
             'published_at' => 'datetime',
@@ -73,6 +79,18 @@ class Minute extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(MinuteAttachment::class, 'minute_id')->orderBy('sort_order');
+    }
+
+    public function signatures(): HasMany
+    {
+        return $this->hasMany(MinuteSignature::class, 'minute_id')->orderBy('signed_at');
+    }
+
+    public function signers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'secretaria_minute_signatures', 'minute_id', 'user_id')
+            ->withPivot(['role_at_the_time', 'ip_address', 'user_agent', 'signed_at'])
+            ->withTimestamps();
     }
 
     public function scopePublishedForOperationalChurches(Builder $query, User $user): Builder
@@ -117,8 +135,22 @@ class Minute extends Model
 
     public function computeContentChecksum(): string
     {
-        $payload = (string) $this->title."\n".(string) $this->body."\n".($this->published_at?->toIso8601String() ?? '');
+        $payload = (string) $this->title."\n".(string) $this->content."\n".($this->published_at?->toIso8601String() ?? '');
 
         return hash('sha256', $payload);
+    }
+
+    public function getBodyAttribute(): ?string
+    {
+        return $this->attributes['body'] ?? $this->attributes['content'] ?? null;
+    }
+
+    public function setBodyAttribute(?string $value): void
+    {
+        $this->attributes['content'] = $value;
+
+        if (array_key_exists('body', $this->attributes)) {
+            $this->attributes['body'] = $value;
+        }
     }
 }

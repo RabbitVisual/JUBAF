@@ -19,6 +19,17 @@ return [
     // Habilitar broadcasting em tempo real
     'broadcasting_enabled' => env('NOTIFICACOES_BROADCASTING_ENABLED', true),
 
+    'evolution' => [
+        'url' => env('EVOLUTION_API_URL'),
+        'key' => env('EVOLUTION_API_KEY'),
+        'instance' => env('EVOLUTION_API_INSTANCE', 'default'),
+    ],
+
+    'whatsapp' => [
+        'base_url' => env('NOTIFICACOES_WHATSAPP_BASE_URL'),
+        'token' => env('NOTIFICACOES_WHATSAPP_TOKEN'),
+    ],
+
     // Tipos de notificações disponíveis
     'types' => [
         'info' => [

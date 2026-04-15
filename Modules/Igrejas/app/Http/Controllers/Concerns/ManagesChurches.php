@@ -209,11 +209,11 @@ trait ManagesChurches
             ->get();
 
         $upcomingEvents = collect();
-        if (Schema::hasTable('calendar_events')) {
+        if (Schema::hasTable('eventos')) {
             $upcomingEvents = CalendarEvent::query()
                 ->where('church_id', $church->id)
-                ->where('starts_at', '>=', now()->startOfDay())
-                ->orderBy('starts_at')
+                ->where('start_date', '>=', now()->startOfDay())
+                ->orderBy('start_date')
                 ->limit(8)
                 ->get();
         }

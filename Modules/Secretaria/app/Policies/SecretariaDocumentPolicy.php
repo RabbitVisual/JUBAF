@@ -17,7 +17,7 @@ class SecretariaDocumentPolicy
 
     protected function documentChurchAllows(User $user, SecretariaDocument $document): bool
     {
-        if ($document->church_id === null) {
+        if ($document->igreja_id === null) {
             return true;
         }
 
@@ -29,7 +29,7 @@ class SecretariaDocumentPolicy
             return true;
         }
 
-        return in_array((int) $document->church_id, $user->churchIdsForSecretariaScope(), true);
+        return in_array((int) $document->igreja_id, $user->churchIdsForSecretariaScope(), true);
     }
 
     public function viewAny(User $user): bool
@@ -44,16 +44,8 @@ class SecretariaDocumentPolicy
             return false;
         }
 
-        if ($document->visibility === 'directorate') {
-            return $this->directorate($user);
-        }
-
-        if ($document->visibility === 'leaders') {
-            if (! ($this->directorate($user) || $user->hasRole('lider'))) {
-                return false;
-            }
-
-            return $this->documentChurchAllows($user, $document);
+        if (! $document->is_public && ! $this->directorate($user)) {
+            return false;
         }
 
         return $this->documentChurchAllows($user, $document);

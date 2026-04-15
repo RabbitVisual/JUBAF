@@ -2,13 +2,13 @@
 
 namespace Modules\Secretaria\App\Listeners;
 
-use Modules\Secretaria\App\Events\MinutePublished;
+use Modules\Secretaria\App\Events\AtaPublished;
 use Modules\Secretaria\App\Services\SecretariaIntegrationBus;
 use Modules\Secretaria\App\Services\SecretariaNotificationDispatcher;
 
 class DispatchMinutePublishedIntegrations
 {
-    public function handle(MinutePublished $event): void
+    public function handle(AtaPublished $event): void
     {
         $minute = $event->minute;
 

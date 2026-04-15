@@ -31,7 +31,7 @@
             </div>
             <div>
                 <dt class="text-xs font-bold uppercase text-gray-500">Referência PSP</dt>
-                <dd class="mt-1 font-mono text-xs break-all">{{ $payment->provider_reference ?? '—' }}</dd>
+                <dd class="mt-1 font-mono text-xs break-all">{{ $payment->external_reference ?? '—' }}</dd>
             </div>
             <div>
                 <dt class="text-xs font-bold uppercase text-gray-500">Lançamento Financeiro</dt>

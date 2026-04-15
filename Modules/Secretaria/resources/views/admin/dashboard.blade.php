@@ -23,10 +23,10 @@
         <div class="rounded-xl border border-amber-200 dark:border-amber-900/40 bg-amber-50/90 dark:bg-amber-950/30 p-4">
             <p class="font-semibold text-amber-900 dark:text-amber-200">Fila executiva</p>
             <ul class="mt-2 text-sm text-amber-900/90 dark:text-amber-100/90 list-disc list-inside">
-                @if($pendingMinutes > 0)<li>{{ $pendingMinutes }} ata(s) aguardam aprovação/publicação.</li>@endif
+                @if($pendingMinutes > 0)<li>{{ $pendingMinutes }} ata(s) aguardam assinaturas.</li>@endif
                 @if($pendingConvocations > 0)<li>{{ $pendingConvocations }} convocatória(s) pendentes.</li>@endif
             </ul>
-            <a href="{{ route($sb.'.atas.index', ['status' => 'pending_approval']) }}" class="mt-2 inline-block text-sm font-medium text-amber-800 dark:text-amber-300 underline">Ver atas</a>
+            <a href="{{ route($sb.'.atas.index', ['status' => 'pending_signatures']) }}" class="mt-2 inline-block text-sm font-medium text-amber-800 dark:text-amber-300 underline">Ver atas</a>
         </div>
     @endif
 

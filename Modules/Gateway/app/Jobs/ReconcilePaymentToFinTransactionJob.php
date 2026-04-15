@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Modules\Calendario\App\Models\CalendarRegistration;
+use Modules\Calendario\App\Events\InscricaoConfirmada;
 use Modules\Financeiro\App\Events\FinancialObligationPaid;
 use Modules\Financeiro\App\Events\PagamentoConfirmado;
 use Modules\Financeiro\App\Models\FinCategory;
@@ -46,7 +47,11 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
         $obligation = $obligationId ? FinObligation::query()->find($obligationId) : null;
         $quotaInvoice = $quotaInvoiceId ? FinQuotaInvoice::query()->find($quotaInvoiceId) : null;
 
-        $churchId = $obligation?->church_id ?? ($quotaInvoice?->church_id ?? ($churchFromPayload ?: null));
+        $registrationChurchId = $payment->user?->church_id;
+        if (! $registrationChurchId && method_exists($payment->user, 'affiliatedChurchIds')) {
+            $registrationChurchId = $payment->user->affiliatedChurchIds()[0] ?? null;
+        }
+        $churchId = $obligation?->church_id ?? ($quotaInvoice?->church_id ?? ($churchFromPayload ?: $registrationChurchId));
         $scope = $churchId ? FinTransaction::SCOPE_CHURCH : FinTransaction::SCOPE_REGIONAL;
 
         $category = $this->resolveCategoryForGateway($obligation, $quotaInvoice);
@@ -71,7 +76,7 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
             $meta = [
                 'gateway_payment_id' => $payment->id,
                 'gateway_driver' => $payment->driver,
-                'provider_reference' => $payment->provider_reference,
+                'provider_reference' => $payment->external_reference,
             ];
             if ($obligation) {
                 $meta['fin_obligation_id'] = $obligation->id;
@@ -91,6 +96,7 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
                 'reference' => 'GW-'.$payment->uuid,
                 'source' => FinTransaction::SOURCE_GATEWAY,
                 'metadata' => $meta,
+                'evento_id' => $payment->payable instanceof CalendarRegistration ? $payment->payable->evento_id : null,
                 'created_by' => $payment->user_id,
             ], FinanceiroService::defaultBankAccount());
 
@@ -119,7 +125,8 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
             event(new PagamentoConfirmado($tx->fresh(), $payment->fresh(), $obligationForEvent, $quotaForEvent));
         });
 
-        $this->finalizePayable($payment->fresh());
+        $payment = $payment->fresh();
+        $this->finalizePayable($payment);
         $this->notifyUser($payment);
     }
 
@@ -166,7 +173,7 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
         $payable = $payment->payable;
         if ($payable instanceof CalendarRegistration) {
             $event = $payable->event;
-            $max = $event?->max_participants;
+            $max = $event?->capacity;
             $othersConfirmed = $event
                 ? $event->registrations()
                     ->where('status', CalendarRegistration::STATUS_CONFIRMED)
@@ -182,6 +189,10 @@ class ReconcilePaymentToFinTransactionJob implements ShouldQueue
                 'payment_status' => 'paid',
                 'amount_charged' => $payment->amount,
             ]);
+
+            if ($status === CalendarRegistration::STATUS_CONFIRMED) {
+                event(new InscricaoConfirmada($payable->fresh(), $payment->fresh()));
+            }
         }
     }
 

@@ -6,9 +6,10 @@ Eventos de domínio usados para integração entre módulos (listeners podem not
 |--------|--------|----------------|---------------------|
 | `Modules\Igrejas\App\Events\ChurchSectorAssigned` | Igrejas | Criação/alteração de `jubaf_sector_id` na congregação | `LogChurchSectorAssignment` |
 | `Modules\Igrejas\App\Events\LeaderAssignedToChurch` | Igrejas | Novo vínculo líder/pastor ↔ igreja (principal ou pivot) | `LogLeaderAssignedToChurch` |
-| `Modules\Secretaria\App\Events\MinutePublished` | Secretaria | Publicação de ata | `DispatchMinutePublishedIntegrations` |
+| `Modules\Secretaria\App\Events\AtaPublished` | Secretaria | Publicação de ata após assinaturas obrigatórias | `DispatchMinutePublishedIntegrations`, `SendAtaSummaryToWhatsApp` |
 | `Modules\Financeiro\App\Events\FinancialObligationGenerated` | Financeiro | Criação de obrigação de cota (`financeiro:generate-obligations`) | `LogFinancialObligationGenerated` |
 | `Modules\Financeiro\App\Events\FinancialObligationPaid` | Financeiro | Pagamento Gateway reconciliado com `fin_obligation_id` no payload | `LogFinancialObligationPaid` |
+| `Modules\Calendario\App\Events\InscricaoConfirmada` | Calendário | Inscrição confirmada após pagamento `PAID` (ou inscrição gratuita) | `EnviarVoucherInscricaoWhatsApp` |
 | `Modules\Talentos\App\Events\TalentSkillValidated` | Talentos | Líder local grava `validated_at` / `validated_by` no pivot `talent_profile_skill` | `SendTalentSkillValidatedNotification` (Notificações in-app, painel jovens) |
 
 ## Payload Gateway (cotas)

@@ -25,13 +25,13 @@ class SendCalendarEventRemindersCommand extends Command
         $tomorrow = Carbon::tomorrow();
         $events = CalendarEvent::query()
             ->where('status', CalendarEvent::STATUS_PUBLISHED)
-            ->whereDate('starts_at', $tomorrow->toDateString())
+            ->whereDate('start_date', $tomorrow->toDateString())
             ->get();
 
         $count = 0;
         foreach ($events as $event) {
             $regs = CalendarRegistration::query()
-                ->where('event_id', $event->id)
+                ->where('evento_id', $event->id)
                 ->where('status', CalendarRegistration::STATUS_CONFIRMED)
                 ->with('user')
                 ->get();
@@ -43,11 +43,11 @@ class SendCalendarEventRemindersCommand extends Command
                 Notificacao::query()->create([
                     'user_id' => $reg->user_id,
                     'title' => 'Lembrete: '.$event->title,
-                    'message' => 'O evento é amanhã ('.$event->starts_at->format('d/m H:i').'). '.($event->location ? 'Local: '.$event->location.'.' : ''),
+                    'message' => 'O evento é amanhã ('.$event->start_date->format('d/m H:i').'). '.($event->location ? 'Local: '.$event->location.'.' : ''),
                     'is_read' => false,
                     'type' => 'calendario.event_reminder',
                     'module_source' => 'Calendario',
-                    'data' => ['calendar_event_id' => $event->id],
+                    'data' => ['evento_id' => $event->id],
                     'panel' => 'jovens',
                 ]);
                 $count++;

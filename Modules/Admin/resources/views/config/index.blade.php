@@ -69,6 +69,10 @@
                                 <x-icon name="puzzle-piece" class="w-5 h-5" />
                                 <span>Integrações</span>
                                 @break
+                            @case('platform_modules')
+                                <x-icon name="bolt" class="w-5 h-5" />
+                                <span>Notificações e módulos</span>
+                                @break
                             @case('bible_homepage')
                                 <x-icon name="book-bible" class="w-5 h-5" style="duotone" />
                                 <span>Bíblia — homepage</span>
@@ -128,6 +132,7 @@
                                 @case('modules') Módulos @break
                                 @case('recaptcha') reCAPTCHA @break
                                 @case('integrations') Integrações @break
+                                @case('platform_modules') Notificações e módulos @break
                                 @case('bible_homepage') Bíblia na homepage @break
                                 @case('homepage') Homepage (rodapé e chaves gerais) @break
                                 @default {{ ucfirst(str_replace('_', ' ', $group)) }}
@@ -135,6 +140,7 @@
                         </h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             @switch($group)
+                                @case('platform_modules') Notificações (e-mail, polling, Evolution API), quotas do Financeiro e alertas do módulo Igrejas — valores gravados no .env e aplicados em todo o projecto. @break
                                 @case('bible_homepage') Versículo do dia, posição, textos e link «Bíblia» no menu público (espelho do painel Homepage). @break
                                 @case('homepage') Chaves gerais da homepage (ex.: créditos no rodapé). @break
                                 @default
@@ -256,7 +262,7 @@
                 // If url has hash, use it
                 if (window.location.hash) {
                     const hash = window.location.hash.substring(1);
-                    if (['general', 'branding', 'email', 'security', 'backup', 'modules', 'recaptcha', 'integrations', 'bible_homepage', 'homepage'].includes(hash)) {
+                    if (['general', 'branding', 'email', 'security', 'backup', 'modules', 'recaptcha', 'integrations', 'platform_modules', 'bible_homepage', 'homepage'].includes(hash)) {
                         this.activeTab = hash;
                     }
                 }

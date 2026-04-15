@@ -15,7 +15,7 @@ class CalendarPriceRule extends Model
 
     public const TYPE_FIXED_PRICE = 'fixed_price';
 
-    protected $table = 'calendar_price_rules';
+    protected $table = 'evento_price_rules';
 
     protected $fillable = [
         'event_id',

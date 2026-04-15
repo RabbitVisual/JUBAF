@@ -20,7 +20,7 @@ final class SecretariaIntegrationBus
             return;
         }
 
-        if (! module_enabled('Calendario') || ! Schema::hasTable('calendar_events')) {
+        if (! module_enabled('Calendario') || ! Schema::hasTable('eventos')) {
             return;
         }
 
@@ -31,8 +31,8 @@ final class SecretariaIntegrationBus
         $payload = [
             'title' => $title,
             'description' => $meeting->notes,
-            'starts_at' => $meeting->starts_at,
-            'ends_at' => $ends,
+            'start_date' => $meeting->starts_at,
+            'end_date' => $ends,
             'all_day' => false,
             'visibility' => $visibility,
             'type' => 'secretaria_reuniao',
@@ -42,8 +42,8 @@ final class SecretariaIntegrationBus
             'created_by' => $actor?->id,
         ];
 
-        if ($meeting->calendar_event_id) {
-            $event = \Modules\Calendario\App\Models\CalendarEvent::query()->find($meeting->calendar_event_id);
+        if ($meeting->evento_id) {
+            $event = \Modules\Calendario\App\Models\CalendarEvent::query()->find($meeting->evento_id);
             if ($event) {
                 $event->update($payload);
 
@@ -52,7 +52,7 @@ final class SecretariaIntegrationBus
         }
 
         $event = \Modules\Calendario\App\Models\CalendarEvent::query()->create($payload);
-        $meeting->forceFill(['calendar_event_id' => $event->id])->saveQuietly();
+        $meeting->forceFill(['evento_id' => $event->id])->saveQuietly();
     }
 
     public static function deleteMeetingCalendarEvent(Meeting $meeting): void
@@ -61,11 +61,11 @@ final class SecretariaIntegrationBus
             return;
         }
 
-        if (! $meeting->calendar_event_id || ! Schema::hasTable('calendar_events')) {
+        if (! $meeting->evento_id || ! Schema::hasTable('eventos')) {
             return;
         }
 
-        \Modules\Calendario\App\Models\CalendarEvent::query()->whereKey($meeting->calendar_event_id)->delete();
+        \Modules\Calendario\App\Models\CalendarEvent::query()->whereKey($meeting->evento_id)->delete();
     }
 
     public static function afterMinutePublished(Minute $minute, User $publisher): void
@@ -82,7 +82,7 @@ final class SecretariaIntegrationBus
             return;
         }
 
-        $snippet = Str::limit(strip_tags((string) $minute->body), 240);
+        $snippet = Str::limit(strip_tags((string) $minute->content), 240);
 
         \Modules\Avisos\App\Models\Aviso::query()->create([
             'titulo' => '[Rascunho] Ata publicada: '.$minute->title,

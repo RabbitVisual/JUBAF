@@ -17,7 +17,7 @@ class StoreTalentAssignmentRequest extends FormRequest
     {
         return [
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            'calendar_event_id' => ['nullable', 'integer', 'exists:calendar_events,id'],
+            'evento_id' => ['nullable', 'integer', 'exists:eventos,id'],
             'role_label' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', Rule::in([
                 TalentAssignment::STATUS_INVITED,

@@ -30,7 +30,7 @@ class SecretariaDashboardController extends Controller
 
         $user = $request->user();
 
-        $pendingMinutesQuery = Minute::query()->where('status', 'pending_approval');
+        $pendingMinutesQuery = Minute::query()->where('status', 'pending_signatures');
         if ($user) {
             ErpChurchScope::applyToSecretariaMinuteQuery($pendingMinutesQuery, $user);
         }
@@ -39,7 +39,7 @@ class SecretariaDashboardController extends Controller
         $pendingConvocations = Convocation::query()->where('status', 'pending_approval')->count();
         $pendingMinutesList = Minute::query()
             ->when($user, fn ($q) => ErpChurchScope::applyToSecretariaMinuteQuery($q, $user))
-            ->where('status', 'pending_approval')
+            ->where('status', 'pending_signatures')
             ->orderByDesc('updated_at')
             ->limit(8)
             ->get();

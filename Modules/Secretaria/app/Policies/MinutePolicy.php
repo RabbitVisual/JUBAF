@@ -69,7 +69,11 @@ class MinutePolicy
             return $minute->isPublishedVisibleToChurchScopedUser($user);
         }
 
-        if ($user->can('secretaria.minutes.edit')) {
+        if ($user->hasAnyRole(['lider', 'pastor', 'jovens'])) {
+            return false;
+        }
+
+        if ($user->can('secretaria.minutes.edit') || $user->can('secretaria.minutes.sign')) {
             return true;
         }
 
@@ -91,11 +95,7 @@ class MinutePolicy
             return false;
         }
 
-        if (in_array($minute->status, ['approved', 'published'], true)) {
-            return $user->can('secretaria.minutes.publish');
-        }
-
-        return true;
+        return $minute->status === 'draft';
     }
 
     public function delete(User $user, Minute $minute): bool
@@ -109,22 +109,22 @@ class MinutePolicy
 
     public function submit(User $user, Minute $minute): bool
     {
-        return $user->can('secretaria.minutes.submit')
+        return $user->can('secretaria.minutes.request_signatures')
             && in_array($minute->status, ['draft'], true)
             && $minute->locked_at === null;
     }
 
-    public function approve(User $user, Minute $minute): bool
+    public function requestSignatures(User $user, Minute $minute): bool
     {
-        return $user->can('secretaria.minutes.approve')
-            && $minute->status === 'pending_approval'
+        return $user->can('secretaria.minutes.request_signatures')
+            && $minute->status === 'draft'
             && $minute->locked_at === null;
     }
 
-    public function publish(User $user, Minute $minute): bool
+    public function sign(User $user, Minute $minute): bool
     {
-        return $user->can('secretaria.minutes.publish')
-            && in_array($minute->status, ['approved', 'pending_approval'], true)
+        return $user->can('secretaria.minutes.sign')
+            && $minute->status === 'pending_signatures'
             && $minute->locked_at === null;
     }
 

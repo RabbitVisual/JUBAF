@@ -15,7 +15,7 @@
                 </span>
                 Arquivo
             </h1>
-            <p class="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-400">Documentos por visibilidade (diretoria, líderes, público).</p>
+            <p class="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-400">Acervo digital com filtros rápidos por categoria e pesquisa.</p>
         </div>
         @can('create', \Modules\Secretaria\App\Models\SecretariaDocument::class)
             <a href="{{ route($routePrefix.'.create') }}" class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
@@ -25,43 +25,43 @@
         @endcan
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead>
-                    <tr class="bg-gray-50/90 text-left text-xs font-bold uppercase tracking-wide text-gray-500 dark:bg-slate-900/90 dark:text-gray-400">
-                        <th class="px-5 py-3.5">Título</th>
-                        <th class="px-5 py-3.5">Visibilidade</th>
-                        <th class="px-5 py-3.5 text-right"></th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-                    @forelse($documents as $d)
-                        <tr class="transition hover:bg-gray-50/80 dark:hover:bg-slate-900/50">
-                            <td class="px-5 py-3.5 font-medium text-gray-900 dark:text-white">{{ $d->title }}</td>
-                            <td class="px-5 py-3.5 text-gray-600 dark:text-gray-300">{{ $d->visibility }}</td>
-                            <td class="px-5 py-3.5 text-right">
-                                @can('download', $d)
-                                    <a href="{{ route($routePrefix.'.download', $d) }}" class="font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Download</a>
-                                @endcan
-                                @can('delete', $d)
-                                    @can('download', $d)<span class="mx-2 text-gray-300 dark:text-slate-600">|</span>@endcan
-                                    <form action="{{ route($routePrefix.'.destroy', $d) }}" method="POST" class="inline" onsubmit="return confirm('Remover?');">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="font-semibold text-red-600 hover:underline dark:text-red-400">Eliminar</button>
-                                    </form>
-                                @endcan
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="px-5 py-12 text-center text-gray-500 dark:text-gray-400">Nenhum documento no arquivo.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    <form method="GET" class="grid gap-3 rounded-2xl border border-gray-200/90 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:grid-cols-3">
+        <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Pesquisar documento..." class="rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900 dark:text-white">
+        <select name="category" class="rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900 dark:text-white">
+            <option value="">Todas as categorias</option>
+            @foreach(['Estatuto', 'Ofício', 'Circular', 'Outros'] as $category)
+                <option value="{{ $category }}" @selected(($filters['category'] ?? '') === $category)>{{ $category }}</option>
+            @endforeach
+        </select>
+        <button type="submit" class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600">Filtrar</button>
+    </form>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        @forelse($documents as $d)
+            <article class="rounded-2xl border border-gray-200/90 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white">{{ $d->title }}</h3>
+                    <span class="rounded-lg bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-700 dark:bg-slate-700 dark:text-slate-200">{{ $d->category }}</span>
+                </div>
+                <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">{{ $d->is_public ? 'Público' : 'Interno' }}</p>
+                <div class="mt-4 flex items-center gap-3 text-sm">
+                    @can('download', $d)
+                        <a href="{{ route($routePrefix.'.download', $d) }}" class="font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Download</a>
+                    @endcan
+                    @can('delete', $d)
+                        <form action="{{ route($routePrefix.'.destroy', $d) }}" method="POST" class="inline" onsubmit="return confirm('Remover?');">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="font-semibold text-red-600 hover:underline dark:text-red-400">Eliminar</button>
+                        </form>
+                    @endcan
+                </div>
+            </article>
+        @empty
+            <div class="col-span-full rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-400">
+                Nenhum documento no acervo.
+            </div>
+        @endforelse
         </div>
-    </div>
     <div class="pt-2">{{ $documents->links() }}</div>
 </div>
 @endsection

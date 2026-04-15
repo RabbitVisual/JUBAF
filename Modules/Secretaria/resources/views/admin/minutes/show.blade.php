@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="text-sm text-gray-500">Estado: <strong>{{ $minute->status }}</strong>@if($minute->published_at) · Publicada {{ $minute->published_at->format('d/m/Y H:i') }}@endif</div>
-    <div class="prose dark:prose-invert max-w-none border rounded-xl p-6 bg-white dark:bg-slate-800">{!! $minute->body !!}</div>
+    <div class="prose dark:prose-invert max-w-none border rounded-xl p-6 bg-white dark:bg-slate-800">{!! $minute->content !!}</div>
     @if($minute->attachments->isNotEmpty())
         <div class="border rounded-xl p-6 bg-white dark:bg-slate-800">
             <h2 class="font-semibold text-gray-900 dark:text-white text-sm">Anexos</h2>
@@ -31,9 +31,13 @@
         </div>
     @endif
     <div class="flex flex-wrap gap-2">
-        @can('submit', $minute)<form action="{{ route($routePrefix.'.submit', $minute) }}" method="POST">@csrf<button class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm">Enviar aprovação</button></form>@endcan
-        @can('approve', $minute)<form action="{{ route($routePrefix.'.approve', $minute) }}" method="POST">@csrf<button class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Aprovar</button></form>@endcan
-        @can('publish', $minute)<form action="{{ route($routePrefix.'.publish', $minute) }}" method="POST" onsubmit="return confirm('Publicar?');">@csrf<button class="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm">Publicar</button></form>@endcan
+        @can('submit', $minute)<form action="{{ route($routePrefix.'.submit', $minute) }}" method="POST">@csrf<button class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm">Solicitar assinaturas</button></form>@endcan
+        @can('sign', $minute)
+            <form action="{{ route($routePrefix.'.sign', $minute) }}" method="POST" class="flex items-center gap-2">@csrf
+                <input type="password" name="password" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="Senha atual">
+                <button class="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm">Assinar</button>
+            </form>
+        @endcan
     </div>
 </div>
 @endsection

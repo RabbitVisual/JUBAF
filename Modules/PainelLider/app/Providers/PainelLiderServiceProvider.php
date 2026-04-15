@@ -3,6 +3,7 @@
 namespace Modules\PainelLider\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -27,6 +28,7 @@ class PainelLiderServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerViewComposers();
     }
 
     /**
@@ -138,6 +140,31 @@ class PainelLiderServiceProvider extends ServiceProvider
     public function provides(): array
     {
         return [];
+    }
+
+    private function registerViewComposers(): void
+    {
+        View::composer('painellider::components.layouts.sidebar', function ($view): void {
+            $user = auth()->user();
+
+            $view->with('liderNavSections', [
+                'dashboard' => [
+                    'route' => 'lideres.dashboard',
+                    'label' => 'Inicio',
+                    'visible' => (bool) $user,
+                ],
+                'financeiro' => [
+                    'route' => 'lideres.financeiro.minhas-contas',
+                    'label' => 'Minhas contas',
+                    'visible' => (bool) $user?->can('financeiro.minhas_contas.view'),
+                ],
+                'talentos' => [
+                    'route' => 'lideres.talentos.validation.index',
+                    'label' => 'Validar talentos',
+                    'visible' => (bool) $user?->can('paineljovens.talentos.validate'),
+                ],
+            ]);
+        });
     }
 
     private function getPublishableViewPaths(): array

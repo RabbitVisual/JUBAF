@@ -13,6 +13,28 @@ use Spatie\Permission\Models\Role;
 class CensoService
 {
     /**
+     * @return list<array{sector_id: int|null, sector_name: string, youth_count: int, average_age: float|null, age_buckets: array<string, int>}>
+     */
+    public function topSectorsByYouthCountForUser(User $user, int $limit = 5): array
+    {
+        $rows = collect($this->youthSummaryBySector())
+            ->filter(fn (array $row) => $row['sector_id'] !== null);
+
+        if ($user->restrictsChurchDirectoryToSector()) {
+            return $rows
+                ->where('sector_id', (int) $user->jubaf_sector_id)
+                ->values()
+                ->all();
+        }
+
+        return $rows
+            ->sortByDesc('youth_count')
+            ->take($limit)
+            ->values()
+            ->all();
+    }
+
+    /**
      * Resumo por setor JUBAF: contagem de jovens (role jovens), idade média e faixas etárias.
      *
      * @return list<array{sector_id: int|null, sector_name: string, youth_count: int, average_age: float|null, age_buckets: array<string, int>}>

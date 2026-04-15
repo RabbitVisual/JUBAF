@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 use Modules\Calendario\App\Models\CalendarEvent;
 use Modules\Calendario\App\Models\CalendarRegistration;
+use Modules\Calendario\App\Events\InscricaoConfirmada;
 use Modules\Calendario\App\Services\CalendarPricingService;
+use Modules\Calendario\App\Services\EventService;
 use Modules\Gateway\App\Models\GatewayPayment;
 use Modules\Gateway\App\Services\PaymentOrchestrator;
 
@@ -22,8 +24,8 @@ class ParticipationController extends Controller
         $user = $request->user();
         $q = CalendarEvent::query()
             ->where('status', CalendarEvent::STATUS_PUBLISHED)
-            ->where('starts_at', '>=', now()->subDay())
-            ->orderBy('starts_at');
+            ->where('start_date', '>=', now()->subDay())
+            ->orderBy('start_date');
 
         $events = $q->get()->filter(function (CalendarEvent $e) use ($user) {
             if (! $e->userCanView($user)) {
@@ -58,7 +60,7 @@ class ParticipationController extends Controller
         $event->load(['batches', 'priceRules']);
 
         $registration = CalendarRegistration::query()
-            ->where('event_id', $event->id)
+            ->where('evento_id', $event->id)
             ->where('user_id', $user->id)
             ->first();
 
@@ -108,12 +110,12 @@ class ParticipationController extends Controller
         ]);
 
         $existing = CalendarRegistration::query()
-            ->where('event_id', $event->id)
+            ->where('evento_id', $event->id)
             ->where('user_id', $user->id)
             ->first();
 
         if ($existing && $existing->status !== CalendarRegistration::STATUS_CANCELLED) {
-            if ($existing->status === CalendarRegistration::STATUS_PENDING_PAYMENT && $existing->gateway_payment_id) {
+            if ($existing->status === CalendarRegistration::STATUS_PENDING_PAYMENT && $existing->payment_id) {
                 $gp = $existing->gatewayPayment;
                 if ($gp) {
                     return redirect()
@@ -148,7 +150,7 @@ class ParticipationController extends Controller
                 $reg = $existing->fresh();
             } else {
                 $reg = CalendarRegistration::query()->create([
-                    'event_id' => $event->id,
+                    'evento_id' => $event->id,
                     'user_id' => $user->id,
                     'status' => CalendarRegistration::STATUS_PENDING_PAYMENT,
                     'payment_status' => 'pending',
@@ -170,7 +172,7 @@ class ParticipationController extends Controller
             ]);
 
             $reg->update([
-                'gateway_payment_id' => $payment->id,
+                'payment_id' => $payment->id,
                 'payment_status' => 'pending',
                 'amount_charged' => $fee,
             ]);
@@ -186,11 +188,8 @@ class ParticipationController extends Controller
                 ->with('success', 'Redirecionamento para pagamento da inscrição.');
         }
 
-        $confirmed = $event->confirmedCount();
-        $status = CalendarRegistration::STATUS_CONFIRMED;
-        if ($event->max_participants !== null && $confirmed >= $event->max_participants) {
-            $status = CalendarRegistration::STATUS_WAITLIST;
-        }
+        $eventService = app(EventService::class);
+        $status = $eventService->resolveRegistrationStatus($event);
 
         $common = [
             'event_batch_id' => $batchId,
@@ -203,13 +202,22 @@ class ParticipationController extends Controller
                 'status' => $status,
                 'payment_status' => 'not_required',
             ], $common));
+            $confirmedRegistration = $existing->fresh();
         } else {
-            CalendarRegistration::query()->create(array_merge([
-                'event_id' => $event->id,
+            $confirmedRegistration = CalendarRegistration::query()->create(array_merge([
+                'evento_id' => $event->id,
                 'user_id' => $user->id,
                 'status' => $status,
                 'payment_status' => 'not_required',
             ], $common));
+        }
+
+        if ($status === CalendarRegistration::STATUS_CONFIRMED) {
+            event(new InscricaoConfirmada($confirmedRegistration, new GatewayPayment([
+                'uuid' => 'free-'.$confirmedRegistration->id,
+                'amount' => 0,
+                'status' => GatewayPayment::STATUS_PAID,
+            ])));
         }
 
         return back()->with('success', $status === CalendarRegistration::STATUS_WAITLIST
@@ -223,7 +231,7 @@ class ParticipationController extends Controller
         $user = $request->user();
 
         $reg = CalendarRegistration::query()
-            ->where('event_id', $event->id)
+            ->where('evento_id', $event->id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 

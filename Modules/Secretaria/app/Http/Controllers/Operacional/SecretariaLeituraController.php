@@ -79,6 +79,14 @@ class SecretariaLeituraController extends Controller
         ]);
     }
 
+    public function minutePdf(Minute $minute): StreamedResponse
+    {
+        $this->authorize('downloadPdf', $minute);
+        abort_unless($minute->pdf_path && Storage::disk('local')->exists($minute->pdf_path), 404);
+
+        return Storage::disk('local')->download($minute->pdf_path, 'ata-'.$minute->id.'.pdf');
+    }
+
     public function minuteAttachmentDownload(Minute $minute, MinuteAttachment $minute_attachment): StreamedResponse
     {
         abort_unless((int) $minute_attachment->minute_id === (int) $minute->id, 404);
@@ -121,17 +129,17 @@ class SecretariaLeituraController extends Controller
         $this->authorize('viewAny', SecretariaDocument::class);
         $q = SecretariaDocument::query()->orderByDesc('created_at');
         if (auth()->user()->hasRole('jovens')) {
-            $q->where('visibility', 'public');
+            $q->where('is_public', true);
         } else {
-            $q->whereIn('visibility', ['public', 'leaders']);
+            $q->where('is_public', true);
         }
         if (user_needs_secretaria_church_scope()) {
             $user = auth()->user();
             $ids = $user->churchIdsForSecretariaScope();
             $q->where(function ($sub) use ($ids) {
-                $sub->whereNull('church_id');
+                $sub->whereNull('igreja_id');
                 if ($ids !== []) {
-                    $sub->orWhereIn('church_id', $ids);
+                    $sub->orWhereIn('igreja_id', $ids);
                 }
             });
         }
@@ -150,6 +158,6 @@ class SecretariaLeituraController extends Controller
         $this->authorize('download', $document);
         abort_unless(Storage::disk('local')->exists($document->path), 404);
 
-        return Storage::disk('local')->download($document->path, $document->original_name ?? 'documento');
+        return Storage::disk('local')->download($document->path, $document->title.'.pdf');
     }
 }

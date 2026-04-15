@@ -44,16 +44,22 @@
 
     <div>
         <h2 class="sr-only">Lista de eventos</h2>
-        <ul class="space-y-4">
+        <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             @forelse($events as $event)
                 <li class="group overflow-hidden rounded-2xl border border-violet-200/70 dark:border-violet-900/35 bg-white dark:bg-slate-800/80 shadow-sm transition-all duration-200 hover:border-fuchsia-300/80 hover:shadow-lg hover:shadow-violet-900/10 dark:hover:border-fuchsia-800/40">
-                    <div class="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="min-w-0 flex gap-4">
-                            <div class="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-md shadow-violet-600/30">
-                                <x-icon name="calendar-days" class="h-7 w-7" style="duotone" />
+                    <div class="aspect-[16/9] w-full overflow-hidden bg-slate-100 dark:bg-slate-700">
+                        @if($event->cover_path)
+                            <img src="{{ asset('storage/'.$event->cover_path) }}" alt="{{ $event->title }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]">
+                        @else
+                            <div class="flex h-full w-full items-center justify-center text-violet-500/70 dark:text-violet-300/70">
+                                <x-icon name="calendar-days" class="h-10 w-10" style="duotone" />
                             </div>
+                        @endif
+                    </div>
+                    <div class="flex flex-col gap-5 p-6">
+                        <div class="min-w-0 flex gap-4">
                             <div class="min-w-0">
-                                <p class="text-xs font-bold uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-400">{{ $event->starts_at->format('d/m/Y · H:i') }}</p>
+                                <p class="text-xs font-bold uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-400">{{ optional($event->start_date)->format('d/m/Y · H:i') }}</p>
                                 <h3 class="mt-1 text-lg font-bold text-gray-900 dark:text-white group-hover:text-violet-800 dark:group-hover:text-violet-200 transition-colors">{{ $event->title }}</h3>
                                 @if($event->location)
                                     <p class="mt-2 flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
@@ -74,8 +80,8 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="{{ route($routePrefix.'.show', $event) }}" class="inline-flex w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-600/30 transition hover:brightness-110 active:scale-[0.98]">
-                            Ver detalhes
+                        <a href="{{ route($routePrefix.'.show', $event) }}" class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-600/30 transition hover:brightness-110 active:scale-[0.98]">
+                            Inscrever-se
                             <x-icon name="arrow-right" class="h-4 w-4" style="duotone" />
                         </a>
                     </div>

@@ -20,7 +20,7 @@
                 </span>
                 Atas
             </h1>
-            <p class="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-400">Rascunhos, aprovação e publicação.</p>
+            <p class="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-400">Rascunhos, recolha de assinaturas e publicação.</p>
         </div>
         @can('create', \Modules\Secretaria\App\Models\Minute::class)
             <a href="{{ route($routePrefix.'.create') }}" class="inline-flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
@@ -42,7 +42,7 @@
                 <label class="{{ $labelClass }}">Estado</label>
                 <select name="status" class="w-full {{ $inputClass }}">
                     <option value="">Todos</option>
-                    @foreach(['draft' => 'Rascunho', 'pending_approval' => 'Pendente', 'approved' => 'Aprovada', 'published' => 'Publicada'] as $k => $l)
+                    @foreach(['draft' => 'Rascunho', 'pending_signatures' => 'Assinaturas pendentes', 'published' => 'Publicada', 'archived' => 'Arquivada'] as $k => $l)
                         <option value="{{ $k }}" @selected(($filters['status'] ?? '') == $k)>{{ $l }}</option>
                     @endforeach
                 </select>

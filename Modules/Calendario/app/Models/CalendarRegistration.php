@@ -15,18 +15,18 @@ class CalendarRegistration extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
-    public const STATUS_PENDING_PAYMENT = 'pending_payment';
+    public const STATUS_PENDING_PAYMENT = 'pending';
 
-    protected $table = 'calendar_registrations';
+    protected $table = 'evento_inscricoes';
 
     protected $fillable = [
-        'event_id',
+        'evento_id',
         'event_batch_id',
         'user_id',
         'status',
         'checked_in_at',
         'payment_status',
-        'gateway_payment_id',
+        'payment_id',
         'discount_code',
         'amount_charged',
         'custom_responses',
@@ -53,7 +53,7 @@ class CalendarRegistration extends Model
 
     public function event(): BelongsTo
     {
-        return $this->belongsTo(CalendarEvent::class, 'event_id');
+        return $this->belongsTo(CalendarEvent::class, 'evento_id');
     }
 
     public function batch(): BelongsTo
@@ -68,6 +68,26 @@ class CalendarRegistration extends Model
 
     public function gatewayPayment(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Gateway\App\Models\GatewayPayment::class, 'gateway_payment_id');
+        return $this->belongsTo(\Modules\Gateway\App\Models\GatewayPayment::class, 'payment_id');
+    }
+
+    public function getEventIdAttribute(): mixed
+    {
+        return $this->evento_id;
+    }
+
+    public function setEventIdAttribute(mixed $value): void
+    {
+        $this->attributes['evento_id'] = $value;
+    }
+
+    public function getGatewayPaymentIdAttribute(): mixed
+    {
+        return $this->payment_id;
+    }
+
+    public function setGatewayPaymentIdAttribute(mixed $value): void
+    {
+        $this->attributes['payment_id'] = $value;
     }
 }

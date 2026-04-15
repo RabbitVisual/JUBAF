@@ -8,6 +8,7 @@ Route::get('/atas', [SecretariaLeituraController::class, 'minutes'])->name('atas
 Route::get('/atas/{minute}/anexos/{minute_attachment}/download', [SecretariaLeituraController::class, 'minuteAttachmentDownload'])
     ->whereNumber(['minute', 'minute_attachment'])
     ->name('atas.attachments.download');
+Route::get('/atas/{minute}/pdf', [SecretariaLeituraController::class, 'minutePdf'])->whereNumber('minute')->name('atas.pdf');
 Route::get('/atas/{minute}', [SecretariaLeituraController::class, 'minuteShow'])->whereNumber('minute')->name('atas.show');
 Route::get('/convocatorias', [SecretariaLeituraController::class, 'convocations'])->name('convocatorias.index');
 Route::get('/convocatorias/{convocation}', [SecretariaLeituraController::class, 'convocationShow'])->whereNumber('convocation')->name('convocatorias.show');

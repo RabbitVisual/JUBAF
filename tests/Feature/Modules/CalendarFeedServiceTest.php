@@ -18,8 +18,8 @@ class CalendarFeedServiceTest extends TestCase
         CalendarEvent::query()->create([
             'title' => 'Teste público',
             'slug' => 'teste-publico-'.uniqid(),
-            'starts_at' => $starts,
-            'ends_at' => $starts->copy()->addHours(2),
+            'start_date' => $starts,
+            'end_date' => $starts->copy()->addHours(2),
             'visibility' => CalendarEvent::VIS_PUBLIC,
             'type' => 'evento',
             'status' => CalendarEvent::STATUS_PUBLISHED,
@@ -29,7 +29,7 @@ class CalendarFeedServiceTest extends TestCase
         CalendarEvent::query()->create([
             'title' => 'Rascunho',
             'slug' => 'rascunho-'.uniqid(),
-            'starts_at' => $starts,
+            'start_date' => $starts,
             'visibility' => CalendarEvent::VIS_PUBLIC,
             'type' => 'evento',
             'status' => CalendarEvent::STATUS_DRAFT,
@@ -56,11 +56,12 @@ class CalendarFeedServiceTest extends TestCase
         $event = CalendarEvent::query()->create([
             'title' => 'Pago',
             'slug' => 'pago-'.uniqid(),
-            'starts_at' => now()->addWeek(),
+            'start_date' => now()->addWeek(),
             'visibility' => CalendarEvent::VIS_PUBLIC,
             'type' => 'evento',
             'status' => CalendarEvent::STATUS_PUBLISHED,
-            'registration_fee' => 100,
+            'ticket_price' => 100,
+            'is_paid' => true,
             'registration_open' => true,
         ]);
 

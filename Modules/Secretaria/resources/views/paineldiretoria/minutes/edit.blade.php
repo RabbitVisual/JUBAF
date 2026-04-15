@@ -34,9 +34,14 @@
         <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700">Guardar</button>
     </form>
     <div class="mx-auto flex max-w-3xl flex-wrap gap-2">
-        @can('submit', $minute)<form action="{{ route($routePrefix.'.submit', $minute) }}" method="POST">@csrf<button type="submit" class="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-amber-700">Enviar aprovação</button></form>@endcan
-        @can('approve', $minute)<form action="{{ route($routePrefix.'.approve', $minute) }}" method="POST">@csrf<button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700">Aprovar</button></form>@endcan
-        @can('publish', $minute)<form action="{{ route($routePrefix.'.publish', $minute) }}" method="POST" onsubmit="return confirm('Publicar e bloquear edição?');">@csrf<button type="submit" class="rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600">Publicar</button></form>@endcan
+        @can('submit', $minute)<form action="{{ route($routePrefix.'.submit', $minute) }}" method="POST">@csrf<button type="submit" class="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-amber-700">Solicitar assinaturas</button></form>@endcan
+        @can('sign', $minute)
+            <form action="{{ route($routePrefix.'.sign', $minute) }}" method="POST" class="flex items-center gap-2">
+                @csrf
+                <input type="password" name="password" placeholder="Senha atual" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900 dark:text-white">
+                <button type="submit" class="rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600">Assinar ata</button>
+            </form>
+        @endcan
         @can('downloadPdf', $minute)<a href="{{ route($routePrefix.'.pdf', $minute) }}" class="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-2.5 text-sm font-bold text-emerald-900 transition hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-900/40">PDF</a>@endcan
     </div>
 </div>

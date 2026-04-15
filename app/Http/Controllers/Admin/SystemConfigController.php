@@ -19,7 +19,7 @@ class SystemConfigController extends Controller
     public function index()
     {
         $configs = $this->configService->getConfigsGrouped();
-        $groups = ['general', 'branding', 'email', 'security', 'backup', 'modules', 'recaptcha', 'integrations', 'bible_homepage', 'homepage'];
+        $groups = ['general', 'branding', 'email', 'security', 'backup', 'modules', 'recaptcha', 'integrations', 'platform_modules', 'bible_homepage', 'homepage'];
 
         // Garantir que as configurações de marca existam
         $this->configService->ensureBrandingConfigs();
@@ -35,6 +35,8 @@ class SystemConfigController extends Controller
 
         // Garantir que as configurações Pusher/Broadcast existam
         $this->configService->ensurePusherConfigs();
+
+        $this->configService->ensureModulePlatformConfigs();
 
         $this->configService->ensureHomepageBibleAndFooterConfigs();
 

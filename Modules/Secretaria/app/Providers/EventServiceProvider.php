@@ -3,7 +3,7 @@
 namespace Modules\Secretaria\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Modules\Secretaria\App\Events\MinutePublished;
+use Modules\Secretaria\App\Events\AtaPublished;
 use Modules\Secretaria\App\Listeners\DispatchMinutePublishedIntegrations;
 
 class EventServiceProvider extends ServiceProvider
@@ -14,8 +14,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<string, array<int, string>>
      */
     protected $listen = [
-        MinutePublished::class => [
+        AtaPublished::class => [
             DispatchMinutePublishedIntegrations::class,
+            \Modules\Notificacoes\App\Listeners\SendAtaSummaryToWhatsApp::class,
         ],
     ];
 

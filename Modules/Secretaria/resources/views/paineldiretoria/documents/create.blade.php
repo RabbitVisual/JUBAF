@@ -22,11 +22,18 @@
             <input type="text" name="title" required class="{{ $ic }}">
         </div>
         <div>
+            <label class="{{ $lc }}">Categoria *</label>
+            <select name="category" class="{{ $ic }}">
+                @foreach(['Estatuto', 'Ofício', 'Circular', 'Outros'] as $category)
+                    <option value="{{ $category }}">{{ $category }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
             <label class="{{ $lc }}">Visibilidade *</label>
-            <select name="visibility" class="{{ $ic }}">
-                <option value="directorate">Diretoria</option>
-                <option value="leaders">Líderes</option>
-                <option value="public">Público</option>
+            <select name="is_public" class="{{ $ic }}">
+                <option value="0">Interno (diretoria/secretaria)</option>
+                <option value="1">Público para pastor e líder</option>
             </select>
         </div>
         <div>

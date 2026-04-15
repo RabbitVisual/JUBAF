@@ -48,11 +48,11 @@ class GatewayPaymentController extends Controller
         $from = $request->date('from') ?? now()->subMonth();
         $to = $request->date('to') ?? now();
 
-        $filename = 'gateway_payments_'.$from->format('Y-m-d').'_'.$to->format('Y-m-d').'.csv';
+        $filename = 'gateway_transactions_'.$from->format('Y-m-d').'_'.$to->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($from, $to): void {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['id', 'uuid', 'driver', 'status', 'amount', 'currency', 'paid_at', 'provider_reference', 'fin_transaction_id']);
+            fputcsv($out, ['id', 'uuid', 'driver', 'status', 'amount', 'currency', 'paid_at', 'external_reference', 'fin_transaction_id']);
 
             GatewayPayment::query()
                 ->whereBetween('created_at', [$from->startOfDay(), $to->endOfDay()])
@@ -67,7 +67,7 @@ class GatewayPaymentController extends Controller
                             $p->amount,
                             $p->currency,
                             $p->paid_at?->toDateTimeString(),
-                            $p->provider_reference,
+                            $p->external_reference,
                             $p->fin_transaction_id,
                         ]);
                     }

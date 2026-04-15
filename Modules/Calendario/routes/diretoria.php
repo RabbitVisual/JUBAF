@@ -24,6 +24,10 @@ Route::prefix('calendario')->name('calendario.')->group(function () {
         ->parameters(['events' => 'event'])
         ->except(['show']);
 
+    Route::get('events/{event}/monitor', [EventController::class, 'monitor'])
+        ->middleware('can:manageRegistrations,event')
+        ->name('events.monitor');
+
     Route::post('events/{event}/registrations/{registration}/check-in', [EventController::class, 'checkIn'])
         ->name('events.registrations.check-in');
 

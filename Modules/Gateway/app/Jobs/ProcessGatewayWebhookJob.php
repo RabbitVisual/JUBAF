@@ -103,7 +103,7 @@ class ProcessGatewayWebhookJob implements ShouldQueue
 
         if (is_string($providerReference) && $providerReference !== '') {
             $p = GatewayPayment::query()
-                ->where('provider_reference', $providerReference)
+                ->where('external_reference', $providerReference)
                 ->first();
             if ($p) {
                 return $p;
@@ -113,7 +113,7 @@ class ProcessGatewayWebhookJob implements ShouldQueue
         if ($driver === GatewayProviderAccount::DRIVER_STRIPE) {
             $sid = Arr::get($data, 'data.object.id');
             if (is_string($sid)) {
-                return GatewayPayment::query()->where('provider_reference', $sid)->first();
+                return GatewayPayment::query()->where('external_reference', $sid)->first();
             }
         }
 

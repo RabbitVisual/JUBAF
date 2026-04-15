@@ -14,8 +14,8 @@ class PublicCalendarController extends Controller
         $events = CalendarEvent::query()
             ->published()
             ->where('visibility', CalendarEvent::VIS_PUBLIC)
-            ->where('starts_at', '>=', now()->startOfDay())
-            ->orderBy('starts_at')
+            ->where('start_date', '>=', now()->startOfDay())
+            ->orderBy('start_date')
             ->paginate(12);
 
         return view('calendario::public.index', [

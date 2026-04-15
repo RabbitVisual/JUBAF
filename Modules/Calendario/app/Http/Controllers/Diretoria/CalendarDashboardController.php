@@ -18,14 +18,14 @@ class CalendarDashboardController extends Controller
         $horizon = (clone $now)->addDays(30);
 
         $upcomingCount = CalendarEvent::query()
-            ->where('starts_at', '>=', $now)
-            ->where('starts_at', '<=', $horizon)
+            ->where('start_date', '>=', $now)
+            ->where('start_date', '<=', $horizon)
             ->count();
 
         $openRegistrationCount = CalendarEvent::query()
             ->where('registration_open', true)
             ->where('status', CalendarEvent::STATUS_PUBLISHED)
-            ->where('starts_at', '>=', $now)
+            ->where('start_date', '>=', $now)
             ->count();
 
         $registrationsThisMonth = CalendarRegistration::query()
@@ -39,8 +39,8 @@ class CalendarDashboardController extends Controller
 
         $nextEvents = CalendarEvent::query()
             ->withCount('registrations')
-            ->where('starts_at', '>=', $now)
-            ->orderBy('starts_at')
+            ->where('start_date', '>=', $now)
+            ->orderBy('start_date')
             ->limit(8)
             ->get();
 

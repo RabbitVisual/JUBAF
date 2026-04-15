@@ -21,8 +21,7 @@ Route::prefix('secretaria')->name('secretaria.')->group(function () {
         ->name('atas.attachments.destroy');
     Route::get('/atas/{minute}/pdf', [MinuteController::class, 'pdf'])->whereNumber('minute')->name('atas.pdf');
     Route::post('/atas/{minute}/submeter', [MinuteController::class, 'submit'])->whereNumber('minute')->name('atas.submit');
-    Route::post('/atas/{minute}/aprovar', [MinuteController::class, 'approve'])->whereNumber('minute')->name('atas.approve');
-    Route::post('/atas/{minute}/publicar', [MinuteController::class, 'publish'])->whereNumber('minute')->name('atas.publish');
+    Route::post('/atas/{minute}/assinar', [MinuteController::class, 'sign'])->whereNumber('minute')->name('atas.sign');
     Route::resource('atas', MinuteController::class)
         ->parameters(['atas' => 'minute']);
 

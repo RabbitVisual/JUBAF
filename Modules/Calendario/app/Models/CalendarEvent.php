@@ -35,7 +35,9 @@ class CalendarEvent extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
-    protected $table = 'calendar_events';
+    public const STATUS_FINISHED = 'finished';
+
+    protected $table = 'eventos';
 
     protected $fillable = [
         'title',
@@ -46,8 +48,9 @@ class CalendarEvent extends Model
         'banner_path',
         'theme_config',
         'is_featured',
-        'starts_at',
-        'ends_at',
+        'uuid',
+        'start_date',
+        'end_date',
         'all_day',
         'timezone',
         'visibility',
@@ -56,8 +59,9 @@ class CalendarEvent extends Model
         'church_id',
         'registration_open',
         'registration_deadline',
-        'max_participants',
-        'registration_fee',
+        'capacity',
+        'is_paid',
+        'ticket_price',
         'form_fields',
         'schedule',
         'requires_council_approval',
@@ -78,12 +82,13 @@ class CalendarEvent extends Model
     protected function casts(): array
     {
         return [
-            'starts_at' => 'datetime',
-            'ends_at' => 'datetime',
+            'start_date' => 'datetime',
+            'end_date' => 'datetime',
             'all_day' => 'boolean',
             'registration_open' => 'boolean',
             'registration_deadline' => 'datetime',
-            'registration_fee' => 'decimal:2',
+            'is_paid' => 'boolean',
+            'ticket_price' => 'decimal:2',
             'theme_config' => 'array',
             'form_fields' => 'array',
             'schedule' => 'array',
@@ -133,7 +138,7 @@ class CalendarEvent extends Model
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(CalendarRegistration::class, 'event_id');
+        return $this->hasMany(CalendarRegistration::class, 'evento_id');
     }
 
     public function batches(): HasMany
@@ -158,7 +163,7 @@ class CalendarEvent extends Model
 
     public function scopeUpcoming(Builder $q): Builder
     {
-        return $q->where('starts_at', '>=', now());
+        return $q->where('start_date', '>=', now());
     }
 
     public function confirmedCount(): int
@@ -233,11 +238,51 @@ class CalendarEvent extends Model
         if ($this->registration_deadline && $at->gt($this->registration_deadline)) {
             return false;
         }
-        if ($this->starts_at && $at->gt($this->starts_at) && ! $this->all_day) {
+        if ($this->start_date && $at->gt($this->start_date) && ! $this->all_day) {
             // allow until event day for all_day
         }
 
         return true;
+    }
+
+    public function getStartsAtAttribute(): mixed
+    {
+        return $this->start_date;
+    }
+
+    public function setStartsAtAttribute(mixed $value): void
+    {
+        $this->attributes['start_date'] = $value;
+    }
+
+    public function getEndsAtAttribute(): mixed
+    {
+        return $this->end_date;
+    }
+
+    public function setEndsAtAttribute(mixed $value): void
+    {
+        $this->attributes['end_date'] = $value;
+    }
+
+    public function getMaxParticipantsAttribute(): mixed
+    {
+        return $this->capacity;
+    }
+
+    public function setMaxParticipantsAttribute(mixed $value): void
+    {
+        $this->attributes['capacity'] = $value;
+    }
+
+    public function getRegistrationFeeAttribute(): mixed
+    {
+        return $this->ticket_price;
+    }
+
+    public function setRegistrationFeeAttribute(mixed $value): void
+    {
+        $this->attributes['ticket_price'] = $value;
     }
 
     /**
@@ -247,12 +292,12 @@ class CalendarEvent extends Model
     {
         return static::query()
             ->whereNotNull('church_id')
-            ->where('starts_at', '<', $endsAt)
+            ->where('start_date', '<', $endsAt)
             ->where(function ($q) use ($startsAt) {
-                $q->whereNull('ends_at')->orWhere('ends_at', '>', $startsAt);
+                $q->whereNull('end_date')->orWhere('end_date', '>', $startsAt);
             })
             ->with(['church:id,name'])
-            ->orderBy('starts_at')
+            ->orderBy('start_date')
             ->limit(40)
             ->get();
     }

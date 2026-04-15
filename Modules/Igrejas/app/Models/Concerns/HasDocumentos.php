@@ -15,12 +15,12 @@ trait HasDocumentos
      */
     public function secretariaDocuments(): HasMany
     {
-        return $this->hasMany(SecretariaDocument::class, 'church_id');
+        return $this->hasMany(SecretariaDocument::class, 'igreja_id');
     }
 
     public function secretariaDocumentsCount(): int
     {
-        if (! Schema::hasTable('secretaria_documents')) {
+        if (! Schema::hasTable('secretaria_ged_documents')) {
             return 0;
         }
 

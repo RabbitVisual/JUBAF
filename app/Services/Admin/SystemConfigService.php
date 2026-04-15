@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\AuditLog;
 use App\Models\SystemConfig;
+use Illuminate\Support\Facades\Artisan;
 
 class SystemConfigService
 {
@@ -459,6 +460,104 @@ class SystemConfigService
                 'group' => 'integrations',
                 'description' => 'Restringir widget de chat à página inicial (quando suportado)',
             ],
+
+            // Notificações, Evolution API, Financeiro (quotas), Igrejas — espelhado no .env
+            'notificacoes.email_enabled' => [
+                'value' => ((bool) config('notificacoes.email_enabled', false)) ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'platform_modules',
+                'description' => 'Notificações — enviar e-mails (centro de notificações + e-mail)',
+            ],
+            'notificacoes.polling_interval' => [
+                'value' => (string) ((int) config('notificacoes.polling_interval', 30000)),
+                'type' => 'integer',
+                'group' => 'platform_modules',
+                'description' => 'Notificações — intervalo de atualização (ms) quando não usar WebSockets',
+            ],
+            'notificacoes.broadcasting_enabled' => [
+                'value' => ((bool) config('notificacoes.broadcasting_enabled', true)) ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'platform_modules',
+                'description' => 'Notificações — atualização em tempo real (broadcasting)',
+            ],
+            'notificacoes.whatsapp_base_url' => [
+                'value' => (string) config('notificacoes.whatsapp.base_url', ''),
+                'type' => 'string',
+                'group' => 'platform_modules',
+                'description' => 'WhatsApp (legado) — URL base da API, se usar integração alternativa',
+            ],
+            'notificacoes.whatsapp_token' => [
+                'value' => (string) config('notificacoes.whatsapp.token', ''),
+                'type' => 'password',
+                'group' => 'platform_modules',
+                'description' => 'WhatsApp (legado) — token / bearer, se aplicável',
+            ],
+            'evolution.api_url' => [
+                'value' => (string) config('notificacoes.evolution.url', ''),
+                'type' => 'string',
+                'group' => 'platform_modules',
+                'description' => 'Evolution API — URL base (ex.: https://api.seudominio.com)',
+            ],
+            'evolution.api_key' => [
+                'value' => (string) config('notificacoes.evolution.key', ''),
+                'type' => 'password',
+                'group' => 'platform_modules',
+                'description' => 'Evolution API — chave de autenticação',
+            ],
+            'evolution.instance' => [
+                'value' => (string) config('notificacoes.evolution.instance', 'default'),
+                'type' => 'string',
+                'group' => 'platform_modules',
+                'description' => 'Evolution API — nome da instância WhatsApp',
+            ],
+            'jubaf.assoc_quota_amount' => [
+                'value' => (string) config('financeiro.quota.default_amount', 100),
+                'type' => 'string',
+                'group' => 'platform_modules',
+                'description' => 'Financeiro — valor de referência da cota associativa (€ / unidade)',
+            ],
+            'jubaf.quota_fin_category_code' => [
+                'value' => (string) config('financeiro.quota.income_category_code', ''),
+                'type' => 'string',
+                'group' => 'platform_modules',
+                'description' => 'Financeiro — código da categoria de receita (plano de contas) para cotas',
+            ],
+            'jubaf.assoc_monthly_quota_amount' => [
+                'value' => (string) config('financeiro.quota.monthly_invoice_amount', config('financeiro.quota.default_amount', 100)),
+                'type' => 'string',
+                'group' => 'platform_modules',
+                'description' => 'Financeiro — valor por mês em facturas de cotas (mensais)',
+            ],
+            'jubaf.fin_extraordinary_groups' => [
+                'value' => implode(',', config('financeiro.extraordinary_expense_group_keys', ['despesas_administrativas'])),
+                'type' => 'text',
+                'group' => 'platform_modules',
+                'description' => 'Financeiro — chaves de grupos de despesas extraordinárias (separadas por vírgula)',
+            ],
+            'igrejas.notify_request_submit' => [
+                'value' => ((bool) config('igrejas.integrations.notify_directorate_on_request_submit', true)) ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'platform_modules',
+                'description' => 'Igrejas — notificar diretoria ao submeter pedido (cadastro / alteração)',
+            ],
+            'igrejas.notify_request_resolve' => [
+                'value' => ((bool) config('igrejas.integrations.notify_submitter_on_request_resolve', true)) ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'platform_modules',
+                'description' => 'Igrejas — notificar requerente quando o pedido for resolvido',
+            ],
+            'igrejas.aviso_draft_church' => [
+                'value' => ((bool) config('igrejas.integrations.aviso_draft_on_church_activated', false)) ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'platform_modules',
+                'description' => 'Igrejas — criar rascunho de aviso ao activar igreja',
+            ],
+            'igrejas.cal_warn_overlap' => [
+                'value' => ((bool) config('igrejas.integrations.calendario_warn_local_overlap', true)) ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'platform_modules',
+                'description' => 'Igrejas — avisar sobre sobreposição de eventos no calendário local',
+            ],
         ];
     }
 
@@ -646,6 +745,28 @@ class SystemConfigService
     }
 
     /**
+     * Garante chaves dos módulos Notificações, Evolution, Financeiro e Igrejas (painel + .env).
+     */
+    public function ensureModulePlatformConfigs(): void
+    {
+        $defaults = $this->getDefaultConfigs();
+        foreach ($defaults as $key => $meta) {
+            if (($meta['group'] ?? '') !== 'platform_modules') {
+                continue;
+            }
+            if (! SystemConfig::where('key', $key)->exists()) {
+                SystemConfig::create([
+                    'key' => $key,
+                    'value' => $meta['value'],
+                    'type' => $meta['type'],
+                    'group' => $meta['group'],
+                    'description' => $meta['description'],
+                ]);
+            }
+        }
+    }
+
+    /**
      * Garante chaves da Bíblia na homepage, rodapé (créditos) e flags de integração.
      * Migra valores legados homepage_footer_vertex_* para homepage_footer_credit_*.
      */
@@ -765,17 +886,9 @@ class SystemConfigService
 
                 $this->updateConfig($key, $value, $config->type, $config->description);
 
-                // Verificar se a chave deve ir para o .env
-                if ($key === 'system.name') {
-                    $envUpdates['APP_NAME'] = $processedValue;
-                } elseif (str_starts_with($key, 'mail.') ||
-                    str_starts_with($key, 'recaptcha.') ||
-                    str_starts_with($key, 'google_maps.') ||
-                    str_starts_with($key, 'broadcast.') ||
-                    str_starts_with($key, 'pusher.')) {
-
-                    $envKey = strtoupper(str_replace('.', '_', $key));
-                    $envUpdates[$envKey] = $processedValue;
+                $envKey = $this->envKeyForConfigKey($key);
+                if ($envKey !== null) {
+                    $envUpdates[$envKey] = $this->formatValueForEnvFile($envKey, $config->type, (string) $processedValue);
                 }
             } else {
                 // Caso a config não exista na DB, apenas atualiza
@@ -793,17 +906,15 @@ class SystemConfigService
      */
     protected function syncOneToEnv(string $key, string $value): void
     {
-        if ($key === 'system.name') {
-            $this->syncBatchToEnv(['APP_NAME' => $value]);
-        } elseif (str_starts_with($key, 'mail.') ||
-            str_starts_with($key, 'recaptcha.') ||
-            str_starts_with($key, 'google_maps.') ||
-            str_starts_with($key, 'broadcast.') ||
-            str_starts_with($key, 'pusher.')) {
-
-            $envKey = strtoupper(str_replace('.', '_', $key));
-            $this->syncBatchToEnv([$envKey => $value]);
+        $envKey = $this->envKeyForConfigKey($key);
+        if ($envKey === null) {
+            return;
         }
+
+        $config = SystemConfig::where('key', $key)->first();
+        $type = $config?->type ?? 'string';
+
+        $this->syncBatchToEnv([$envKey => $this->formatValueForEnvFile($envKey, $type, $value)]);
     }
 
     /**
@@ -843,9 +954,56 @@ class SystemConfigService
 
             if ($modified) {
                 file_put_contents($envPath, $envContent);
+                try {
+                    Artisan::call('config:clear');
+                } catch (\Throwable $e) {
+                    \Log::warning('config:clear após sincronizar .env: '.$e->getMessage());
+                }
             }
         } catch (\Exception $e) {
             \Log::warning('Erro ao sincronizar lote de configurações com .env: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Nome da variável no .env para uma chave de system_configs, ou null se não sincronizar.
+     */
+    protected function envKeyForConfigKey(string $key): ?string
+    {
+        if ($key === 'system.name') {
+            return 'APP_NAME';
+        }
+
+        $prefixes = [
+            'mail.',
+            'recaptcha.',
+            'google_maps.',
+            'broadcast.',
+            'pusher.',
+            'notificacoes.',
+            'evolution.',
+            'jubaf.',
+            'igrejas.',
+        ];
+
+        foreach ($prefixes as $prefix) {
+            if (str_starts_with($key, $prefix)) {
+                return strtoupper(str_replace('.', '_', $key));
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Formato gravado no .env (booleanos como true/false para leitura consistente pelo Laravel).
+     */
+    protected function formatValueForEnvFile(string $envKey, string $configType, string $value): string
+    {
+        if ($configType === 'boolean') {
+            return $value === '1' ? 'true' : 'false';
+        }
+
+        return $value;
     }
 }

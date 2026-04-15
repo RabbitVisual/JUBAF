@@ -19,16 +19,16 @@
     </div>
 
     <div>
-        <label for="calendar_event_id" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Evento
+        <label for="evento_id" class="mb-1.5 block text-sm font-semibold text-gray-800 dark:text-gray-200">Evento
             (opcional)</label>
-        <select id="calendar_event_id" name="calendar_event_id" class="{{ $fieldClass }}">
+        <select id="evento_id" name="evento_id" class="{{ $fieldClass }}">
             <option value="">— Sem evento —</option>
             @foreach ($events as $ev)
-                <option value="{{ $ev->id }}" @selected(old('calendar_event_id', $assignment->calendar_event_id) == $ev->id)>{{ $ev->title }} ·
-                    {{ $ev->starts_at?->format('d/m/Y H:i') }}</option>
+                <option value="{{ $ev->id }}" @selected(old('evento_id', $assignment->evento_id) == $ev->id)>{{ $ev->title }} ·
+                    {{ $ev->start_date?->format('d/m/Y H:i') }}</option>
             @endforeach
         </select>
-        @error('calendar_event_id')
+        @error('evento_id')
             <p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
         @enderror
         @if ($events->isEmpty())

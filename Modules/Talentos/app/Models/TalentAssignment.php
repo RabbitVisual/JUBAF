@@ -17,7 +17,7 @@ class TalentAssignment extends Model
 
     protected $fillable = [
         'user_id',
-        'calendar_event_id',
+        'evento_id',
         'role_label',
         'status',
         'notes',
@@ -31,7 +31,7 @@ class TalentAssignment extends Model
 
     public function calendarEvent(): BelongsTo
     {
-        return $this->belongsTo(CalendarEvent::class, 'calendar_event_id');
+        return $this->belongsTo(CalendarEvent::class, 'evento_id');
     }
 
     public function creator(): BelongsTo

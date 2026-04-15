@@ -47,13 +47,13 @@ class CalendarPricingService
     {
         if ($batch !== null) {
             if (! $batch->isSaleOpen($at)) {
-                return (float) $event->registration_fee;
+                return (float) $event->ticket_price;
             }
 
             return (float) $batch->price;
         }
 
-        return (float) ($event->registration_fee ?? 0);
+        return (float) ($event->ticket_price ?? 0);
     }
 
     /**

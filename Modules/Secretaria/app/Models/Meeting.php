@@ -20,7 +20,7 @@ class Meeting extends Model
         'status',
         'notes',
         'created_by_id',
-        'calendar_event_id',
+        'evento_id',
     ];
 
     protected function casts(): array
@@ -48,6 +48,6 @@ class Meeting extends Model
 
     public function calendarEvent(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Calendario\App\Models\CalendarEvent::class, 'calendar_event_id');
+        return $this->belongsTo(\Modules\Calendario\App\Models\CalendarEvent::class, 'evento_id');
     }
 }

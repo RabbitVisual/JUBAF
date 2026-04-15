@@ -36,11 +36,11 @@ class CalendarFeedService
         $q = CalendarEvent::query()
             ->with(['church:id,name'])
             ->where(function ($w) use ($rangeStart, $rangeEnd) {
-                $w->whereBetween('starts_at', [$rangeStart, $rangeEnd])
+                $w->whereBetween('start_date', [$rangeStart, $rangeEnd])
                     ->orWhere(function ($w2) use ($rangeStart, $rangeEnd) {
-                        $w2->where('starts_at', '<', $rangeEnd)
+                        $w2->where('start_date', '<', $rangeEnd)
                             ->where(function ($w3) use ($rangeStart) {
-                                $w3->whereNull('ends_at')->orWhere('ends_at', '>', $rangeStart);
+                                $w3->whereNull('end_date')->orWhere('end_date', '>', $rangeStart);
                             });
                     });
             });
@@ -59,7 +59,7 @@ class CalendarFeedService
         }
         // diretoria: todos os status (rascunhos, aprovação, etc.)
 
-        $events = $q->orderBy('starts_at')->get();
+        $events = $q->orderBy('start_date')->get();
 
         foreach ($events as $event) {
             if ($user && ! $event->userCanView($user)) {
@@ -74,11 +74,11 @@ class CalendarFeedService
                 'id' => 'event:'.$event->id,
                 'title' => $event->title,
                 'start' => $event->all_day
-                    ? $event->starts_at->copy()->startOfDay()->toIso8601String()
-                    : $event->starts_at->toIso8601String(),
+                    ? $event->start_date->copy()->startOfDay()->toIso8601String()
+                    : $event->start_date->toIso8601String(),
                 'end' => $event->all_day
-                    ? ($event->ends_at ?? $event->starts_at)->copy()->endOfDay()->toIso8601String()
-                    : ($event->ends_at ?? $event->starts_at->copy()->addHours(2))->toIso8601String(),
+                    ? ($event->end_date ?? $event->start_date)->copy()->endOfDay()->toIso8601String()
+                    : ($event->end_date ?? $event->start_date->copy()->addHours(2))->toIso8601String(),
                 'allDay' => (bool) $event->all_day,
                 'backgroundColor' => $color,
                 'borderColor' => $color,

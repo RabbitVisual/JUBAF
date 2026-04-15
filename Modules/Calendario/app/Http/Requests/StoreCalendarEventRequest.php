@@ -24,8 +24,8 @@ class StoreCalendarEventRequest extends FormRequest
                 CalendarEvent::STATUS_PUBLISHED,
                 CalendarEvent::STATUS_CANCELLED,
             ])],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'all_day' => ['boolean'],
             'visibility' => ['required', Rule::in([
                 CalendarEvent::VIS_PUBLIC,
@@ -39,8 +39,9 @@ class StoreCalendarEventRequest extends FormRequest
             'church_id' => ['nullable', 'exists:igrejas_churches,id'],
             'registration_open' => ['boolean'],
             'registration_deadline' => ['nullable', 'date'],
-            'max_participants' => ['nullable', 'integer', 'min:1'],
-            'registration_fee' => ['nullable', 'numeric', 'min:0'],
+            'capacity' => ['nullable', 'integer', 'min:1'],
+            'ticket_price' => ['nullable', 'numeric', 'min:0'],
+            'is_paid' => ['boolean'],
             'is_featured' => ['boolean'],
             'requires_council_approval' => ['boolean'],
             'contact_name' => ['nullable', 'string', 'max:120'],
@@ -83,6 +84,11 @@ class StoreCalendarEventRequest extends FormRequest
         $this->merge([
             'is_featured' => $this->boolean('is_featured'),
             'requires_council_approval' => $this->boolean('requires_council_approval'),
+            'is_paid' => $this->boolean('is_paid'),
+            'start_date' => $this->input('start_date', $this->input('starts_at')),
+            'end_date' => $this->input('end_date', $this->input('ends_at')),
+            'capacity' => $this->input('capacity', $this->input('max_participants')),
+            'ticket_price' => $this->input('ticket_price', $this->input('registration_fee')),
         ]);
     }
 }

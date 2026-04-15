@@ -70,6 +70,8 @@ class RolesPermissionsSeeder extends Seeder
         }
 
         $this->seedPermission('secretaria.minutes.submit');
+        $this->seedPermission('secretaria.minutes.request_signatures');
+        $this->seedPermission('secretaria.minutes.sign');
         foreach (['approve', 'publish'] as $a) {
             $this->seedPermission('secretaria.minutes.'.$a);
             $this->seedPermission('secretaria.convocations.'.$a);
@@ -265,6 +267,7 @@ class RolesPermissionsSeeder extends Seeder
             'igrejas.requests.submit',
             'igrejas.jovens.provision',
             'financeiro.minhas_contas.view',
+            'secretaria.minutes.sign',
         ];
         $lider->syncPermissions(Permission::whereIn('name', $permissionsLider)->pluck('name')->toArray());
 

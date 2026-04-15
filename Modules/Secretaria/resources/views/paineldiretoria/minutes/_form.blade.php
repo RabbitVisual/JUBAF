@@ -47,8 +47,10 @@
         Use o editor abaixo como no Word: <strong>títulos</strong>, <strong>listas</strong> e <strong>negrito</strong>.
         Não é necessário escrever código — os botões formatam o texto por si.
     </p>
-    <div id="quill-minute-body" class="quill-editor-wrapper rounded-xl" aria-label="Editor do corpo da ata"></div>
-    <textarea name="body" id="minute-body" class="hidden" rows="1" cols="1">{{ old('body', $minute->body) }}</textarea>
+    <div class="rounded-2xl border border-amber-200/90 bg-amber-50/40 p-3 shadow-inner dark:border-amber-900/40 dark:bg-slate-900">
+        <div id="quill-minute-body" class="quill-editor-wrapper rounded-xl" aria-label="Editor do corpo da ata"></div>
+    </div>
+    <textarea name="content" id="minute-body" class="hidden" rows="1" cols="1">{{ old('content', $minute->content ?? $minute->body) }}</textarea>
 </div>
 
 @once

@@ -22,15 +22,15 @@ class RegistrationsController extends Controller
             $q->where('status', $request->input('status'));
         }
         if ($request->filled('event_id')) {
-            $q->where('event_id', $request->input('event_id'));
+            $q->where('evento_id', $request->input('event_id'));
         }
 
         $registrations = $q->orderByDesc('id')->paginate(25)->withQueryString();
 
         $eventsForFilter = CalendarEvent::query()
-            ->orderByDesc('starts_at')
+            ->orderByDesc('start_date')
             ->limit(200)
-            ->get(['id', 'title', 'starts_at']);
+            ->get(['id', 'title', 'start_date']);
 
         return view('calendario::paineldiretoria.registrations.index', [
             'layout' => 'paineldiretoria::components.layouts.app',

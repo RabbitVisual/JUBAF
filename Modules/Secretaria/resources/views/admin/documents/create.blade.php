@@ -7,11 +7,17 @@
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Carregar documento</h1>
     <form action="{{ route($routePrefix.'.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 bg-white dark:bg-slate-800 border rounded-xl p-6">@csrf
         <div><label class="block text-sm font-medium mb-1">Título *</label><input type="text" name="title" required class="w-full rounded-lg border dark:bg-slate-900 px-3 py-2 text-sm"></div>
+        <div><label class="block text-sm font-medium mb-1">Categoria *</label>
+            <select name="category" class="w-full rounded-lg border dark:bg-slate-900 px-3 py-2 text-sm">
+                @foreach(['Estatuto', 'Ofício', 'Circular', 'Outros'] as $category)
+                    <option value="{{ $category }}">{{ $category }}</option>
+                @endforeach
+            </select>
+        </div>
         <div><label class="block text-sm font-medium mb-1">Visibilidade *</label>
-            <select name="visibility" class="w-full rounded-lg border dark:bg-slate-900 px-3 py-2 text-sm">
-                <option value="directorate">Diretoria</option>
-                <option value="leaders">Líderes</option>
-                <option value="public">Público</option>
+            <select name="is_public" class="w-full rounded-lg border dark:bg-slate-900 px-3 py-2 text-sm">
+                <option value="0">Interno</option>
+                <option value="1">Público</option>
             </select>
         </div>
         <div><label class="block text-sm font-medium mb-1">Igreja (opcional)</label>

@@ -21,14 +21,19 @@ class GatewayPayment extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
+    protected $table = 'gateway_transactions';
+
     protected $fillable = [
         'uuid',
         'gateway_provider_account_id',
         'driver',
-        'provider_reference',
+        'external_reference',
         'amount',
+        'payment_method',
         'currency',
         'status',
+        'qr_code_base64',
+        'ticket_url',
         'payable_type',
         'payable_id',
         'idempotency_key',
@@ -93,5 +98,15 @@ class GatewayPayment extends Model
             self::STATUS_CANCELLED => 'Cancelado',
             default => $this->status,
         };
+    }
+
+    public function getProviderReferenceAttribute(): ?string
+    {
+        return $this->external_reference;
+    }
+
+    public function setProviderReferenceAttribute(?string $value): void
+    {
+        $this->attributes['external_reference'] = $value;
     }
 }

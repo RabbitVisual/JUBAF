@@ -13,6 +13,7 @@ use Modules\Secretaria\App\Policies\ConvocationPolicy;
 use Modules\Secretaria\App\Policies\MeetingPolicy;
 use Modules\Secretaria\App\Policies\MinutePolicy;
 use Modules\Secretaria\App\Policies\SecretariaDocumentPolicy;
+use Modules\Secretaria\App\Services\AtaWorkflowService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -48,6 +49,7 @@ class SecretariaServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(AtaWorkflowService::class);
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
     }

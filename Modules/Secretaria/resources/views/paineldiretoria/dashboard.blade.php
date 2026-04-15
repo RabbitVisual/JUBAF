@@ -38,7 +38,7 @@
                                 <li><a href="{{ route($sb.'.atas.show', $pm) }}" class="font-medium underline decoration-amber-600/40 underline-offset-2 hover:text-amber-900 dark:hover:text-amber-100">{{ \Illuminate\Support\Str::limit($pm->title, 48) }}</a></li>
                             @endforeach
                         </ul>
-                        <a href="{{ route($sb.'.atas.index', ['status' => 'pending_approval']) }}" class="mt-2 inline-flex text-xs font-bold text-amber-800 hover:underline dark:text-amber-200">Ver todas as atas</a>
+                        <a href="{{ route($sb.'.atas.index', ['status' => 'pending_signatures']) }}" class="mt-2 inline-flex text-xs font-bold text-amber-800 hover:underline dark:text-amber-200">Ver todas as atas</a>
                     </div>
                 @endif
                 @if($pendingConvocations > 0)

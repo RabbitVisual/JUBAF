@@ -28,14 +28,18 @@ class DocumentController extends Controller
     {
         $this->authorize('viewAny', SecretariaDocument::class);
         $q = SecretariaDocument::query()->with(['church', 'uploadedBy'])->orderByDesc('created_at');
-        if ($request->filled('visibility')) {
-            $q->where('visibility', $request->string('visibility'));
+        if ($request->filled('category')) {
+            $q->where('category', $request->string('category'));
+        }
+        if ($request->filled('q')) {
+            $search = '%'.$request->string('q').'%';
+            $q->where('title', 'like', $search);
         }
         $documents = $q->paginate(20)->withQueryString();
 
         return $this->secretariaView('documents.index', [
             'documents' => $documents,
-            'filters' => $request->only(['visibility']),
+            'filters' => $request->only(['category', 'q']),
         ]);
     }
 
@@ -53,7 +57,8 @@ class DocumentController extends Controller
         $this->authorize('create', SecretariaDocument::class);
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'visibility' => ['required', 'string', 'in:directorate,leaders,public'],
+            'category' => ['required', 'string', 'in:Estatuto,Ofício,Circular,Outros'],
+            'is_public' => ['required', 'boolean'],
             'church_id' => ['nullable', 'exists:igrejas_churches,id'],
             'file' => ['required', 'file', 'max:10240'],
         ]);
@@ -62,13 +67,12 @@ class DocumentController extends Controller
         $path = $file->store('secretaria/documents', 'local');
 
         SecretariaDocument::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
             'title' => $data['title'],
-            'visibility' => $data['visibility'],
-            'church_id' => $data['church_id'] ?? null,
-            'path' => $path,
-            'original_name' => $file->getClientOriginalName(),
-            'mime' => $file->getClientMimeType(),
-            'size' => $file->getSize(),
+            'category' => $data['category'],
+            'igreja_id' => $data['church_id'] ?? null,
+            'is_public' => (bool) $data['is_public'],
+            'file_path' => $path,
             'uploaded_by_id' => $request->user()->id,
         ]);
 
@@ -89,6 +93,6 @@ class DocumentController extends Controller
         $this->authorize('download', $document);
         abort_unless(Storage::disk('local')->exists($document->path), 404);
 
-        return Storage::disk('local')->download($document->path, $document->original_name ?? 'documento');
+        return Storage::disk('local')->download($document->path, $document->title.'.pdf');
     }
 }

@@ -65,8 +65,8 @@ class FinanceCalendarTalentosTest extends TestCase
 
         $event = CalendarEvent::query()->create([
             'title' => 'Encontro de teste',
-            'starts_at' => now()->addWeek(),
-            'ends_at' => now()->addWeek()->addHours(2),
+            'start_date' => now()->addWeek(),
+            'end_date' => now()->addWeek()->addHours(2),
             'visibility' => CalendarEvent::VIS_JOVENS,
             'type' => 'evento',
             'registration_open' => true,
@@ -78,8 +78,8 @@ class FinanceCalendarTalentosTest extends TestCase
             ->post(route('jovens.calendario.register', $event))
             ->assertRedirect();
 
-        $this->assertDatabaseHas('calendar_registrations', [
-            'event_id' => $event->id,
+        $this->assertDatabaseHas('evento_inscricoes', [
+            'evento_id' => $event->id,
             'user_id' => $user->id,
             'status' => 'confirmed',
         ]);

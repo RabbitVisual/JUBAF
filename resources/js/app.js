@@ -10,6 +10,7 @@ import './dialogs'; // Importar sistema de diálogos profissionais
 import './toast'; // Importar sistema de notificações toast
 import './form-helpers'; // Helpers para substituir confirms inline
 import './map'; // Importar sistema de mapas
+import './painel-charts';
 
 // Alpine.js
 import Alpine from 'alpinejs';

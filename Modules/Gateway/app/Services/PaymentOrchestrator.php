@@ -39,15 +39,18 @@ class PaymentOrchestrator
         $result = $driver->createPayment($payment, $account);
 
         $payment->refresh();
-        $payment->provider_reference = $result->providerReference ?? $payment->provider_reference;
+        $payment->external_reference = $result->providerReference ?? $payment->external_reference;
         $payment->checkout_url = $result->checkoutUrl ?? $payment->checkout_url;
         $payment->client_secret = $result->clientSecret ?? $payment->client_secret;
+        $payment->payment_method = $result->paymentMethod ?? $payment->payment_method;
+        $payment->qr_code_base64 = $result->qrCodeBase64 ?? $payment->qr_code_base64;
+        $payment->ticket_url = $result->ticketUrl ?? $payment->ticket_url;
         $payment->raw_last_payload = $result->rawResponse ?? $payment->raw_last_payload;
         $payment->save();
 
         $this->audit->log('payment.initiated', $payment, $payment->payable, [
             'driver' => $account->driver,
-            'provider_reference' => $payment->provider_reference,
+            'provider_reference' => $payment->external_reference,
         ]);
 
         return $payment;

@@ -14,7 +14,7 @@ class CheckoutController extends Controller
     {
         $payment = GatewayPayment::query()->where('uuid', $uuid)->firstOrFail();
 
-        if ($payment->checkout_url && $payment->status === GatewayPayment::STATUS_PENDING) {
+        if ($payment->checkout_url && $payment->status === GatewayPayment::STATUS_PENDING && ! $payment->qr_code_base64) {
             return redirect()->away($payment->checkout_url);
         }
 

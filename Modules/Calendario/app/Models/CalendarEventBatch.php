@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CalendarEventBatch extends Model
 {
-    protected $table = 'calendar_event_batches';
+    protected $table = 'evento_batches';
 
     protected $fillable = [
         'event_id',

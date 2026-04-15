@@ -53,7 +53,7 @@ class FinTransaction extends Model
         'reconciled',
         'is_extraordinary',
         'secretaria_minute_id',
-        'calendar_event_id',
+        'evento_id',
         'metadata',
         'created_by',
     ];

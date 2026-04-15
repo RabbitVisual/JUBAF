@@ -14,6 +14,7 @@ use Modules\Calendario\App\Http\Requests\UpdateCalendarEventRequest;
 use Modules\Calendario\App\Models\CalendarEvent;
 use Modules\Calendario\App\Models\CalendarPriceRule;
 use Modules\Calendario\App\Models\CalendarRegistration;
+use Modules\Financeiro\App\Models\FinTransaction;
 use Modules\Igrejas\App\Models\Church;
 
 class EventController extends Controller
@@ -25,10 +26,10 @@ class EventController extends Controller
         $q = CalendarEvent::query()->withCount('registrations');
 
         if ($request->filled('from')) {
-            $q->whereDate('starts_at', '>=', $request->input('from'));
+            $q->whereDate('start_date', '>=', $request->input('from'));
         }
         if ($request->filled('to')) {
-            $q->whereDate('starts_at', '<=', $request->input('to'));
+            $q->whereDate('start_date', '<=', $request->input('to'));
         }
         if ($request->filled('visibility')) {
             $q->where('visibility', $request->input('visibility'));
@@ -37,7 +38,7 @@ class EventController extends Controller
             $q->where('status', $request->input('status'));
         }
 
-        $events = $q->orderBy('starts_at')->paginate(20)->withQueryString();
+        $events = $q->orderBy('start_date')->paginate(20)->withQueryString();
 
         return view('calendario::paineldiretoria.events.index', [
             'layout' => 'paineldiretoria::components.layouts.app',
@@ -74,8 +75,8 @@ class EventController extends Controller
                 'all_day' => false,
                 'status' => CalendarEvent::STATUS_PUBLISHED,
                 'max_per_registration' => 1,
-                'starts_at' => $startsAt,
-                'ends_at' => $endsAt,
+                'start_date' => $startsAt,
+                'end_date' => $endsAt,
             ]),
         ]);
     }
@@ -144,7 +145,7 @@ class EventController extends Controller
     public function checkIn(Request $request, CalendarEvent $event, CalendarRegistration $registration): RedirectResponse
     {
         $this->authorize('manageRegistrations', $event);
-        abort_unless((int) $registration->event_id === (int) $event->id, 404);
+        abort_unless((int) $registration->evento_id === (int) $event->id, 404);
 
         if ($request->boolean('undo')) {
             $registration->update(['checked_in_at' => null]);
@@ -349,8 +350,8 @@ class EventController extends Controller
             return $msg;
         }
 
-        $starts = $data['starts_at'];
-        $ends = $data['ends_at'] ?? $starts->copy()->addHours(2);
+        $starts = $data['start_date'];
+        $ends = $data['end_date'] ?? $starts->copy()->addHours(2);
         $overlap = CalendarEvent::localChurchEventsOverlapping($starts, $ends)
             ->when($ignore, fn ($c) => $c->filter(fn ($e) => (int) $e->id !== (int) $ignore->id));
         if ($overlap->isNotEmpty()) {
@@ -358,5 +359,30 @@ class EventController extends Controller
         }
 
         return $msg;
+    }
+
+    public function monitor(CalendarEvent $event): View
+    {
+        $this->authorize('manageRegistrations', $event);
+
+        $event->load(['registrations.user']);
+        $totalRevenue = FinTransaction::query()
+            ->where('source', FinTransaction::SOURCE_GATEWAY)
+            ->where('evento_id', $event->id)
+            ->sum('amount');
+        $confirmed = $event->registrations->where('status', CalendarRegistration::STATUS_CONFIRMED)->count();
+        $capacity = $event->capacity;
+        $occupancyPercent = $capacity ? round(($confirmed / max($capacity, 1)) * 100, 1) : null;
+
+        return view('calendario::paineldiretoria.events.monitor', [
+            'layout' => 'paineldiretoria::components.layouts.app',
+            'routePrefix' => 'diretoria.calendario',
+            'event' => $event,
+            'totalRevenue' => $totalRevenue,
+            'confirmed' => $confirmed,
+            'capacity' => $capacity,
+            'occupancyPercent' => $occupancyPercent,
+            'registrations' => $event->registrations->sortByDesc('id')->values(),
+        ]);
     }
 }

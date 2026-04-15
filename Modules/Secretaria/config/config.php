@@ -16,4 +16,5 @@ return [
         'aviso_draft_on_convocation_publish' => false,
         'homepage_public_secretaria_cta' => true,
     ],
+    'required_minute_signers' => ['presidente', 'secretario-1'],
 ];

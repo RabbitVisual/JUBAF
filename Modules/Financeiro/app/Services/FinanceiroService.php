@@ -3,15 +3,108 @@
 namespace Modules\Financeiro\App\Services;
 
 use App\Models\User;
+use App\Support\ErpChurchScope;
+use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\Financeiro\App\Models\FinBankAccount;
 use Modules\Financeiro\App\Models\FinCategory;
+use Modules\Financeiro\App\Models\FinObligation;
 use Modules\Financeiro\App\Models\FinTransaction;
 
 class FinanceiroService
 {
+    /**
+     * @return array{
+     *   month_in: float,
+     *   month_out: float,
+     *   month_balance: float,
+     *   sparkline: array<int, array{date: string, in: float, out: float}>
+     * }
+     */
+    public function monthKpisForUser(User $user): array
+    {
+        $start = Carbon::now()->startOfMonth();
+        $end = Carbon::now()->endOfMonth();
+
+        $base = FinTransaction::query()->whereBetween('occurred_on', [$start->toDateString(), $end->toDateString()]);
+        ErpChurchScope::applyToFinTransactionQuery($base, $user);
+
+        $monthIn = (float) (clone $base)->where('direction', 'in')->sum('amount');
+        $monthOut = (float) (clone $base)->where('direction', 'out')->sum('amount');
+
+        $rows = (clone $base)
+            ->selectRaw('DATE(occurred_on) as day')
+            ->selectRaw("SUM(CASE WHEN direction = 'in' THEN amount ELSE 0 END) as in_total")
+            ->selectRaw("SUM(CASE WHEN direction = 'out' THEN amount ELSE 0 END) as out_total")
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get();
+
+        $indexedRows = $rows->keyBy('day');
+        $sparkline = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            $day = $cursor->toDateString();
+            $entry = $indexedRows->get($day);
+            $sparkline[] = [
+                'date' => $day,
+                'in' => (float) ($entry->in_total ?? 0),
+                'out' => (float) ($entry->out_total ?? 0),
+            ];
+            $cursor->addDay();
+        }
+
+        return [
+            'month_in' => $monthIn,
+            'month_out' => $monthOut,
+            'month_balance' => $monthIn - $monthOut,
+            'sparkline' => $sparkline,
+        ];
+    }
+
+    /**
+     * @return Collection<int, FinTransaction>
+     */
+    public function latestTransactionsForUser(User $user, int $limit = 8): Collection
+    {
+        $query = FinTransaction::query()->with(['category', 'church']);
+        ErpChurchScope::applyToFinTransactionQuery($query, $user);
+
+        return $query
+            ->orderByDesc('occurred_on')
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * @return array{total: int, overdue: int, pending: int, settled: int}
+     */
+    public function obligationsStatusForChurchIds(array $churchIds): array
+    {
+        if ($churchIds === []) {
+            return [
+                'total' => 0,
+                'overdue' => 0,
+                'pending' => 0,
+                'settled' => 0,
+            ];
+        }
+
+        $base = FinObligation::query()->whereIn('church_id', $churchIds);
+
+        return [
+            'total' => (clone $base)->count(),
+            'overdue' => (clone $base)->where('status', FinObligation::STATUS_OVERDUE)->count(),
+            'pending' => (clone $base)->where('status', FinObligation::STATUS_PENDING)->count(),
+            'settled' => (clone $base)->where('status', FinObligation::STATUS_SETTLED)->count(),
+        ];
+    }
+
     public function categoryRequiresExtraordinaryAudit(FinCategory $category, string $direction): bool
     {
         if ($direction !== 'out') {
@@ -59,7 +152,7 @@ class FinanceiroService
                 'reconciled' => false,
                 'is_extraordinary' => $isExtraordinary,
                 'secretaria_minute_id' => $data['secretaria_minute_id'] ?? null,
-                'calendar_event_id' => $data['calendar_event_id'] ?? null,
+                'evento_id' => $data['evento_id'] ?? ($data['calendar_event_id'] ?? null),
                 'metadata' => $data['metadata'] ?? null,
                 'created_by' => $user?->id,
             ];
@@ -110,7 +203,9 @@ class FinanceiroService
                 'status' => $data['status'] ?? $transaction->status,
                 'is_extraordinary' => $isExtraordinary,
                 'secretaria_minute_id' => array_key_exists('secretaria_minute_id', $data) ? $data['secretaria_minute_id'] : $transaction->secretaria_minute_id,
-                'calendar_event_id' => array_key_exists('calendar_event_id', $data) ? $data['calendar_event_id'] : $transaction->calendar_event_id,
+                'evento_id' => array_key_exists('evento_id', $data)
+                    ? $data['evento_id']
+                    : (array_key_exists('calendar_event_id', $data) ? $data['calendar_event_id'] : $transaction->evento_id),
             ]);
 
             $transaction->save();

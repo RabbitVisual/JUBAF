@@ -3,6 +3,7 @@
 namespace Modules\PainelDiretoria\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -27,6 +28,7 @@ class PainelDiretoriaServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerViewComposers();
     }
 
     /**
@@ -138,6 +140,31 @@ class PainelDiretoriaServiceProvider extends ServiceProvider
     public function provides(): array
     {
         return [];
+    }
+
+    private function registerViewComposers(): void
+    {
+        View::composer('paineldiretoria::components.layouts.sidebar', function ($view): void {
+            $user = auth()->user();
+
+            $view->with('diretoriaNavSections', [
+                'dashboard' => [
+                    'route' => 'diretoria.dashboard',
+                    'label' => 'Dashboard',
+                    'visible' => (bool) $user,
+                ],
+                'financeiro' => [
+                    'route' => 'diretoria.financeiro.dashboard',
+                    'label' => 'Tesouraria',
+                    'visible' => (bool) $user?->can('financeiro.dashboard.view'),
+                ],
+                'secretaria' => [
+                    'route' => 'diretoria.secretaria.dashboard',
+                    'label' => 'Secretaria',
+                    'visible' => (bool) $user?->can('secretaria.minutes.view'),
+                ],
+            ]);
+        });
     }
 
     private function getPublishableViewPaths(): array
