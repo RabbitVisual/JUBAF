@@ -1,0 +1,26 @@
+{
+  "resources/assets/js/app.js": {
+    "file": "assets/app-2f1dcb22.js",
+    "imports": [
+      "resources/assets/js/charts.js",
+      "resources/assets/js/filters.js"
+    ],
+    "isEntry": true,
+    "src": "resources/assets/js/app.js"
+  },
+  "resources/assets/js/charts.js": {
+    "file": "assets/charts-6c9ccb32.js",
+    "isEntry": true,
+    "src": "resources/assets/js/charts.js"
+  },
+  "resources/assets/js/filters.js": {
+    "file": "assets/filters-49e74260.js",
+    "isEntry": true,
+    "src": "resources/assets/js/filters.js"
+  },
+  "resources/assets/sass/app.scss": {
+    "file": "assets/app-03d39716.css",
+    "isEntry": true,
+    "src": "resources/assets/sass/app.scss"
+  }
+}

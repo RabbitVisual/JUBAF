@@ -1,0 +1,31 @@
+{
+    "name": "vertex-solutions/secretaria",
+    "description": "",
+    "authors": [
+        {
+            "name": "Vertex Solutions LTDA",
+            "email": "dev@vertexsolutions.com.br"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Secretaria\\App\\": "app/",
+            "Modules\\Secretaria\\Database\\Factories\\": "database/factories/",
+            "Modules\\Secretaria\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\Secretaria\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Secretaria\\Tests\\": "tests/"
+        }
+    }
+}

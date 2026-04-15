@@ -1,0 +1,22 @@
+{
+    "name": "Chat",
+    "alias": "chat",
+    "description": "Módulo completo de chat institucional para suporte ao público e comunicação interna",
+    "keywords": [
+        "chat",
+        "suporte",
+        "atendimento",
+        "comunicacao",
+        "mensagens"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Reinan Rodrigues",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Chat\\Providers\\ChatServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

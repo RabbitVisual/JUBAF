@@ -1,0 +1,21 @@
+{
+    "name": "Igrejas",
+    "alias": "igrejas",
+    "description": "Base para cadastro e gestão de igrejas e congregações, com rotas web/API e painel no padrão Vertex.",
+    "keywords": [
+        "igrejas",
+        "congregacoes",
+        "cadastro",
+        "institucional"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Vertex Solutions LTDA",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Igrejas\\Providers\\IgrejasServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": []
+}

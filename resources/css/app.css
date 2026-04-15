@@ -1,0 +1,365 @@
+/* Tailwind CSS v4.1 */
+@import 'tailwindcss';
+@import './fonts.css';
+@import '../fw-pro/css/all.css';
+
+/* Flowbite 4.0 - Theme and Plugin */
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
+
+/* Dark Mode Variant para Tailwind CSS v4.1 - OBRIGATÓRIO para dark mode funcionar */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+/* NÃO incluir storage/framework/views: o Laravel recompila .php a cada request e o Vite recarrega a página em loop no `npm run dev`. As classes vêm dos .blade.php abaixo. */
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.vue";
+@source "../../Modules/**/*.blade.php";
+@source "../../Modules/**/*.js";
+@source "../../Modules/**/*.vue";
+
+@theme {
+    --font-sans: 'System Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Paleta de Cores Moderna e Elegante */
+    --color-primary: #6366f1;
+    --color-primary-50: #eef2ff;
+    --color-primary-100: #e0e7ff;
+    --color-primary-200: #c7d2fe;
+    --color-primary-300: #a5b4fc;
+    --color-primary-400: #818cf8;
+    --color-primary-500: #6366f1;
+    --color-primary-600: #4f46e5;
+    --color-primary-700: #4338ca;
+    --color-primary-800: #3730a3;
+    --color-primary-900: #312e81;
+    --color-primary-950: #1e1b4b;
+
+    --color-secondary: #8b5cf6;
+    --color-secondary-50: #faf5ff;
+    --color-secondary-100: #f3e8ff;
+    --color-secondary-200: #e9d5ff;
+    --color-secondary-300: #d8b4fe;
+    --color-secondary-400: #c084fc;
+    --color-secondary-500: #a855f7;
+    --color-secondary-600: #9333ea;
+    --color-secondary-700: #7e22ce;
+    --color-secondary-800: #6b21a8;
+    --color-secondary-900: #581c87;
+    --color-secondary-950: #3b0764;
+
+    --color-success: #10b981;
+    --color-success-50: #ecfdf5;
+    --color-success-100: #d1fae5;
+    --color-success-200: #a7f3d0;
+    --color-success-300: #6ee7b7;
+    --color-success-400: #34d399;
+    --color-success-500: #10b981;
+    --color-success-600: #059669;
+    --color-success-700: #047857;
+    --color-success-800: #065f46;
+    --color-success-900: #064e3b;
+    --color-success-950: #022c22;
+
+    --color-warning: #f59e0b;
+    --color-warning-50: #fffbeb;
+    --color-warning-100: #fef3c7;
+    --color-warning-200: #fde68a;
+    --color-warning-300: #fcd34d;
+    --color-warning-400: #fbbf24;
+    --color-warning-500: #f59e0b;
+    --color-warning-600: #d97706;
+    --color-warning-700: #b45309;
+    --color-warning-800: #92400e;
+    --color-warning-900: #78350f;
+    --color-warning-950: #451a03;
+
+    --color-error: #ef4444;
+    --color-error-50: #fef2f2;
+    --color-error-100: #fee2e2;
+    --color-error-200: #fecaca;
+    --color-error-300: #fca5a5;
+    --color-error-400: #f87171;
+    --color-error-500: #ef4444;
+    --color-error-600: #dc2626;
+    --color-error-700: #b91c1c;
+    --color-error-800: #991b1b;
+    --color-error-900: #7f1d1d;
+    --color-error-950: #450a0a;
+
+    --color-info: #3b82f6;
+    --color-info-50: #eff6ff;
+    --color-info-100: #dbeafe;
+    --color-info-200: #bfdbfe;
+    --color-info-300: #93c5fd;
+    --color-info-400: #60a5fa;
+    --color-info-500: #3b82f6;
+    --color-info-600: #2563eb;
+    --color-info-700: #1d4ed8;
+    --color-info-800: #1e40af;
+    --color-info-900: #1e3a8a;
+    --color-info-950: #172554;
+
+    /* Neutros Modernos */
+    --color-gray-50: #f8fafc;
+    --color-gray-100: #f1f5f9;
+    --color-gray-200: #e2e8f0;
+    --color-gray-300: #cbd5e1;
+    --color-gray-400: #94a3b8;
+    --color-gray-500: #64748b;
+    --color-gray-600: #475569;
+    --color-gray-700: #334155;
+    --color-gray-800: #1e293b;
+    --color-gray-900: #0f172a;
+    --color-gray-950: #020617;
+
+    /* Cores para tema escuro */
+    --color-dark-bg: #0f172a;
+    --color-dark-surface: #1e293b;
+    --color-dark-border: #334155;
+    --color-dark-text: #f1f5f9;
+    --color-dark-text-muted: #94a3b8;
+
+    /* Configuração do dark mode - Tailwind v4 usa 'class' por padrão */
+    --default-transition-duration: 200ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Paleta de Cores Admin - Verde Administrativo Profissional */
+    --color-admin-primary: #059669;
+    --color-admin-primary-50: #ecfdf5;
+    --color-admin-primary-100: #d1fae5;
+    --color-admin-primary-200: #a7f3d0;
+    --color-admin-primary-300: #6ee7b7;
+    --color-admin-primary-400: #34d399;
+    --color-admin-primary-500: #059669;
+    --color-admin-primary-600: #047857;
+    --color-admin-primary-700: #065f46;
+    --color-admin-primary-800: #064e3b;
+    --color-admin-primary-900: #022c22;
+    --color-admin-primary-950: #011611;
+
+    --color-admin-secondary: #1e293b;
+    --color-admin-secondary-50: #f8fafc;
+    --color-admin-secondary-100: #f1f5f9;
+    --color-admin-secondary-200: #e2e8f0;
+    --color-admin-secondary-300: #cbd5e1;
+    --color-admin-secondary-400: #94a3b8;
+    --color-admin-secondary-500: #64748b;
+    --color-admin-secondary-600: #475569;
+    --color-admin-secondary-700: #334155;
+    --color-admin-secondary-800: #1e293b;
+    --color-admin-secondary-900: #0f172a;
+    --color-admin-secondary-950: #020617;
+
+    /* Cores Admin para tema escuro */
+    --color-admin-dark-bg: #0f172a;
+    --color-admin-dark-sidebar: #1e293b;
+    --color-admin-dark-surface: #1e293b;
+    --color-admin-dark-border: #334155;
+    --color-admin-dark-text: #f1f5f9;
+    --color-admin-dark-text-muted: #94a3b8;
+}
+
+/*
+|--------------------------------------------------------------------------
+| JUBAF — superfícies institucionais (CSS explícito)
+|--------------------------------------------------------------------------
+| Garante contraste no modo claro mesmo quando utilitários Tailwind com
+| cores arbitrárias (ex.: via-[#0047AB]) não entram no CSS compilado.
+*/
+@layer components {
+    .jubaf-hero-surface {
+        background: linear-gradient(135deg, #0a1628 0%, #0047ab 42%, #0f172a 100%);
+        color: #fff;
+    }
+
+    .jubaf-carousel-scrim {
+        background: linear-gradient(
+            90deg,
+            rgba(15, 23, 42, 0.94) 0%,
+            rgba(0, 71, 171, 0.9) 50%,
+            rgba(15, 23, 42, 0.93) 100%
+        );
+    }
+
+    .jubaf-blue-panel {
+        background: linear-gradient(135deg, #003380 0%, #0047ab 50%, #172554 100%);
+        color: #fff;
+    }
+}
+
+/* Animações customizadas para homepage */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-up-delay {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    50% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-delay {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes patternMove {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 100px 100px;
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.8s ease-out;
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-slide-up {
+    animation: slide-up 0.8s ease-out;
+}
+
+.animate-slide-up-delay {
+    animation: slide-up-delay 1.2s ease-out;
+}
+
+.animate-fade-in-delay {
+    animation: fade-in-delay 1.5s ease-out;
+}
+
+/* Transições otimizadas - aplicadas apenas onde necessário */
+/* Removida transição global para melhor performance no dark mode toggle */
+
+/* Dark mode nativo do Tailwind CSS v4.1 */
+/* Apenas a classe 'dark' no <html> é necessária */
+html.dark {
+    color-scheme: dark;
+}
+
+/* Scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Estilos para cards com hover melhorado */
+.group:hover .group-hover\:scale-110 {
+    transform: scale(1.1);
+}
+
+/* Melhorias de contraste para dark mode */
+.dark {
+    color-scheme: dark;
+}
+
+.dark img {
+    opacity: 0.9;
+}
+
+.dark img:hover {
+    opacity: 1;
+}
+
+/* Utilitários customizados para o painel */
+@layer utilities {
+    .sidebar-transition {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
+
+    .dropdown-transition {
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .card-hover {
+        transition: box-shadow 0.2s ease, opacity 0.2s ease;
+        position: relative;
+    }
+
+    .card-hover:hover {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .dark .card-hover:hover {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Prevenir vibração - usar apenas sombra no hover, sem transform */
+    .card-hover:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+
+    /* Fix para setas duplicadas em selects com appearance-none */
+    select.appearance-none {
+        background-image: none !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+    }
+}
+
+/* Alpine.js: evita flash de conteúdo antes da hidratação (tabs, etc.) */
+[x-cloak] {
+    display: none !important;
+}

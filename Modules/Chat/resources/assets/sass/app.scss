@@ -1,0 +1,163 @@
+// ==========================================================================
+// MÓDULO CHAT - VERTEX SEMAGRI
+// ==========================================================================
+// Arquivo principal de estilos do módulo de Chat
+// Organizado em parciais para melhor manutenção
+//
+// @author VERTEX SEMAGRI
+// @version 2.0.0
+// ==========================================================================
+
+// --------------------------------------------------------------------------
+// 1. CONFIGURAÇÃO E VARIÁVEIS
+// --------------------------------------------------------------------------
+// Variáveis globais de cores, espaçamentos, tipografia, etc.
+@use 'variables' as *;
+
+// --------------------------------------------------------------------------
+// 2. MIXINS E FUNÇÕES
+// --------------------------------------------------------------------------
+// Mixins reutilizáveis para flexbox, responsividade, transições, etc.
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// 3. ANIMAÇÕES
+// --------------------------------------------------------------------------
+// Keyframes e classes de animação
+@use 'animations';
+
+// --------------------------------------------------------------------------
+// 4. ESTILOS BASE
+// --------------------------------------------------------------------------
+// Container principal, header, sidebar, layout
+@use 'base';
+
+// --------------------------------------------------------------------------
+// 5. MENSAGENS
+// --------------------------------------------------------------------------
+// Bolhas de mensagem, indicador de digitação, separadores
+@use 'messages';
+
+// --------------------------------------------------------------------------
+// 6. INPUT DE MENSAGEM
+// --------------------------------------------------------------------------
+// Área de input, form de envio, upload de arquivos
+@use 'input';
+
+// --------------------------------------------------------------------------
+// 7. WIDGET PÚBLICO
+// --------------------------------------------------------------------------
+// Botão flutuante, janela do chat, formulário de identificação
+@use 'widget';
+
+// --------------------------------------------------------------------------
+// 8. COMPONENTES
+// --------------------------------------------------------------------------
+// Toast, modal, dropdown, tooltip, spinner, badges, botões
+@use 'components';
+
+// --------------------------------------------------------------------------
+// 9. UTILITÁRIOS
+// --------------------------------------------------------------------------
+
+// Ocultar elementos
+.chat-hidden {
+    display: none !important;
+}
+
+// Visualmente oculto mas acessível
+.chat-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Truncar texto
+.chat-truncate {
+    @include truncate;
+}
+
+// Centralizar conteúdo
+.chat-center {
+    @include flex-center;
+}
+
+// Espaçamentos
+@each $size, $value in (
+    'xs': $chat-spacing-xs,
+    'sm': $chat-spacing-sm,
+    'md': $chat-spacing-md,
+    'lg': $chat-spacing-lg,
+    'xl': $chat-spacing-xl
+) {
+    .chat-mt-#{$size} { margin-top: $value; }
+    .chat-mb-#{$size} { margin-bottom: $value; }
+    .chat-ml-#{$size} { margin-left: $value; }
+    .chat-mr-#{$size} { margin-right: $value; }
+    .chat-mx-#{$size} { margin-left: $value; margin-right: $value; }
+    .chat-my-#{$size} { margin-top: $value; margin-bottom: $value; }
+    .chat-pt-#{$size} { padding-top: $value; }
+    .chat-pb-#{$size} { padding-bottom: $value; }
+    .chat-pl-#{$size} { padding-left: $value; }
+    .chat-pr-#{$size} { padding-right: $value; }
+    .chat-px-#{$size} { padding-left: $value; padding-right: $value; }
+    .chat-py-#{$size} { padding-top: $value; padding-bottom: $value; }
+}
+
+// Cores de texto
+.chat-text-primary {
+    color: $chat-text-primary-light;
+    @include dark-mode { color: $chat-text-primary-dark; }
+}
+
+.chat-text-secondary {
+    color: $chat-text-secondary-light;
+    @include dark-mode { color: $chat-text-secondary-dark; }
+}
+
+.chat-text-muted {
+    color: $chat-text-muted-light;
+    @include dark-mode { color: $chat-text-muted-dark; }
+}
+
+.chat-text-success { color: $success-color; }
+.chat-text-danger { color: $danger-color; }
+.chat-text-warning { color: $warning-color; }
+.chat-text-primary-color { color: $primary-color; }
+
+// Tamanhos de fonte
+.chat-text-xs { font-size: $chat-font-size-xs; }
+.chat-text-sm { font-size: $chat-font-size-sm; }
+.chat-text-base { font-size: $chat-font-size-base; }
+.chat-text-lg { font-size: $chat-font-size-lg; }
+.chat-text-xl { font-size: $chat-font-size-xl; }
+
+// Pesos de fonte
+.chat-font-normal { font-weight: 400; }
+.chat-font-medium { font-weight: 500; }
+.chat-font-semibold { font-weight: 600; }
+.chat-font-bold { font-weight: 700; }
+
+// Alinhamento de texto
+.chat-text-left { text-align: left; }
+.chat-text-center { text-align: center; }
+.chat-text-right { text-align: right; }
+
+// --------------------------------------------------------------------------
+// 10. PRINT STYLES
+// --------------------------------------------------------------------------
+
+@media print {
+    .chat-widget,
+    .chat-toast,
+    .chat-modal {
+        display: none !important;
+    }
+}
+

@@ -1,0 +1,19 @@
+{
+    "Notificacoes": true,
+    "Homepage": true,
+    "Chat": true,
+    "Avisos": true,
+    "Blog": true,
+    "Bible": true,
+    "Igrejas": true,
+    "Financeiro": true,
+    "Talentos": true,
+    "Calendario": true,
+    "PainelLider": true,
+    "PainelJovens": true,
+    "PainelDiretoria": true,
+    "Secretaria": true,
+    "Permisao": true,
+    "Gateway": true,
+    "Admin": true
+}

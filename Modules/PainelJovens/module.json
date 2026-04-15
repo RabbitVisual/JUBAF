@@ -1,0 +1,20 @@
+{
+    "name": "PainelJovens",
+    "alias": "paineljovens",
+    "description": "Painel e experiência dedicada ao perfil jovens: rotas, layout e integração com o ecossistema Vertex.",
+    "keywords": [
+        "jovens",
+        "painel",
+        "perfil"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Vertex Solutions LTDA",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\PainelJovens\\Providers\\PainelJovensServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": []
+}

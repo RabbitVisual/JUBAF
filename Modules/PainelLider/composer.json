@@ -1,0 +1,31 @@
+{
+    "name": "vertex-solutions/painellider",
+    "description": "",
+    "authors": [
+        {
+            "name": "Vertex Solutions LTDA",
+            "email": "dev@vertexsolutions.com.br"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PainelLider\\App\\": "app/",
+            "Modules\\PainelLider\\Database\\Factories\\": "database/factories/",
+            "Modules\\PainelLider\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\PainelLider\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PainelLider\\Tests\\": "tests/"
+        }
+    }
+}

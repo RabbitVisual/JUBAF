@@ -1,0 +1,23 @@
+{
+    "name": "Avisos",
+    "alias": "avisos",
+    "description": "Sistema de alertas, avisos e banners para a homepage e páginas públicas, com componentes alinhados ao design system do projeto.",
+    "keywords": [
+        "avisos",
+        "banners",
+        "alertas",
+        "marketing",
+        "cta",
+        "homepage"
+    ],
+    "priority": 5,
+    "version": "1.0.0",
+    "author": "Reinan Rodrigues",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Avisos\\Providers\\AvisosServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": []
+}

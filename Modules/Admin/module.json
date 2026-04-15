@@ -1,0 +1,14 @@
+{
+    "name": "Admin",
+    "alias": "admin",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Vertex Solutions LTDA",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Admin\\Providers\\AdminServiceProvider"
+    ],
+    "files": []
+}

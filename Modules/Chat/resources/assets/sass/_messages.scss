@@ -1,0 +1,310 @@
+// ==========================================================================
+// ESTILOS DE MENSAGENS DO CHAT - VERTEX SEMAGRI
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// CONTAINER DE MENSAGENS
+// --------------------------------------------------------------------------
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: $chat-spacing-lg;
+    @include custom-scrollbar;
+
+    // Background pattern sutil
+    background-color: $chat-bg-light;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+
+    @include dark-mode {
+        background-color: $chat-bg-dark;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+}
+
+// --------------------------------------------------------------------------
+// WRAPPER DE MENSAGEM
+// --------------------------------------------------------------------------
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: $chat-spacing-md;
+    animation: fadeInUp 0.3s ease;
+
+    &.sent {
+        justify-content: flex-end;
+    }
+
+    &.received {
+        justify-content: flex-start;
+    }
+
+    &.system {
+        justify-content: center;
+    }
+}
+
+// --------------------------------------------------------------------------
+// BOLHA DE MENSAGEM
+// --------------------------------------------------------------------------
+
+.message-bubble {
+    max-width: $chat-message-max-width;
+    padding: $chat-spacing-sm $chat-spacing-md;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    @include tablet {
+        max-width: $chat-message-max-width-mobile;
+    }
+
+    // Mensagem enviada (atendente)
+    &.sent {
+        background: $chat-sent-bg-light;
+        color: $chat-text-primary-light;
+        border-radius: $chat-border-radius-lg $chat-border-radius-lg 0 $chat-border-radius-lg;
+        @include shadow('sm');
+
+        @include dark-mode {
+            background: $chat-sent-bg-dark;
+            color: white;
+        }
+    }
+
+    // Mensagem recebida (visitante)
+    &.received {
+        background: $chat-received-bg-light;
+        color: $chat-text-primary-light;
+        border-radius: $chat-border-radius-lg $chat-border-radius-lg $chat-border-radius-lg 0;
+        @include shadow('sm');
+
+        @include dark-mode {
+            background: $chat-received-bg-dark;
+            color: $chat-text-primary-dark;
+        }
+    }
+
+    // Mensagem do sistema
+    &.system {
+        background: $chat-system-bg-light;
+        color: $chat-text-secondary-light;
+        border-radius: $chat-border-radius-md;
+        font-size: $chat-font-size-xs;
+        max-width: 80%;
+        text-align: center;
+        padding: $chat-spacing-xs $chat-spacing-md;
+
+        @include dark-mode {
+            background: $chat-system-bg-dark;
+            color: $chat-text-secondary-dark;
+        }
+    }
+
+    // Conteúdo da mensagem
+    .message-content {
+        font-size: $chat-font-size-sm;
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+
+    // Metadados (hora, status de leitura)
+    .message-meta {
+        @include flex-start;
+        justify-content: flex-end;
+        gap: 4px;
+        margin-top: 4px;
+
+        .time {
+            font-size: $chat-font-size-xs;
+            opacity: 0.6;
+        }
+
+        .read-status {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+
+            &.read {
+                color: #3b82f6;
+                opacity: 1;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// INDICADOR DE DIGITAÇÃO
+// --------------------------------------------------------------------------
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: $chat-spacing-sm $chat-spacing-md;
+
+    &__wrapper {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: $chat-spacing-md;
+
+        &.hidden {
+            display: none;
+        }
+    }
+
+    &__bubble {
+        background: $chat-received-bg-light;
+        border-radius: $chat-border-radius-lg $chat-border-radius-lg $chat-border-radius-lg 0;
+        @include shadow('sm');
+
+        @include dark-mode {
+            background: $chat-received-bg-dark;
+        }
+    }
+
+    span {
+        width: 8px;
+        height: 8px;
+        background: $chat-text-muted-light;
+        border-radius: $chat-border-radius-full;
+        animation: typing 1.4s infinite ease-in-out;
+
+        @include dark-mode {
+            background: $chat-text-muted-dark;
+        }
+
+        &:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        &:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// SEPARADOR DE DATA
+// --------------------------------------------------------------------------
+
+.message-date-separator {
+    @include flex-center;
+    margin: $chat-spacing-lg 0;
+
+    &__label {
+        padding: $chat-spacing-xs $chat-spacing-md;
+        font-size: $chat-font-size-xs;
+        font-weight: 500;
+        color: $chat-text-muted-light;
+        background: rgba($chat-border-light, 0.5);
+        border-radius: $chat-border-radius-full;
+
+        @include dark-mode {
+            color: $chat-text-muted-dark;
+            background: rgba($chat-border-dark, 0.5);
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// MENSAGEM COM ANEXO
+// --------------------------------------------------------------------------
+
+.message-attachment {
+    margin-top: $chat-spacing-sm;
+    padding: $chat-spacing-sm;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: $chat-border-radius-md;
+
+    @include dark-mode {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    &__preview {
+        @include flex-start;
+        gap: $chat-spacing-sm;
+
+        .icon {
+            @include flex-center;
+            width: 36px;
+            height: 36px;
+            background: $primary-color;
+            border-radius: $chat-border-radius-sm;
+            color: white;
+
+            svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .info {
+            flex: 1;
+            min-width: 0;
+
+            .name {
+                font-size: $chat-font-size-sm;
+                font-weight: 500;
+                @include truncate;
+            }
+
+            .size {
+                font-size: $chat-font-size-xs;
+                color: $chat-text-muted-light;
+
+                @include dark-mode {
+                    color: $chat-text-muted-dark;
+                }
+            }
+        }
+    }
+
+    &__image {
+        max-width: 100%;
+        border-radius: $chat-border-radius-md;
+        cursor: pointer;
+        @include transition;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// MENSAGEM DE ERRO
+// --------------------------------------------------------------------------
+
+.message-error {
+    @include flex-center;
+    gap: $chat-spacing-sm;
+    padding: $chat-spacing-xs $chat-spacing-sm;
+    font-size: $chat-font-size-xs;
+    color: $danger-color;
+    background: rgba($danger-color, 0.1);
+    border-radius: $chat-border-radius-sm;
+    margin-top: $chat-spacing-xs;
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    button {
+        font-size: $chat-font-size-xs;
+        color: $danger-color;
+        text-decoration: underline;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+
+        &:hover {
+            color: $danger-hover;
+        }
+    }
+}
+

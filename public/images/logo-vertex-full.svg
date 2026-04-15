@@ -1,0 +1,63 @@
+<svg width="450" height="120" viewBox="0 0 450 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mainGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#28a745;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#20c997;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#198754;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffc107;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffb300;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff9800;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffc107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff9800;stop-opacity:1" />
+    </linearGradient>
+    <filter id="logoShadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.25"/>
+    </filter>
+    <filter id="textShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Ícone principal - Folha com vértices -->
+  <g transform="translate(20, 20)" filter="url(#logoShadow)">
+    <!-- Círculo de fundo -->
+    <circle cx="40" cy="40" r="38" fill="url(#mainGreenGrad)"/>
+    
+    <!-- Folha estilizada -->
+    <path d="M40 15 Q30 15, 25 25 Q20 32, 20 40 Q20 48, 25 55 Q30 65, 40 65 Q50 65, 55 55 Q60 48, 60 40 Q60 32, 55 25 Q50 15, 40 15 Z" 
+          fill="#ffffff" 
+          opacity="0.15"/>
+    
+    <!-- Linha central -->
+    <path d="M40 20 L40 60" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+    
+    <!-- Vértices douradas -->
+    <circle cx="40" cy="32" r="4" fill="url(#accentGoldGrad)"/>
+    <circle cx="33" cy="42" r="3" fill="url(#accentGoldGrad)"/>
+    <circle cx="47" cy="42" r="3" fill="url(#accentGoldGrad)"/>
+    <circle cx="40" cy="50" r="2.5" fill="url(#accentGoldGrad)"/>
+    
+    <!-- Brilho -->
+    <circle cx="40" cy="40" r="5" fill="#ffffff" opacity="0.4"/>
+  </g>
+  
+  <!-- Texto VERTEX -->
+  <text x="130" y="52" font-family="'Segoe UI', 'Arial', sans-serif" font-size="38" font-weight="bold" 
+        fill="url(#textGrad)" filter="url(#textShadow)" letter-spacing="2">VERTEX</text>
+  
+  <!-- Texto SEMAGRI -->
+  <text x="130" y="78" font-family="'Segoe UI', 'Arial', sans-serif" font-size="28" font-weight="600" 
+        fill="url(#mainGreenGrad)" filter="url(#textShadow)" letter-spacing="1">SEMAGRI</text>
+  
+  <!-- Linha decorativa -->
+  <line x1="130" y1="88" x2="420" y2="88" stroke="url(#accentGoldGrad)" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+  
+  <!-- Subtítulo -->
+  <text x="130" y="105" font-family="'Segoe UI', 'Arial', sans-serif" font-size="13" fill="#666" letter-spacing="0.5">
+    Sistema Municipal de Agricultura e Infraestrutura
+  </text>
+</svg>

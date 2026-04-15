@@ -1,0 +1,597 @@
+// ==========================================================================
+// ESTILOS DO WIDGET PÚBLICO DE CHAT - VERTEX SEMAGRI
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// CONTAINER DO WIDGET
+// --------------------------------------------------------------------------
+
+.chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: $z-chat-widget;
+    font-family: $chat-font-family;
+
+    @include mobile {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    // Reset de estilos
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+// --------------------------------------------------------------------------
+// BOTÃO FLUTUANTE
+// --------------------------------------------------------------------------
+
+.chat-widget-button {
+    @include flex-center;
+    width: 60px;
+    height: 60px;
+    background: $gradient-green;
+    border: none;
+    border-radius: $chat-border-radius-full;
+    cursor: pointer;
+    @include shadow('xl');
+    @include transition;
+    position: relative;
+
+    &:hover {
+        transform: scale(1.1);
+        @include shadow('xl');
+    }
+
+    &:active {
+        transform: scale(1.05);
+    }
+
+    @include mobile {
+        width: 56px;
+        height: 56px;
+    }
+
+    // Ícone do chat
+    &__icon {
+        width: 28px;
+        height: 28px;
+        color: white;
+        @include transition;
+
+        @include mobile {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    // Ícone de fechar (quando aberto)
+    &__close-icon {
+        display: none;
+        width: 24px;
+        height: 24px;
+        color: white;
+    }
+
+    // Estado aberto
+    &.open {
+        .chat-widget-button__icon {
+            display: none;
+        }
+
+        .chat-widget-button__close-icon {
+            display: block;
+        }
+    }
+
+    // Badge de notificação
+    &__badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        @include badge($danger-color);
+        min-width: 22px;
+        height: 22px;
+        font-size: 12px;
+        animation: badgePulse 2s infinite;
+    }
+
+    // Indicador de online
+    &__status {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        @include status-dot(12px);
+        border: 2px solid white;
+    }
+}
+
+// --------------------------------------------------------------------------
+// JANELA DO CHAT
+// --------------------------------------------------------------------------
+
+.chat-widget-window {
+    position: absolute;
+    bottom: 76px;
+    right: 0;
+    width: 380px;
+    height: 520px;
+    max-height: calc(100vh - 120px);
+    background: white;
+    border-radius: $chat-border-radius-xl;
+    @include shadow('xl');
+    @include flex-column;
+    overflow: hidden;
+    transform-origin: bottom right;
+    animation: scaleIn 0.2s ease;
+
+    @include mobile {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+    }
+
+    @include dark-mode {
+        background: $chat-sidebar-bg-dark;
+    }
+
+    // Estado fechado
+    &.hidden {
+        display: none;
+    }
+}
+
+// --------------------------------------------------------------------------
+// HEADER DO WIDGET
+// --------------------------------------------------------------------------
+
+.chat-widget-header {
+    @include flex-between;
+    padding: $chat-spacing-md $chat-spacing-lg;
+    background: $gradient-green;
+    color: white;
+    flex-shrink: 0;
+
+    &__info {
+        @include flex-start;
+        gap: $chat-spacing-md;
+
+        .logo {
+            @include flex-center;
+            width: 44px;
+            height: 44px;
+            background: rgba(white, 0.2);
+            border-radius: $chat-border-radius-lg;
+
+            img {
+                width: 28px;
+                height: 28px;
+            }
+
+            svg {
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        .text {
+            h4 {
+                font-size: $chat-font-size-base;
+                font-weight: 600;
+                margin-bottom: 2px;
+            }
+
+            p {
+                font-size: $chat-font-size-xs;
+                opacity: 0.9;
+
+                .status-dot {
+                    display: inline-block;
+                    width: 8px;
+                    height: 8px;
+                    border-radius: $chat-border-radius-full;
+                    margin-right: 4px;
+                    vertical-align: middle;
+
+                    &.online {
+                        background: #86efac;
+                    }
+
+                    &.offline {
+                        background: rgba(white, 0.5);
+                    }
+                }
+            }
+        }
+    }
+
+    &__close {
+        @include button-icon(36px);
+        background: rgba(white, 0.1);
+        color: white;
+        display: none;
+
+        @include mobile {
+            display: flex;
+        }
+
+        &:hover {
+            background: rgba(white, 0.2);
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// FORMULÁRIO DE IDENTIFICAÇÃO
+// --------------------------------------------------------------------------
+
+.chat-widget-form {
+    @include flex-column;
+    flex: 1;
+    padding: $chat-spacing-lg;
+    overflow-y: auto;
+    @include custom-scrollbar;
+
+    &__title {
+        font-size: $chat-font-size-lg;
+        font-weight: 600;
+        color: $chat-text-primary-light;
+        margin-bottom: $chat-spacing-xs;
+        text-align: center;
+
+        @include dark-mode {
+            color: $chat-text-primary-dark;
+        }
+    }
+
+    &__subtitle {
+        font-size: $chat-font-size-sm;
+        color: $chat-text-secondary-light;
+        margin-bottom: $chat-spacing-lg;
+        text-align: center;
+
+        @include dark-mode {
+            color: $chat-text-secondary-dark;
+        }
+    }
+
+    &__group {
+        margin-bottom: $chat-spacing-md;
+
+        label {
+            display: block;
+            font-size: $chat-font-size-sm;
+            font-weight: 500;
+            color: $chat-text-primary-light;
+            margin-bottom: $chat-spacing-xs;
+
+            @include dark-mode {
+                color: $chat-text-primary-dark;
+            }
+        }
+
+        input {
+            @include input-base;
+        }
+
+        .error-message {
+            font-size: $chat-font-size-xs;
+            color: $danger-color;
+            margin-top: 4px;
+        }
+    }
+
+    &__submit {
+        width: 100%;
+        padding: $chat-spacing-sm $chat-spacing-lg;
+        font-size: $chat-font-size-base;
+        font-weight: 600;
+        color: white;
+        background: $gradient-green;
+        border: none;
+        border-radius: $chat-border-radius-lg;
+        cursor: pointer;
+        @include shadow('md');
+        @include transition;
+        margin-top: $chat-spacing-md;
+
+        &:hover:not(:disabled) {
+            @include shadow('lg');
+            transform: translateY(-1px);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        &.loading {
+            pointer-events: none;
+
+            .spinner {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                border: 2px solid rgba(white, 0.3);
+                border-top-color: white;
+                border-radius: $chat-border-radius-full;
+                animation: spin 0.8s linear infinite;
+                margin-right: $chat-spacing-sm;
+                vertical-align: middle;
+            }
+        }
+    }
+
+    &__privacy {
+        font-size: $chat-font-size-xs;
+        color: $chat-text-muted-light;
+        text-align: center;
+        margin-top: $chat-spacing-md;
+
+        @include dark-mode {
+            color: $chat-text-muted-dark;
+        }
+
+        a {
+            color: $primary-color;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// ÁREA DE MENSAGENS DO WIDGET
+// --------------------------------------------------------------------------
+
+.chat-widget-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: $chat-spacing-md;
+    @include custom-scrollbar;
+    background: $chat-bg-light;
+
+    @include dark-mode {
+        background: $chat-bg-dark;
+    }
+}
+
+// --------------------------------------------------------------------------
+// INPUT DO WIDGET
+// --------------------------------------------------------------------------
+
+.chat-widget-input {
+    padding: $chat-spacing-md;
+    background: white;
+    border-top: 1px solid $chat-border-light;
+    flex-shrink: 0;
+
+    @include dark-mode {
+        background: $chat-sidebar-bg-dark;
+        border-color: $chat-border-dark;
+    }
+
+    &__form {
+        @include flex-start;
+        gap: $chat-spacing-sm;
+
+        textarea {
+            flex: 1;
+            padding: $chat-spacing-sm $chat-spacing-md;
+            font-size: $chat-font-size-sm;
+            font-family: inherit;
+            color: $chat-text-primary-light;
+            background: $chat-input-bg-light;
+            border: none;
+            border-radius: 20px;
+            resize: none;
+            outline: none;
+            max-height: 100px;
+            line-height: 1.4;
+
+            &::placeholder {
+                color: $chat-text-muted-light;
+            }
+
+            @include dark-mode {
+                color: $chat-text-primary-dark;
+                background: $chat-input-bg-dark;
+
+                &::placeholder {
+                    color: $chat-text-muted-dark;
+                }
+            }
+        }
+
+        button {
+            @include button-icon(40px);
+            background: $gradient-green;
+            color: white;
+            flex-shrink: 0;
+
+            &:hover:not(:disabled) {
+                transform: scale(1.05);
+            }
+
+            &:disabled {
+                opacity: 0.5;
+            }
+
+            svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// ESTADO OFFLINE DO WIDGET
+// --------------------------------------------------------------------------
+
+.chat-widget-offline {
+    @include flex-column;
+    @include flex-center;
+    flex: 1;
+    padding: $chat-spacing-xl;
+    text-align: center;
+
+    &__icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: $chat-spacing-md;
+        color: $chat-text-muted-light;
+
+        @include dark-mode {
+            color: $chat-text-muted-dark;
+        }
+    }
+
+    &__title {
+        font-size: $chat-font-size-lg;
+        font-weight: 600;
+        color: $chat-text-primary-light;
+        margin-bottom: $chat-spacing-xs;
+
+        @include dark-mode {
+            color: $chat-text-primary-dark;
+        }
+    }
+
+    &__message {
+        font-size: $chat-font-size-sm;
+        color: $chat-text-secondary-light;
+        margin-bottom: $chat-spacing-lg;
+
+        @include dark-mode {
+            color: $chat-text-secondary-dark;
+        }
+    }
+
+    &__schedule {
+        padding: $chat-spacing-md;
+        background: rgba($primary-color, 0.05);
+        border-radius: $chat-border-radius-lg;
+        width: 100%;
+
+        h5 {
+            font-size: $chat-font-size-sm;
+            font-weight: 600;
+            color: $chat-text-primary-light;
+            margin-bottom: $chat-spacing-sm;
+
+            @include dark-mode {
+                color: $chat-text-primary-dark;
+            }
+        }
+
+        p {
+            font-size: $chat-font-size-sm;
+            color: $chat-text-secondary-light;
+
+            @include dark-mode {
+                color: $chat-text-secondary-dark;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// MENSAGEM DE BOAS-VINDAS
+// --------------------------------------------------------------------------
+
+.chat-widget-welcome {
+    padding: $chat-spacing-md;
+    margin-bottom: $chat-spacing-md;
+    background: linear-gradient(135deg, rgba($success-color, 0.1) 0%, rgba($primary-color, 0.1) 100%);
+    border-radius: $chat-border-radius-lg;
+    text-align: center;
+
+    p {
+        font-size: $chat-font-size-sm;
+        color: $chat-text-secondary-light;
+        line-height: 1.5;
+
+        @include dark-mode {
+            color: $chat-text-secondary-dark;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// AVALIAÇÃO DO ATENDIMENTO
+// --------------------------------------------------------------------------
+
+.chat-widget-rating {
+    padding: $chat-spacing-lg;
+    text-align: center;
+
+    &__title {
+        font-size: $chat-font-size-base;
+        font-weight: 600;
+        color: $chat-text-primary-light;
+        margin-bottom: $chat-spacing-md;
+
+        @include dark-mode {
+            color: $chat-text-primary-dark;
+        }
+    }
+
+    &__stars {
+        @include flex-center;
+        gap: $chat-spacing-sm;
+        margin-bottom: $chat-spacing-md;
+
+        button {
+            @include button-icon(40px);
+            background: transparent;
+            color: $chat-border-light;
+            @include transition;
+
+            &:hover,
+            &.active {
+                color: $warning-color;
+                transform: scale(1.1);
+            }
+
+            svg {
+                width: 28px;
+                height: 28px;
+            }
+        }
+    }
+
+    &__comment {
+        margin-bottom: $chat-spacing-md;
+
+        textarea {
+            @include input-base;
+            min-height: 80px;
+            resize: vertical;
+        }
+    }
+
+    &__submit {
+        @include button-primary;
+        width: 100%;
+        padding: $chat-spacing-sm $chat-spacing-lg;
+        border-radius: $chat-border-radius-lg;
+    }
+}
+

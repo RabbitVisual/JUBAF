@@ -1,0 +1,534 @@
+// ==========================================================================
+// ESTILOS BASE DO MÓDULO CHAT - VERTEX SEMAGRI
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// CONTAINER PRINCIPAL DO CHAT
+// --------------------------------------------------------------------------
+
+.chat-module {
+    font-family: $chat-font-family;
+    font-size: $chat-font-size-base;
+    line-height: 1.5;
+    color: $chat-text-primary-light;
+
+    @include dark-mode {
+        color: $chat-text-primary-dark;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+}
+
+// --------------------------------------------------------------------------
+// CONTAINER DO CHAT
+// --------------------------------------------------------------------------
+
+.chat-container {
+    @include flex-column;
+    height: calc(100vh - 180px);
+    min-height: 500px;
+    background: white;
+    border-radius: $chat-border-radius-xl;
+    border: 1px solid $chat-border-light;
+    @include shadow('lg');
+    overflow: hidden;
+
+    @include dark-mode {
+        background: $chat-sidebar-bg-dark;
+        border-color: $chat-border-dark;
+    }
+
+    @include tablet {
+        height: calc(100vh - 140px);
+        border-radius: $chat-border-radius-lg;
+    }
+}
+
+// --------------------------------------------------------------------------
+// HEADER DO CHAT
+// --------------------------------------------------------------------------
+
+.chat-header {
+    @include flex-between;
+    padding: $chat-spacing-md $chat-spacing-lg;
+    background: white;
+    border-bottom: 1px solid $chat-border-light;
+    flex-shrink: 0;
+
+    @include dark-mode {
+        background: $chat-sidebar-bg-dark;
+        border-color: $chat-border-dark;
+    }
+
+    &__title {
+        @include flex-start;
+        gap: $chat-spacing-md;
+
+        .icon-wrapper {
+            @include flex-center;
+            width: 40px;
+            height: 40px;
+            background: $gradient-green;
+            border-radius: $chat-border-radius-lg;
+            @include shadow('md');
+
+            svg {
+                width: 24px;
+                height: 24px;
+                color: white;
+            }
+        }
+
+        h1 {
+            font-size: $chat-font-size-xl;
+            font-weight: 700;
+            color: $chat-text-primary-light;
+            margin: 0;
+
+            @include dark-mode {
+                color: $chat-text-primary-dark;
+            }
+        }
+
+        .stats {
+            font-size: $chat-font-size-sm;
+            color: $chat-text-secondary-light;
+
+            @include dark-mode {
+                color: $chat-text-secondary-dark;
+            }
+
+            .waiting {
+                color: $status-waiting;
+                font-weight: 600;
+            }
+
+            .active {
+                color: $status-active;
+                font-weight: 600;
+            }
+        }
+    }
+
+    &__actions {
+        @include flex-start;
+        gap: $chat-spacing-sm;
+    }
+}
+
+// --------------------------------------------------------------------------
+// LAYOUT PRINCIPAL (SIDEBAR + ÁREA DE MENSAGENS)
+// --------------------------------------------------------------------------
+
+.chat-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+// --------------------------------------------------------------------------
+// SIDEBAR DE CONVERSAS
+// --------------------------------------------------------------------------
+
+.chat-sidebar {
+    @include flex-column;
+    width: $chat-sidebar-width;
+    min-width: $chat-sidebar-min-width;
+    background: $chat-sidebar-bg-light;
+    border-right: 1px solid $chat-border-light;
+    flex-shrink: 0;
+
+    @include dark-mode {
+        background: $chat-bg-dark;
+        border-color: $chat-border-dark;
+    }
+
+    @include tablet {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        z-index: 50;
+        transform: translateX(-100%);
+        transition: transform $chat-transition-slow;
+
+        &.open {
+            transform: translateX(0);
+        }
+    }
+
+    &__search {
+        padding: $chat-spacing-md;
+        border-bottom: 1px solid $chat-border-light;
+        flex-shrink: 0;
+
+        @include dark-mode {
+            border-color: $chat-border-dark;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+
+            input {
+                @include input-base;
+                padding-left: 40px;
+                border-radius: $chat-border-radius-lg;
+            }
+
+            svg {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 20px;
+                height: 20px;
+                color: $chat-text-muted-light;
+                pointer-events: none;
+
+                @include dark-mode {
+                    color: $chat-text-muted-dark;
+                }
+            }
+        }
+    }
+
+    &__list {
+        flex: 1;
+        overflow-y: auto;
+        @include custom-scrollbar;
+    }
+
+    &__empty {
+        @include flex-column;
+        @include flex-center;
+        padding: $chat-spacing-xl;
+        text-align: center;
+        color: $chat-text-muted-light;
+
+        @include dark-mode {
+            color: $chat-text-muted-dark;
+        }
+
+        svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: $chat-spacing-md;
+            color: $chat-border-light;
+
+            @include dark-mode {
+                color: $chat-border-dark;
+            }
+        }
+
+        p {
+            margin: 0;
+
+            &:first-of-type {
+                font-weight: 500;
+                margin-bottom: $chat-spacing-xs;
+            }
+
+            &:last-of-type {
+                font-size: $chat-font-size-sm;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// ITEM DE SESSÃO NA LISTA
+// --------------------------------------------------------------------------
+
+.chat-session-item {
+    @include flex-start;
+    gap: $chat-spacing-md;
+    padding: $chat-spacing-md;
+    border-bottom: 1px solid rgba($chat-border-light, 0.5);
+    cursor: pointer;
+    @include transition;
+
+    @include dark-mode {
+        border-color: rgba($chat-border-dark, 0.5);
+    }
+
+    &:hover {
+        background: rgba($primary-color, 0.05);
+    }
+
+    &.active {
+        background: rgba($primary-color, 0.1);
+        border-left: 3px solid $primary-color;
+    }
+
+    &__avatar {
+        position: relative;
+        flex-shrink: 0;
+
+        .avatar {
+            @include avatar($chat-avatar-lg);
+        }
+
+        .status-dot {
+            @include status-dot;
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            border: 2px solid white;
+
+            @include dark-mode {
+                border-color: $chat-bg-dark;
+            }
+        }
+    }
+
+    &__info {
+        flex: 1;
+        min-width: 0;
+
+        .header {
+            @include flex-between;
+            margin-bottom: $chat-spacing-xs;
+
+            .name {
+                font-weight: 600;
+                color: $chat-text-primary-light;
+                @include truncate;
+
+                @include dark-mode {
+                    color: $chat-text-primary-dark;
+                }
+            }
+
+            .time {
+                font-size: $chat-font-size-xs;
+                color: $chat-text-muted-light;
+                flex-shrink: 0;
+                margin-left: $chat-spacing-sm;
+
+                @include dark-mode {
+                    color: $chat-text-muted-dark;
+                }
+            }
+        }
+
+        .preview {
+            font-size: $chat-font-size-sm;
+            color: $chat-text-secondary-light;
+            @include truncate;
+
+            @include dark-mode {
+                color: $chat-text-secondary-dark;
+            }
+
+            .sender {
+                color: $success-color;
+                font-weight: 500;
+            }
+
+            .italic {
+                font-style: italic;
+            }
+        }
+
+        .meta {
+            @include flex-start;
+            gap: $chat-spacing-sm;
+            margin-top: $chat-spacing-xs;
+
+            .status-badge {
+                padding: 2px 8px;
+                font-size: $chat-font-size-xs;
+                border-radius: $chat-border-radius-full;
+                font-weight: 500;
+
+                &.waiting {
+                    background: rgba($status-waiting, 0.1);
+                    color: $status-waiting;
+                }
+
+                &.active {
+                    background: rgba($status-active, 0.1);
+                    color: $status-active;
+                }
+
+                &.closed {
+                    background: rgba($status-closed, 0.1);
+                    color: $status-closed;
+                }
+            }
+
+            .unread-badge {
+                @include badge($success-color);
+                animation: badgePulse 2s infinite;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// ÁREA PRINCIPAL DE MENSAGENS
+// --------------------------------------------------------------------------
+
+.chat-main {
+    @include flex-column;
+    flex: 1;
+    min-width: 0;
+    background: $chat-bg-light;
+
+    @include dark-mode {
+        background: $chat-bg-dark;
+    }
+}
+
+// --------------------------------------------------------------------------
+// HEADER DA CONVERSA ATIVA
+// --------------------------------------------------------------------------
+
+.chat-conversation-header {
+    @include flex-between;
+    padding: $chat-spacing-md $chat-spacing-lg;
+    background: white;
+    border-bottom: 1px solid $chat-border-light;
+    flex-shrink: 0;
+
+    @include dark-mode {
+        background: $chat-sidebar-bg-dark;
+        border-color: $chat-border-dark;
+    }
+
+    &__info {
+        @include flex-start;
+        gap: $chat-spacing-md;
+
+        .back-btn {
+            @include button-icon(36px);
+            background: transparent;
+            color: $chat-text-secondary-light;
+            display: none;
+
+            @include tablet {
+                display: flex;
+            }
+
+            &:hover {
+                background: rgba($primary-color, 0.1);
+                color: $primary-color;
+            }
+
+            @include dark-mode {
+                color: $chat-text-secondary-dark;
+            }
+        }
+
+        .avatar {
+            @include avatar;
+        }
+
+        .details {
+            h3 {
+                font-weight: 600;
+                color: $chat-text-primary-light;
+                margin: 0 0 2px 0;
+
+                @include dark-mode {
+                    color: $chat-text-primary-dark;
+                }
+            }
+
+            p {
+                font-size: $chat-font-size-sm;
+                color: $chat-text-secondary-light;
+                margin: 0;
+
+                @include dark-mode {
+                    color: $chat-text-secondary-dark;
+                }
+            }
+        }
+    }
+
+    &__actions {
+        @include flex-start;
+        gap: $chat-spacing-xs;
+
+        button, a {
+            @include button-icon(36px);
+            background: transparent;
+            color: $chat-text-secondary-light;
+            text-decoration: none;
+
+            &:hover {
+                background: rgba($primary-color, 0.1);
+                color: $primary-color;
+            }
+
+            &.danger:hover {
+                background: rgba($danger-color, 0.1);
+                color: $danger-color;
+            }
+
+            @include dark-mode {
+                color: $chat-text-secondary-dark;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// ESTADO VAZIO (NENHUMA CONVERSA SELECIONADA)
+// --------------------------------------------------------------------------
+
+.chat-empty-state {
+    @include flex-column;
+    @include flex-center;
+    flex: 1;
+    padding: $chat-spacing-xl;
+    text-align: center;
+    background: rgba($chat-sidebar-bg-light, 0.5);
+
+    @include dark-mode {
+        background: rgba($chat-bg-dark, 0.5);
+    }
+
+    .icon-wrapper {
+        @include flex-center;
+        width: 96px;
+        height: 96px;
+        margin-bottom: $chat-spacing-lg;
+        background: linear-gradient(135deg, rgba($success-color, 0.1) 0%, rgba($success-color, 0.2) 100%);
+        border-radius: $chat-border-radius-full;
+
+        svg {
+            width: 48px;
+            height: 48px;
+            color: $success-color;
+        }
+    }
+
+    h3 {
+        font-size: $chat-font-size-xl;
+        font-weight: 600;
+        color: $chat-text-primary-light;
+        margin: 0 0 $chat-spacing-sm 0;
+
+        @include dark-mode {
+            color: $chat-text-primary-dark;
+        }
+    }
+
+    p {
+        font-size: $chat-font-size-sm;
+        color: $chat-text-secondary-light;
+        max-width: 320px;
+        margin: 0;
+
+        @include dark-mode {
+            color: $chat-text-secondary-dark;
+        }
+    }
+}
+

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instalar JUBAF — Painel de líderes</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+            background: white;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 32px 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            border-radius: 16px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+        
+        .feature:last-child {
+            margin-bottom: 0;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            background: white;
+            color: #f97316;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-block;
+            margin: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .progress {
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .progress.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+        
+        .progress-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .status {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📱</div>
+        <h1>Instalar JUBAF</h1>
+        <p class="subtitle">
+            Instale o aplicativo para usar offline, receber notificações e ter acesso rápido aos seus serviços.
+        </p>
+        
+        <div class="features">
+            <div class="feature">
+                <svg class="feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728m-3.536-3.536a4 4 0 000-5.656m-7.071 7.071a9 9 0 010-12.728m3.536 3.536a4 4 0 000 5.656"/>
+                </svg>
+                <span>Funciona 100% offline</span>
+            </div>
+            <div class="feature">
+                <svg class="feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m4.5 0a12.05 12.05 0 003.478-.397m-9 0a12.05 12.05 0 00-3.478-.397m15 0a12.05 12.05 0 003.478-.397M9.75 15.906V12.75m-3.75 3.156v3.75m6-3.75v3.75m-6-3.75h3.75m3.75 0h3.75M9.75 12.75h3.75m-3.75 0V9.75m0 3h3.75m-3.75 0h-3.75"/>
+                </svg>
+                <span>Sincronização automática</span>
+            </div>
+            <div class="feature">
+                <svg class="feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Acesso rápido na tela inicial</span>
+            </div>
+            <div class="feature">
+                <svg class="feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                </svg>
+                <span>Notificações e atualizações</span>
+            </div>
+        </div>
+        
+        <button id="install-btn" class="btn">📥 Instalar Agora</button>
+        <a href="/lideres/dashboard" class="btn btn-secondary">Continuar sem instalar</a>
+        
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Preparando instalação...</div>
+        </div>
+        
+        <div class="status" id="status"></div>
+    </div>
+    
+    <script>
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+        const progress = document.getElementById('progress');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const status = document.getElementById('status');
+        
+        // Detectar evento de instalação
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-block';
+        });
+        
+        // Verificar se já está instalado
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            installBtn.textContent = '✅ Já Instalado';
+            installBtn.disabled = true;
+            installBtn.style.opacity = '0.6';
+        }
+        
+        // Botão de instalação
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Mostrar prompt de instalação
+                deferredPrompt.prompt();
+                
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    showProgress();
+                    updateProgress(20, 'Instalando aplicativo...');
+                    
+                    setTimeout(() => {
+                        updateProgress(50, 'Configurando Service Worker...');
+                        
+                        // Registrar Service Worker
+                        if ('serviceWorker' in navigator) {
+                            navigator.serviceWorker.register('/sw.js')
+                                .then(() => {
+                                    updateProgress(80, 'Pré-carregando dados...');
+                                    
+                                    // Pré-carregar dados
+                                    setTimeout(() => {
+                                        updateProgress(100, 'Instalação completa!');
+                                        
+                                        setTimeout(() => {
+                                            showStatus('success', '✅ Aplicativo instalado com sucesso! Redirecionando...');
+                                            setTimeout(() => {
+                                                window.location.href = '/lideres/dashboard';
+                                            }, 2000);
+                                        }, 1000);
+                                    }, 2000);
+                                })
+                                .catch((error) => {
+                                    showStatus('error', 'Erro ao registrar Service Worker: ' + error.message);
+                                });
+                        } else {
+                            updateProgress(100, 'Instalação completa!');
+                            showStatus('success', '✅ Aplicativo instalado!');
+                        }
+                    }, 1000);
+                } else {
+                    showStatus('error', 'Instalação cancelada.');
+                }
+                
+                deferredPrompt = null;
+            } else {
+                // Fallback para navegadores que não suportam prompt
+                showStatus('error', 'Instalação não disponível neste navegador. Use o menu do navegador para instalar.');
+            }
+        });
+        
+        function showProgress() {
+            progress.classList.add('show');
+            installBtn.style.display = 'none';
+        }
+        
+        function updateProgress(percent, text) {
+            progressFill.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+        
+        function showStatus(type, message) {
+            status.textContent = message;
+            status.className = 'status show ' + type;
+        }
+        
+        // Verificar se Service Worker está registrado
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then((registration) => {
+                if (registration) {
+                    console.log('Service Worker já registrado');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

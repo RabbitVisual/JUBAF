@@ -1,0 +1,23 @@
+{
+    "name": "Financeiro",
+    "alias": "financeiro",
+    "description": "Tesouraria regional JUBAF: lançamentos (âmbito regional ASBAF e por igreja), reembolsos, balancete e exportação — integrada ao painel da diretoria e aos demais módulos.",
+    "keywords": [
+        "financeiro",
+        "tesouraria",
+        "JUBAF",
+        "ASBAF",
+        "balancete",
+        "reembolso"
+    ],
+    "priority": 0,
+    "version": "1.1.0",
+    "author": "JUBAF",
+    "company": "Juventude Batista Feirense",
+    "providers": [
+        "Modules\\Financeiro\\Providers\\FinanceiroServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": []
+}

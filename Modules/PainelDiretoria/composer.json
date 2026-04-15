@@ -1,0 +1,31 @@
+{
+    "name": "vertex-solutions/paineldiretoria",
+    "description": "",
+    "authors": [
+        {
+            "name": "Vertex Solutions LTDA",
+            "email": "dev@vertexsolutions.com.br"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PainelDiretoria\\App\\": "app/",
+            "Modules\\PainelDiretoria\\Database\\Factories\\": "database/factories/",
+            "Modules\\PainelDiretoria\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\PainelDiretoria\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PainelDiretoria\\Tests\\": "tests/"
+        }
+    }
+}

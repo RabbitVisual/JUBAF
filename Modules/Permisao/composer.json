@@ -1,0 +1,31 @@
+{
+    "name": "vertex-solutions/permisao",
+    "description": "",
+    "authors": [
+        {
+            "name": "Vertex Solutions LTDA",
+            "email": "dev@vertexsolutions.com.br"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Permisao\\App\\": "app/",
+            "Modules\\Permisao\\Database\\Factories\\": "database/factories/",
+            "Modules\\Permisao\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\Permisao\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Permisao\\Tests\\": "tests/"
+        }
+    }
+}

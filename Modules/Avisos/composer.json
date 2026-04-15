@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/avisos",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Avisos\\App\\": "app/",
+            "Modules\\Avisos\\Database\\Factories\\": "database/factories/",
+            "Modules\\Avisos\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\Avisos\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Avisos\\Tests\\": "tests/"
+        }
+    }
+}

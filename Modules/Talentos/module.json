@@ -1,0 +1,21 @@
+{
+    "name": "Talentos",
+    "alias": "talentos",
+    "description": "Base do módulo de talentos e missões: perfis, oportunidades e rotas administrativas no padrão Vertex.",
+    "keywords": [
+        "talentos",
+        "missoes",
+        "perfis",
+        "voluntarios"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Vertex Solutions LTDA",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Talentos\\Providers\\TalentosServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": []
+}

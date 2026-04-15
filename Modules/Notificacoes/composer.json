@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/notificacoes",
+    "description": "Notificações in-app JUBAF",
+    "authors": [
+        {
+            "name": "JUBAF"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Notificacoes\\App\\": "app/",
+            "Modules\\Notificacoes\\Database\\Factories\\": "database/factories/",
+            "Modules\\Notificacoes\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\Notificacoes\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Notificacoes\\Tests\\": "tests/"
+        }
+    }
+}

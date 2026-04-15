@@ -1,0 +1,22 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+
+    paths:
+        - app/
+        - Modules/
+
+    # Level 9 is the highest. Level 5 is ideal for production readiness.
+    level: 5
+
+    treatPhpDocTypesAsCertain: false
+
+# Ignore generic errors that might occur in older libraries
+# ignoreErrors:
+#    - '#Unsafe usage of new static#'
+
+# Exclude specific heavy files if necessary
+# excludePaths:
+#    - ./*/*/FileToBeExcluded.php

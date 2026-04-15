@@ -1,0 +1,31 @@
+{
+    "name": "vertex-solutions/gateway",
+    "description": "",
+    "authors": [
+        {
+            "name": "Vertex Solutions LTDA",
+            "email": "dev@vertexsolutions.com.br"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Gateway\\App\\": "app/",
+            "Modules\\Gateway\\Database\\Factories\\": "database/factories/",
+            "Modules\\Gateway\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\Gateway\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Gateway\\Tests\\": "tests/"
+        }
+    }
+}

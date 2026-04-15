@@ -1,0 +1,329 @@
+// ==========================================================================
+// ESTILOS DO INPUT DE MENSAGEM - VERTEX SEMAGRI
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// ÁREA DE INPUT
+// --------------------------------------------------------------------------
+
+.chat-input-area {
+    padding: $chat-spacing-md $chat-spacing-lg;
+    background: white;
+    border-top: 1px solid $chat-border-light;
+    flex-shrink: 0;
+
+    @include dark-mode {
+        background: $chat-sidebar-bg-dark;
+        border-color: $chat-border-dark;
+    }
+
+    // Estado: conversa encerrada
+    &.closed {
+        background: $chat-sidebar-bg-light;
+        text-align: center;
+        padding: $chat-spacing-lg;
+
+        @include dark-mode {
+            background: $chat-bg-dark;
+        }
+
+        p {
+            font-size: $chat-font-size-sm;
+            color: $chat-text-muted-light;
+            margin: 0 0 $chat-spacing-sm 0;
+
+            @include dark-mode {
+                color: $chat-text-muted-dark;
+            }
+        }
+
+        .reopen-btn {
+            font-size: $chat-font-size-sm;
+            font-weight: 500;
+            color: $success-color;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            @include transition;
+
+            &:hover {
+                color: $success-hover;
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// FORM DE MENSAGEM
+// --------------------------------------------------------------------------
+
+.message-form {
+    @include flex-start;
+    gap: $chat-spacing-md;
+
+    &__input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    &__textarea {
+        width: 100%;
+        padding: $chat-spacing-sm $chat-spacing-md;
+        padding-right: 48px;
+        font-size: $chat-font-size-sm;
+        font-family: inherit;
+        line-height: 1.5;
+        color: $chat-text-primary-light;
+        background: $chat-input-bg-light;
+        border: none;
+        border-radius: 24px;
+        resize: none;
+        outline: none;
+        max-height: 120px;
+        @include transition;
+
+        &::placeholder {
+            color: $chat-text-muted-light;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 2px rgba($success-color, 0.2);
+        }
+
+        @include dark-mode {
+            color: $chat-text-primary-dark;
+            background: $chat-input-bg-dark;
+
+            &::placeholder {
+                color: $chat-text-muted-dark;
+            }
+        }
+    }
+
+    &__emoji-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        @include button-icon(32px);
+        background: transparent;
+        color: $chat-text-muted-light;
+
+        &:hover {
+            color: $chat-text-secondary-light;
+        }
+
+        @include dark-mode {
+            color: $chat-text-muted-dark;
+
+            &:hover {
+                color: $chat-text-secondary-dark;
+            }
+        }
+    }
+
+    &__send-btn {
+        @include button-icon(48px);
+        background: $gradient-green;
+        color: white;
+        @include shadow('md');
+        flex-shrink: 0;
+
+        &:hover:not(:disabled) {
+            @include shadow('lg');
+            transform: scale(1.05);
+        }
+
+        &:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// BARRA DE AÇÕES RÁPIDAS
+// --------------------------------------------------------------------------
+
+.chat-quick-actions {
+    @include flex-start;
+    gap: $chat-spacing-sm;
+    padding: $chat-spacing-sm 0;
+    border-bottom: 1px solid $chat-border-light;
+    margin-bottom: $chat-spacing-sm;
+
+    @include dark-mode {
+        border-color: $chat-border-dark;
+    }
+
+    &__btn {
+        @include flex-center;
+        gap: 4px;
+        padding: $chat-spacing-xs $chat-spacing-sm;
+        font-size: $chat-font-size-xs;
+        font-weight: 500;
+        color: $chat-text-secondary-light;
+        background: transparent;
+        border: 1px solid $chat-border-light;
+        border-radius: $chat-border-radius-full;
+        cursor: pointer;
+        @include transition;
+
+        &:hover {
+            background: rgba($primary-color, 0.05);
+            border-color: $primary-color;
+            color: $primary-color;
+        }
+
+        @include dark-mode {
+            color: $chat-text-secondary-dark;
+            border-color: $chat-border-dark;
+
+            &:hover {
+                background: rgba($primary-color, 0.1);
+            }
+        }
+
+        svg {
+            width: 14px;
+            height: 14px;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// UPLOAD DE ARQUIVO
+// --------------------------------------------------------------------------
+
+.chat-file-upload {
+    &__preview {
+        @include flex-between;
+        padding: $chat-spacing-sm $chat-spacing-md;
+        margin-bottom: $chat-spacing-sm;
+        background: rgba($primary-color, 0.05);
+        border: 1px dashed $primary-color;
+        border-radius: $chat-border-radius-md;
+
+        .file-info {
+            @include flex-start;
+            gap: $chat-spacing-sm;
+            flex: 1;
+            min-width: 0;
+
+            .icon {
+                @include flex-center;
+                width: 32px;
+                height: 32px;
+                background: $primary-color;
+                border-radius: $chat-border-radius-sm;
+                color: white;
+                flex-shrink: 0;
+
+                svg {
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+
+            .details {
+                flex: 1;
+                min-width: 0;
+
+                .name {
+                    font-size: $chat-font-size-sm;
+                    font-weight: 500;
+                    @include truncate;
+                }
+
+                .size {
+                    font-size: $chat-font-size-xs;
+                    color: $chat-text-muted-light;
+
+                    @include dark-mode {
+                        color: $chat-text-muted-dark;
+                    }
+                }
+            }
+        }
+
+        .remove-btn {
+            @include button-icon(28px);
+            background: transparent;
+            color: $danger-color;
+
+            &:hover {
+                background: rgba($danger-color, 0.1);
+            }
+        }
+    }
+
+    &__progress {
+        height: 4px;
+        background: $chat-border-light;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: $chat-spacing-xs;
+
+        @include dark-mode {
+            background: $chat-border-dark;
+        }
+
+        .bar {
+            height: 100%;
+            background: $primary-color;
+            border-radius: 2px;
+            @include transition;
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// SUGESTÕES DE RESPOSTA RÁPIDA
+// --------------------------------------------------------------------------
+
+.chat-quick-replies {
+    @include flex-start;
+    flex-wrap: wrap;
+    gap: $chat-spacing-sm;
+    padding: $chat-spacing-sm 0;
+
+    &__item {
+        padding: $chat-spacing-xs $chat-spacing-md;
+        font-size: $chat-font-size-sm;
+        color: $primary-color;
+        background: rgba($primary-color, 0.1);
+        border: 1px solid transparent;
+        border-radius: $chat-border-radius-full;
+        cursor: pointer;
+        @include transition;
+
+        &:hover {
+            background: rgba($primary-color, 0.15);
+            border-color: $primary-color;
+        }
+
+        @include dark-mode {
+            background: rgba($primary-color, 0.2);
+
+            &:hover {
+                background: rgba($primary-color, 0.25);
+            }
+        }
+    }
+}
+

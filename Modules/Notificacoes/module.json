@@ -1,0 +1,22 @@
+{
+    "name": "Notificacoes",
+    "alias": "notificacoes",
+    "description": "Sistema de notificações, alertas e comunicações internas do site, com entrega na área logada e integrações com outros módulos.",
+    "keywords": [
+        "notificacoes",
+        "alertas",
+        "comunicacoes",
+        "mensagens",
+        "sistema"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "JUBAF",
+    "company": "JUBAF",
+    "providers": [
+        "Modules\\Notificacoes\\Providers\\NotificacoesServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

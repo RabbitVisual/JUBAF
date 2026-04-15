@@ -1,0 +1,22 @@
+{
+    "name": "Homepage",
+    "alias": "homepage",
+    "description": "Módulo de gestão da página inicial do sistema, banners, carousel e conteúdo principal do site",
+    "keywords": [
+        "homepage",
+        "inicial",
+        "banner",
+        "carousel",
+        "site"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Reinan Rodrigues",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Homepage\\Providers\\HomepageServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

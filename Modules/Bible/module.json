@@ -1,0 +1,25 @@
+{
+    "name": "Bible",
+    "alias": "bible",
+    "description": "Bíblia digital: versões, livros, capítulos, versículos, planos de leitura, favoritos e integração com o site e a homepage.",
+    "keywords": [
+        "bible",
+        "biblia",
+        "versiculos",
+        "livros",
+        "capitulos",
+        "leitura",
+        "planos"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Reinan Rodrigues",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Bible\\Providers\\BibleServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": [],
+    "is_core": true
+}

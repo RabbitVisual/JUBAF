@@ -1,0 +1,21 @@
+{
+    "name": "PainelLider",
+    "alias": "painellider",
+    "description": "Painel e experiência dedicada ao perfil líder: rotas, layout e integração com o ecossistema Vertex.",
+    "keywords": [
+        "lider",
+        "lideranca",
+        "painel",
+        "perfil"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Vertex Solutions LTDA",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\PainelLider\\Providers\\PainelLiderServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": []
+}

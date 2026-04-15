@@ -1,0 +1,22 @@
+{
+    "name": "Blog",
+    "alias": "blog",
+    "description": "Blog oficial JUBAF — notícias, comunicação institucional e integração com os demais módulos do sistema.",
+    "keywords": [
+        "blog",
+        "noticias",
+        "jubaf",
+        "comunicacao",
+        "juventude"
+    ],
+    "priority": 0,
+    "version": "2.0.0",
+    "author": "JUBAF",
+    "company": "JUBAF",
+    "providers": [
+        "Modules\\Blog\\Providers\\BlogServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -1,0 +1,21 @@
+{
+    "name": "Calendario",
+    "alias": "calendario",
+    "description": "Módulo de calendário institucional: eventos, agendamentos e rotas administrativas alinhadas ao padrão Vertex.",
+    "keywords": [
+        "calendario",
+        "eventos",
+        "agenda",
+        "datas"
+    ],
+    "priority": 0,
+    "version": "1.0.0",
+    "author": "Vertex Solutions LTDA",
+    "company": "Vertex Solutions LTDA",
+    "providers": [
+        "Modules\\Calendario\\Providers\\CalendarioServiceProvider"
+    ],
+    "files": [],
+    "aliases": {},
+    "requires": []
+}

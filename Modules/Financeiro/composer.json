@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/financeiro",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Financeiro\\App\\": "app/",
+            "Modules\\Financeiro\\Database\\Factories\\": "database/factories/",
+            "Modules\\Financeiro\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\Financeiro\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Financeiro\\Tests\\": "tests/"
+        }
+    }
+}

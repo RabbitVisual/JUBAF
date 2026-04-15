@@ -1,0 +1,50 @@
+<svg width="280" height="80" viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#28a745;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#20c997;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#198754;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="vertexGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffc107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff9800;stop-opacity:1" />
+    </linearGradient>
+    <filter id="iconShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Ícone - Folha com vértices -->
+  <g transform="translate(8, 12)" filter="url(#iconShadow)">
+    <!-- Círculo de fundo -->
+    <circle cx="28" cy="28" r="26" fill="url(#leafGrad)"/>
+    
+    <!-- Folha estilizada -->
+    <path d="M28 10 Q20 10, 16 18 Q13 24, 13 28 Q13 32, 16 38 Q20 46, 28 46 Q36 46, 40 38 Q43 32, 43 28 Q43 24, 40 18 Q36 10, 28 10 Z" 
+          fill="#ffffff" 
+          opacity="0.15"/>
+    
+    <!-- Linha central -->
+    <path d="M28 14 L28 42" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+    
+    <!-- Vértices douradas -->
+    <circle cx="28" cy="22" r="3" fill="url(#vertexGrad)"/>
+    <circle cx="23" cy="30" r="2.5" fill="url(#vertexGrad)"/>
+    <circle cx="33" cy="30" r="2.5" fill="url(#vertexGrad)"/>
+    <circle cx="28" cy="36" r="2" fill="url(#vertexGrad)"/>
+    
+    <!-- Brilho -->
+    <circle cx="28" cy="28" r="3.5" fill="#ffffff" opacity="0.4"/>
+  </g>
+  
+  <!-- Texto VERTEX -->
+  <text x="75" y="38" font-family="'Segoe UI', 'Arial', sans-serif" font-size="26" font-weight="bold" 
+        fill="url(#vertexGrad)" letter-spacing="1.5">VERTEX</text>
+  
+  <!-- Texto SEMAGRI -->
+  <text x="75" y="58" font-family="'Segoe UI', 'Arial', sans-serif" font-size="18" font-weight="600" 
+        fill="url(#leafGrad)" letter-spacing="0.8">SEMAGRI</text>
+  
+  <!-- Linha decorativa -->
+  <line x1="75" y1="65" x2="270" y2="65" stroke="url(#vertexGrad)" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+</svg>

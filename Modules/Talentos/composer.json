@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/talentos",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Talentos\\App\\": "app/",
+            "Modules\\Talentos\\Database\\Factories\\": "database/factories/",
+            "Modules\\Talentos\\Database\\Seeders\\": "database/seeders/",
+            "Modules\\Talentos\\Providers\\": "app/Providers/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Talentos\\Tests\\": "tests/"
+        }
+    }
+}
