@@ -1,10 +1,10 @@
-@extends('painellider::components.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Dashboard do Lider')
 
 @section('content')
     <div class="mx-auto max-w-7xl space-y-6 px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <x-ui.card padding="dense" class="border-slate-200 dark:border-slate-700">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Painel local</p>
@@ -14,12 +14,10 @@
                     </p>
                 </div>
                 @if ($user->church)
-                    <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-                        {{ $user->church->name }}
-                    </span>
+                    <x-ui.badge tone="success" class="!rounded-full !px-3 !py-1">{{ $user->church->name }}</x-ui.badge>
                 @endif
             </div>
-        </section>
+        </x-ui.card>
 
         <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
@@ -41,40 +39,34 @@
         </section>
 
         <section class="grid gap-6 lg:grid-cols-2">
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Status financeiro da igreja</h2>
                     @if (Route::has('lideres.financeiro.minhas-contas'))
-                        <a href="{{ route('lideres.financeiro.minhas-contas') }}" class="text-xs font-semibold text-indigo-700 hover:underline dark:text-indigo-300">Ver contas</a>
+                        <x-ui.button variant="ghost" size="sm" href="{{ route('lideres.financeiro.minhas-contas') }}" class="!px-0 !py-0 !text-xs !font-semibold !text-indigo-700 hover:!underline dark:!text-indigo-300">Ver contas</x-ui.button>
                     @endif
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-700" data-ui-datatable>
-                        <thead>
-                            <tr class="text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                                <th class="px-3 py-2">Mes</th>
-                                <th class="px-3 py-2">Igreja</th>
-                                <th class="px-3 py-2">Status</th>
-                                <th class="px-3 py-2 text-right">Valor</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            @forelse($recentInvoices as $invoice)
-                                <tr>
-                                    <td class="px-3 py-2 text-slate-600 dark:text-slate-300">{{ optional($invoice->billing_month)->format('m/Y') }}</td>
-                                    <td class="px-3 py-2 text-slate-900 dark:text-slate-100">{{ $invoice->church?->name ?: '-' }}</td>
-                                    <td class="px-3 py-2 text-slate-600 dark:text-slate-300">{{ strtoupper((string) $invoice->status) }}</td>
-                                    <td class="px-3 py-2 text-right font-semibold text-slate-900 dark:text-slate-100">R$ {{ number_format((float) $invoice->amount, 2, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-3 py-5 text-center text-slate-500 dark:text-slate-400">Sem faturas recentes.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </article>
+                <x-ui.table class="!rounded-xl !border-0 !shadow-none dark:!bg-slate-900">
+                    <x-slot name="head">
+                        <th class="px-5 py-3.5">Mes</th>
+                        <th class="px-5 py-3.5">Igreja</th>
+                        <th class="px-5 py-3.5">Status</th>
+                        <th class="px-5 py-3.5 text-right">Valor</th>
+                    </x-slot>
+                    @forelse($recentInvoices as $invoice)
+                        <tr class="odd:bg-white even:bg-gray-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/50">
+                            <td class="px-5 py-3.5 text-slate-600 dark:text-slate-300">{{ optional($invoice->billing_month)->format('m/Y') }}</td>
+                            <td class="px-5 py-3.5 text-slate-900 dark:text-slate-100">{{ $invoice->church?->name ?: '-' }}</td>
+                            <td class="px-5 py-3.5 text-slate-600 dark:text-slate-300">{{ strtoupper((string) $invoice->status) }}</td>
+                            <td class="px-5 py-3.5 text-right font-semibold tabular-nums text-slate-900 dark:text-slate-100">R$ {{ number_format((float) $invoice->amount, 2, ',', '.') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-5 py-8 text-center text-slate-500 dark:text-slate-400">Sem faturas recentes.</td>
+                        </tr>
+                    @endforelse
+                </x-ui.table>
+            </div>
 
             <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <div class="mb-4 flex items-center justify-between">

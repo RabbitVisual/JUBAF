@@ -22,7 +22,7 @@ class GatewayProviderAccountController extends Controller
         $accounts = GatewayProviderAccount::query()->orderBy('name')->paginate(20);
 
         return view('gateway::admin.accounts.index', [
-            'layout' => 'admin::layouts.admin',
+            'layout' => 'layouts.app',
             'accounts' => $accounts,
         ]);
     }
@@ -32,7 +32,7 @@ class GatewayProviderAccountController extends Controller
         $this->authorize('create', GatewayProviderAccount::class);
 
         return view('gateway::admin.accounts.create', [
-            'layout' => 'admin::layouts.admin',
+            'layout' => 'layouts.app',
             'drivers' => GatewayProviderAccount::drivers(),
         ]);
     }
@@ -79,7 +79,7 @@ class GatewayProviderAccountController extends Controller
         $this->authorize('update', $account);
 
         return view('gateway::admin.accounts.edit', [
-            'layout' => 'admin::layouts.admin',
+            'layout' => 'layouts.app',
             'account' => $account,
             'drivers' => GatewayProviderAccount::drivers(),
             'credentials_json' => json_encode($account->credentials, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),

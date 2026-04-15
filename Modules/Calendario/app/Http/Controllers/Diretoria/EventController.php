@@ -41,7 +41,7 @@ class EventController extends Controller
         $events = $q->orderBy('start_date')->paginate(20)->withQueryString();
 
         return view('calendario::paineldiretoria.events.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.calendario',
             'events' => $events,
             'filters' => $request->only(['from', 'to', 'visibility', 'status']),
@@ -65,7 +65,7 @@ class EventController extends Controller
         }
 
         return view('calendario::paineldiretoria.events.create', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.calendario',
             'churches' => module_enabled('Igrejas') ? Church::query()->orderBy('name')->get() : collect(),
             'event' => new CalendarEvent([
@@ -107,7 +107,7 @@ class EventController extends Controller
         $event->load(['batches', 'priceRules']);
 
         return view('calendario::paineldiretoria.events.edit', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.calendario',
             'churches' => module_enabled('Igrejas') ? Church::query()->orderBy('name')->get() : collect(),
             'event' => $event,
@@ -375,7 +375,7 @@ class EventController extends Controller
         $occupancyPercent = $capacity ? round(($confirmed / max($capacity, 1)) * 100, 1) : null;
 
         return view('calendario::paineldiretoria.events.monitor', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.calendario',
             'event' => $event,
             'totalRevenue' => $totalRevenue,

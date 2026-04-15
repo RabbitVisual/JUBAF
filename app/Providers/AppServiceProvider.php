@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
+use App\View\Composers\ErpShellComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        View::composer('layouts.app', ErpShellComposer::class);
+
         if (class_exists(\Modules\Igrejas\App\Events\IgrejaAtualizada::class)
             && class_exists(\Modules\Notificacoes\App\Listeners\SendChurchCrmAlerts::class)) {
             Event::listen(

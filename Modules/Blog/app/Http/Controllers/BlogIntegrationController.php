@@ -110,8 +110,8 @@ class BlogIntegrationController extends Controller
 
             if (module_enabled('Calendario') && class_exists(\Modules\Calendario\App\Models\CalendarEvent::class)) {
                 $data['eventos_no_mes'] = \Modules\Calendario\App\Models\CalendarEvent::query()
-                    ->whereYear('starts_at', $year)
-                    ->whereMonth('starts_at', $month)
+                    ->whereYear('start_date', $year)
+                    ->whereMonth('start_date', $month)
                     ->count();
             }
 

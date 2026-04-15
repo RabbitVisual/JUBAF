@@ -31,7 +31,7 @@ class DirectoryController extends Controller
         $profiles = $q->paginate(24)->withQueryString();
 
         return view('talentos::paineldiretoria.directory.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'profiles' => $profiles,
             'skills' => TalentSkill::query()->orderBy('name')->get(),
@@ -54,7 +54,7 @@ class DirectoryController extends Controller
         }]);
 
         return view('talentos::paineldiretoria.directory.show', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'member' => $user,
             'profile' => $profile,

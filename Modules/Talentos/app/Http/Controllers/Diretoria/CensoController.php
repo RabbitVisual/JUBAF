@@ -18,7 +18,7 @@ class CensoController extends Controller
         abort_unless($request->user()?->can('paineljovens.census.view'), 403);
 
         return view('talentos::paineldiretoria.censo.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'summary' => $this->censoService->youthSummaryBySector(),
             'topSkills' => $this->censoService->topValidatedSkills(16),

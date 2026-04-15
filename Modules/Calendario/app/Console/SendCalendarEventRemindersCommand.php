@@ -31,7 +31,7 @@ class SendCalendarEventRemindersCommand extends Command
         $count = 0;
         foreach ($events as $event) {
             $regs = CalendarRegistration::query()
-                ->where('evento_id', $event->id)
+                ->where('event_id', $event->id)
                 ->where('status', CalendarRegistration::STATUS_CONFIRMED)
                 ->with('user')
                 ->get();

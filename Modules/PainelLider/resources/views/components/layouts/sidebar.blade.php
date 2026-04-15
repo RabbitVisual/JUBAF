@@ -59,7 +59,7 @@
                 <li>
                     <a href="{{ route('lideres.blog.index') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('lideres.blog.*') ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-800 dark:hover:text-emerald-200' }}">
                         <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('lideres.blog.*') ? 'bg-white/15' : 'bg-emerald-100/80 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300' }}">
-                            <x-module-icon module="blog" class="w-5 h-5 {{ request()->routeIs('lideres.blog.*') ? 'text-white' : 'text-emerald-700 dark:text-emerald-300' }}" style="duotone" alt="" />
+                            <x-module-icon module="Blog" class="w-5 h-5 {{ request()->routeIs('lideres.blog.*') ? 'text-white' : 'text-emerald-700 dark:text-emerald-300' }}" style="duotone" alt="" />
                         </span>
                         <span class="text-sm font-semibold leading-tight text-left">Blog JUBAF</span>
                     </a>

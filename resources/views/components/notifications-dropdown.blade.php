@@ -4,7 +4,7 @@
     $triggerButtonClass = 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700';
     if (request()->routeIs('admin.*') && Route::has('admin.notificacoes.index')) {
         $viewAllRoute = 'admin.notificacoes.index';
-        $triggerButtonClass = 'text-white/90 hover:text-white hover:bg-white/10';
+        $triggerButtonClass = 'text-gray-500 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-slate-700';
     } elseif (request()->routeIs('diretoria.*') && Route::has('diretoria.notificacoes.index')) {
         $viewAllRoute = 'diretoria.notificacoes.index';
         $triggerButtonClass = 'text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/30';

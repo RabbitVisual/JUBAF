@@ -30,7 +30,7 @@ class ExpenseRequestController extends Controller
         $requests = $q->paginate(20)->withQueryString();
 
         return view('financeiro::paineldiretoria.expense_requests.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'requests' => $requests,
             'filters' => $request->only(['status']),
@@ -42,7 +42,7 @@ class ExpenseRequestController extends Controller
         $this->authorize('create', FinExpenseRequest::class);
 
         return view('financeiro::paineldiretoria.expense_requests.create', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
         ]);
     }
@@ -72,7 +72,7 @@ class ExpenseRequestController extends Controller
         $this->authorize('update', $expense_request);
 
         return view('financeiro::paineldiretoria.expense_requests.edit', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'expenseRequest' => $expense_request,
         ]);

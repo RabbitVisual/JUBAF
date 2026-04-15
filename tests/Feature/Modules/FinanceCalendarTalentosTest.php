@@ -79,7 +79,7 @@ class FinanceCalendarTalentosTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('evento_inscricoes', [
-            'evento_id' => $event->id,
+            'event_id' => $event->id,
             'user_id' => $user->id,
             'status' => 'confirmed',
         ]);

@@ -65,8 +65,8 @@ class HomepagePublicApiController extends Controller
             ->published()
             ->where('visibility', CalendarEvent::VIS_PUBLIC)
             ->where('is_featured', true)
-            ->where('starts_at', '>=', now()->startOfDay())
-            ->orderBy('starts_at')
+            ->where('start_date', '>=', now()->startOfDay())
+            ->orderBy('start_date')
             ->limit(8)
             ->get()
             ->map(fn (CalendarEvent $e) => [

@@ -18,7 +18,7 @@ class TalentAreaController extends Controller
         $areas = TalentArea::query()->orderBy('name')->get();
 
         return view('talentos::paineldiretoria.taxonomy.areas-index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'areas' => $areas,
         ]);
@@ -29,7 +29,7 @@ class TalentAreaController extends Controller
         $this->authorize('create', TalentArea::class);
 
         return view('talentos::paineldiretoria.taxonomy.area-form', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'area' => new TalentArea,
             'mode' => 'create',
@@ -50,7 +50,7 @@ class TalentAreaController extends Controller
         $this->authorize('update', $area);
 
         return view('talentos::paineldiretoria.taxonomy.area-form', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'area' => $area,
             'mode' => 'edit',

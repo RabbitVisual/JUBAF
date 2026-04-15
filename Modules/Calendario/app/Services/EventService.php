@@ -30,7 +30,7 @@ class EventService
     public function confirmedCount(CalendarEvent $event): int
     {
         return CalendarRegistration::query()
-            ->where('evento_id', $event->id)
+            ->where('event_id', $event->id)
             ->where('status', CalendarRegistration::STATUS_CONFIRMED)
             ->count();
     }

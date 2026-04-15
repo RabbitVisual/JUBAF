@@ -50,21 +50,21 @@
             </div>
             <div class="flex flex-col items-stretch gap-3 sm:flex-row lg:flex-col lg:items-end">
                 @can('create', \Modules\Financeiro\App\Models\FinTransaction::class)
-                    <a href="{{ route('diretoria.financeiro.transactions.create') }}" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/30 transition hover:bg-emerald-700">
+                    <x-ui.button variant="emerald" size="lg" href="{{ route('diretoria.financeiro.transactions.create') }}" class="!rounded-2xl !shadow-lg !shadow-emerald-600/30">
                         <x-icon name="plus" class="h-4 w-4" style="solid" />
                         Novo lançamento
-                    </a>
+                    </x-ui.button>
                 @endcan
                 <div class="flex flex-wrap gap-2">
                     @can('financeiro.reports.view')
-                        <a href="{{ route('diretoria.financeiro.reports.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-xs font-bold text-slate-800 shadow-sm hover:border-emerald-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white">
+                        <x-ui.button variant="secondary" size="sm" href="{{ route('diretoria.financeiro.reports.index') }}" class="!rounded-xl !px-3 !py-2 !text-xs">
                             <x-icon name="chart-column" class="h-3.5 w-3.5 text-emerald-600" style="duotone" />
                             Balancete
-                        </a>
-                        <a href="{{ route('diretoria.financeiro.reports.export.pdf', ['period' => 'month']) }}" class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/90 px-3 py-2 text-xs font-bold text-emerald-900 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-100">
+                        </x-ui.button>
+                        <x-ui.button variant="emerald" size="sm" href="{{ route('diretoria.financeiro.reports.export.pdf', ['period' => 'month']) }}" class="!rounded-xl !border !border-emerald-200 !bg-emerald-50/90 !px-3 !py-2 !text-xs !text-emerald-900 hover:!bg-emerald-100 dark:!border-emerald-800 dark:!bg-emerald-950/50 dark:!text-emerald-100">
                             <x-icon name="file-pdf" class="h-3.5 w-3.5" style="duotone" />
                             PDF mês
-                        </a>
+                        </x-ui.button>
                     @endcan
                 </div>
             </div>

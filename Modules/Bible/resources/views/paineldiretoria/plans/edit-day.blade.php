@@ -1,4 +1,4 @@
-@extends('paineldiretoria::components.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Studio de Conteúdo - ' . $day->title)
 

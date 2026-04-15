@@ -1,4 +1,4 @@
-@extends('admin::layouts.app')
+@extends('layouts.app')
 
 @section('title', $book->name . ' ' . $chapter->chapter_number . ' - ' . $version->name)
 

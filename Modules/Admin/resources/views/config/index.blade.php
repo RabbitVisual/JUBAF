@@ -1,4 +1,4 @@
-@extends('admin::layouts.admin')
+@extends('layouts.app')
 
 @section('title', 'Configurações do Sistema')
 
@@ -25,7 +25,7 @@
         </form>
     </div>
 
-    <!-- NOTE: Alerts are now handled globally in admin::layouts.admin to prevent duplication -->
+    <!-- NOTE: Alerts are handled globally via layouts.app (flash-messages partial) -->
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- Sidebar Navigation -->

@@ -28,7 +28,7 @@ class RoleManagementController extends Controller
 
     protected function panelLayout(): string
     {
-        return 'admin::layouts.admin';
+        return 'layouts.app';
     }
 
     public function index()

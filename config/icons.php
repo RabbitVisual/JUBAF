@@ -17,6 +17,7 @@ return [
         'agua'                  => 'faucet-drip',
         'avisos'                => 'bullhorn',
         'blog'                  => 'newspaper',
+        'Blog'                  => 'newspaper',
         'caf'                   => 'id-card',
         'chat'                  => 'comments',
         'demandas'              => 'clipboard-list',

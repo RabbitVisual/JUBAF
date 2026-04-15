@@ -23,7 +23,7 @@ class CategoryController extends Controller
             ->get();
 
         return view('financeiro::paineldiretoria.categories.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'categories' => $categories,
         ]);
@@ -34,7 +34,7 @@ class CategoryController extends Controller
         $this->authorize('create', FinCategory::class);
 
         return view('financeiro::paineldiretoria.categories.create', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'category' => new FinCategory([
                 'direction' => 'in',
@@ -66,7 +66,7 @@ class CategoryController extends Controller
         $this->authorize('update', $category);
 
         return view('financeiro::paineldiretoria.categories.edit', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'category' => $category,
         ]);

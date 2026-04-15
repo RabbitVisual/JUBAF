@@ -30,7 +30,7 @@ registerBiblePublicIndex(Alpine);
 
 Alpine.start();
 
-// Flowbite 4.0 - Importar localmente (sem CDN)
+// Flowbite 4.x (shells ERP: drawers/dropdowns). Preline permanece para páginas que já usam HSStaticMethods — evitar misturar data-hs-* com data-dropdown-toggle no mesmo controlo.
 import 'flowbite';
 
 // Preline UI

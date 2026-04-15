@@ -1,1 +1,1 @@
-@extends('admin::layouts.admin')
+@extends('layouts.app')

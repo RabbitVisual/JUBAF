@@ -1,4 +1,4 @@
-@extends('admin::layouts.admin')
+@extends('layouts.app')
 
 @section('title', 'Avisos - Admin')
 

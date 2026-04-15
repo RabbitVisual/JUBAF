@@ -65,7 +65,7 @@ class DiretoriaIgrejasDashboardController extends Controller
             ->get();
 
         return view('igrejas::paineldiretoria.dashboard', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.igrejas',
             'totalChurches' => $totalChurches,
             'activeChurches' => $activeChurches,

@@ -32,7 +32,7 @@ class GatewayDashboardController extends Controller
             ->get();
 
         return view('gateway::paineldiretoria.dashboard', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'pending' => $pending,
             'paidMonth' => $paidMonth,
             'failed' => $failed,

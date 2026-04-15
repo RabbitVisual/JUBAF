@@ -45,7 +45,7 @@ class CalendarDashboardController extends Controller
             ->get();
 
         return view('calendario::paineldiretoria.dashboard', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.calendario',
             'upcomingCount' => $upcomingCount,
             'openRegistrationCount' => $openRegistrationCount,

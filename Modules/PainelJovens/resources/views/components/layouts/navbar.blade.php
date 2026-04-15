@@ -39,7 +39,7 @@
                     }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
                 }
             }"
-            @click="toggleTheme()"
+            @click="window.toggleTheme()"
             class="relative w-11 h-11 md:w-12 md:h-12 shrink-0 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition-all shadow-sm active:scale-95 group"
             aria-label="Alternar tema">
             <span x-show="!isDark" x-cloak class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
@@ -97,12 +97,3 @@
         </div>
     </div>
 </nav>
-
-<script>
-    function toggleTheme() {
-        const html = document.documentElement;
-        const next = html.classList.contains('dark') ? 'light' : 'dark';
-        html.classList.toggle('dark');
-        localStorage.setItem('theme', next);
-    }
-</script>

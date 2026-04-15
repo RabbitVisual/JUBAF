@@ -14,9 +14,7 @@ class SecretariaLeituraController extends Controller
 {
     protected function layout(): string
     {
-        return request()->routeIs('lideres.*')
-            ? 'painellider::components.layouts.app'
-            : 'paineljovens::components.layouts.app';
+        return 'layouts.app';
     }
 
     protected function homeRoute(): string

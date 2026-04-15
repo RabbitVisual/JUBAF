@@ -24,7 +24,7 @@ class GatewayPaymentController extends Controller
         $payments = $q->orderByDesc('id')->paginate(25)->withQueryString();
 
         return view('gateway::paineldiretoria.payments.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'payments' => $payments,
             'filters' => $request->only(['status']),
         ]);
@@ -36,7 +36,7 @@ class GatewayPaymentController extends Controller
         $payment->load(['user', 'providerAccount', 'payable', 'finTransaction']);
 
         return view('gateway::paineldiretoria.payments.show', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'payment' => $payment,
         ]);
     }

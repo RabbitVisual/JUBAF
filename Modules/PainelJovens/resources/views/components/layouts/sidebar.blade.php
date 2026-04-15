@@ -149,7 +149,7 @@
                 <li>
                     <a href="{{ route('jovens.blog.index') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('jovens.blog.*') ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-800 dark:hover:text-emerald-200' }}">
                         <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('jovens.blog.*') ? 'bg-white/15' : 'bg-emerald-100/80 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300' }}">
-                            <x-module-icon module="blog" class="w-5 h-5 {{ request()->routeIs('jovens.blog.*') ? 'text-white' : 'text-emerald-700 dark:text-emerald-300' }}" style="duotone" alt="" />
+                            <x-module-icon module="Blog" class="w-5 h-5 {{ request()->routeIs('jovens.blog.*') ? 'text-white' : 'text-emerald-700 dark:text-emerald-300' }}" style="duotone" alt="" />
                         </span>
                         <span class="text-sm font-semibold leading-tight text-left">Blog JUBAF</span>
                     </a>
@@ -167,9 +167,9 @@
                 @endif
                 @if(module_enabled('Igrejas') && Route::has('jovens.igreja.index'))
                 <li>
-                    <a href="{{ route('jovens.igreja.index') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('jovens.igreja.*') ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-950/40 hover:text-fuchsia-800 dark:hover:text-fuchsia-200' }}">
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('jovens.igreja.*') ? 'bg-white/15' : 'bg-fuchsia-100/80 dark:bg-fuchsia-900/30 text-fuchsia-700 dark:text-fuchsia-300' }}">
-                            <x-module-icon module="Igrejas" class="w-5 h-5 {{ request()->routeIs('jovens.igreja.*') ? 'text-white' : 'text-fuchsia-700 dark:text-fuchsia-300' }}" style="duotone" />
+                    <a href="{{ route('jovens.igreja.index') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('jovens.igreja.*') ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-orange-950/40 hover:text-orange-800 dark:hover:text-orange-200' }}">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('jovens.igreja.*') ? 'bg-white/15' : 'bg-orange-100/80 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300' }}">
+                            <x-module-icon module="Igrejas" class="w-5 h-5 {{ request()->routeIs('jovens.igreja.*') ? 'text-white' : 'text-orange-700 dark:text-orange-300' }}" style="duotone" />
                         </span>
                         <span class="text-sm font-semibold leading-tight text-left">Minha igreja</span>
                     </a>
@@ -197,9 +197,9 @@
                 @endif
                 @if(module_enabled('Talentos') && Route::has('jovens.talentos.profile.edit') && auth()->user()?->can('talentos.profile.edit'))
                 <li>
-                    <a href="{{ route('jovens.talentos.profile.edit') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('jovens.talentos.*') ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-800 dark:hover:text-violet-200' }}">
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('jovens.talentos.*') ? 'bg-white/15' : 'bg-violet-100/80 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300' }}">
-                            <x-module-icon module="Talentos" class="w-5 h-5 {{ request()->routeIs('jovens.talentos.*') ? 'text-white' : 'text-violet-700 dark:text-violet-300' }}" style="duotone" />
+                    <a href="{{ route('jovens.talentos.profile.edit') }}" class="group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('jovens.talentos.*') ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/25' : 'text-slate-700 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-800 dark:hover:text-rose-200' }}">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('jovens.talentos.*') ? 'bg-white/15' : 'bg-rose-100/80 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300' }}">
+                            <x-module-icon module="Talentos" class="w-5 h-5 {{ request()->routeIs('jovens.talentos.*') ? 'text-white' : 'text-rose-700 dark:text-rose-300' }}" style="duotone" />
                         </span>
                         <span class="text-sm font-semibold leading-tight text-left">Banco de talentos</span>
                     </a>

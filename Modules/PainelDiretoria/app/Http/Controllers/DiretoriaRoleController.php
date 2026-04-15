@@ -23,6 +23,6 @@ class DiretoriaRoleController extends RoleManagementController
 
     protected function panelLayout(): string
     {
-        return 'paineldiretoria::components.layouts.app';
+        return 'layouts.app';
     }
 }

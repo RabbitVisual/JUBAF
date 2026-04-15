@@ -18,7 +18,7 @@ class TalentSkillController extends Controller
         $skills = TalentSkill::query()->orderBy('name')->get();
 
         return view('talentos::paineldiretoria.taxonomy.skills-index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'skills' => $skills,
         ]);
@@ -29,7 +29,7 @@ class TalentSkillController extends Controller
         $this->authorize('create', TalentSkill::class);
 
         return view('talentos::paineldiretoria.taxonomy.skill-form', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'skill' => new TalentSkill,
             'mode' => 'create',
@@ -50,7 +50,7 @@ class TalentSkillController extends Controller
         $this->authorize('update', $skill);
 
         return view('talentos::paineldiretoria.taxonomy.skill-form', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'skill' => $skill,
             'mode' => 'edit',

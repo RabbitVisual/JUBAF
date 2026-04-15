@@ -51,7 +51,7 @@ class TalentDashboardController extends Controller
         }
 
         return view('talentos::paineldiretoria.dashboard', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'canDirectory' => $canDirectory,
             'canAssignments' => $canAssignments,

@@ -47,7 +47,7 @@ class ObligationController extends Controller
         ];
 
         return view('financeiro::paineldiretoria.obligations.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'obligations' => $obligations,
             'filters' => $request->only(['year', 'status']),

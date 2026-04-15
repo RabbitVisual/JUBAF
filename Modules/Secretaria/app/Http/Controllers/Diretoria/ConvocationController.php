@@ -21,7 +21,7 @@ class ConvocationController extends Controller
 
     protected function panelLayout(): string
     {
-        return 'paineldiretoria::components.layouts.app';
+        return 'layouts.app';
     }
 
     public function index(Request $request)

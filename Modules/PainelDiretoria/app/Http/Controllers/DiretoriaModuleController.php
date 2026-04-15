@@ -24,6 +24,6 @@ class DiretoriaModuleController extends AdminModuleController
 
     protected function panelLayout(): string
     {
-        return 'paineldiretoria::components.layouts.app';
+        return 'layouts.app';
     }
 }

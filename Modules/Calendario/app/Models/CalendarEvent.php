@@ -119,11 +119,11 @@ class CalendarEvent extends Model
         });
 
         static::saved(function () {
-            Cache::forget('homepage.portal.upcoming_events');
+            Cache::forget('homepage.portal.upcoming_event_ids');
         });
 
         static::deleted(function () {
-            Cache::forget('homepage.portal.upcoming_events');
+            Cache::forget('homepage.portal.upcoming_event_ids');
         });
     }
 
@@ -149,7 +149,7 @@ class CalendarEvent extends Model
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(CalendarRegistration::class, 'evento_id');
+        return $this->hasMany(CalendarRegistration::class, 'event_id');
     }
 
     public function batches(): HasMany

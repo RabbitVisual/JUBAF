@@ -13,7 +13,7 @@ class MinuteController extends Base
 
     protected function panelLayout(): string
     {
-        return 'admin::layouts.admin';
+        return 'layouts.app';
     }
 
     protected function secretariaViewsDirectory(): string

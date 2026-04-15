@@ -28,7 +28,7 @@ class AssignmentController extends Controller
         $assignments = $q->orderByDesc('id')->paginate(25)->withQueryString();
 
         return view('talentos::paineldiretoria.assignments.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'assignments' => $assignments,
             'filters' => $request->only(['status']),
@@ -40,13 +40,13 @@ class AssignmentController extends Controller
         $this->authorize('create', TalentAssignment::class);
 
         $events = module_enabled('Calendario')
-            ? CalendarEvent::query()->where('starts_at', '>=', now()->subDay())->orderBy('starts_at')->limit(100)->get()
+            ? CalendarEvent::query()->where('start_date', '>=', now()->subDay())->orderBy('start_date')->limit(100)->get()
             : collect();
 
         $preUserId = $request->integer('user_id') ?: null;
 
         return view('talentos::paineldiretoria.assignments.create', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'assignment' => new TalentAssignment([
                 'status' => TalentAssignment::STATUS_INVITED,
@@ -74,11 +74,11 @@ class AssignmentController extends Controller
         $this->authorize('update', $assignment);
 
         $events = module_enabled('Calendario')
-            ? CalendarEvent::query()->where('starts_at', '>=', now()->subMonths(3))->orderBy('starts_at')->limit(150)->get()
+            ? CalendarEvent::query()->where('start_date', '>=', now()->subMonths(3))->orderBy('start_date')->limit(150)->get()
             : collect();
 
         return view('talentos::paineldiretoria.assignments.edit', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.talentos',
             'assignment' => $assignment,
             'users' => User::query()->orderBy('name')->limit(500)->get(),

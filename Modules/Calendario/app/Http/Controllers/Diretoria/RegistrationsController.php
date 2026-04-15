@@ -22,7 +22,7 @@ class RegistrationsController extends Controller
             $q->where('status', $request->input('status'));
         }
         if ($request->filled('event_id')) {
-            $q->where('evento_id', $request->input('event_id'));
+            $q->where('event_id', $request->input('event_id'));
         }
 
         $registrations = $q->orderByDesc('id')->paginate(25)->withQueryString();
@@ -33,7 +33,7 @@ class RegistrationsController extends Controller
             ->get(['id', 'title', 'start_date']);
 
         return view('calendario::paineldiretoria.registrations.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.calendario',
             'registrations' => $registrations,
             'eventsForFilter' => $eventsForFilter,

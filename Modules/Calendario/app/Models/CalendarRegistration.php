@@ -20,7 +20,7 @@ class CalendarRegistration extends Model
     protected $table = 'evento_inscricoes';
 
     protected $fillable = [
-        'evento_id',
+        'event_id',
         'event_batch_id',
         'user_id',
         'status',
@@ -53,7 +53,7 @@ class CalendarRegistration extends Model
 
     public function event(): BelongsTo
     {
-        return $this->belongsTo(CalendarEvent::class, 'evento_id');
+        return $this->belongsTo(CalendarEvent::class, 'event_id');
     }
 
     public function batch(): BelongsTo
@@ -71,14 +71,17 @@ class CalendarRegistration extends Model
         return $this->belongsTo(\Modules\Gateway\App\Models\GatewayPayment::class, 'payment_id');
     }
 
-    public function getEventIdAttribute(): mixed
+    /**
+     * Alias for legacy code / Portuguese naming (column is `event_id`).
+     */
+    public function getEventoIdAttribute(): mixed
     {
-        return $this->evento_id;
+        return $this->attributes['event_id'] ?? null;
     }
 
-    public function setEventIdAttribute(mixed $value): void
+    public function setEventoIdAttribute(mixed $value): void
     {
-        $this->attributes['evento_id'] = $value;
+        $this->attributes['event_id'] = $value;
     }
 
     public function getGatewayPaymentIdAttribute(): mixed

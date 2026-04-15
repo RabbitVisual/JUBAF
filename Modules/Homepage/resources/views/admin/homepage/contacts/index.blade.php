@@ -1,4 +1,4 @@
-@extends(request()->routeIs('diretoria.*') ? 'paineldiretoria::components.layouts.app' : 'admin::layouts.admin')
+@extends('layouts.app')
 
 @php
     $contactStats = $contactStats ?? ['total' => 0, 'unread' => 0];

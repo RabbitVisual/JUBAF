@@ -30,7 +30,7 @@ class DiretoriaChurchChangeRequestController extends Controller
         $requests = $q->paginate(20)->withQueryString();
 
         return view('igrejas::paineldiretoria.requests.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.igrejas',
             'requests' => $requests,
             'filters' => $request->only(['status']),
@@ -45,7 +45,7 @@ class DiretoriaChurchChangeRequestController extends Controller
         $churchChangeRequest->load(['church', 'submitter', 'reviewer']);
 
         return view('igrejas::paineldiretoria.requests.show', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.igrejas',
             'req' => $churchChangeRequest,
             'canReview' => $request->user()->can('review', $churchChangeRequest),

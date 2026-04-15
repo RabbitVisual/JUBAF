@@ -1,4 +1,4 @@
-@extends('painellider::components.layouts.app')
+@extends('layouts.app')
 
 @section('title', __('Bíblia interlinear — :app', ['app' => config('app.name')]))
 

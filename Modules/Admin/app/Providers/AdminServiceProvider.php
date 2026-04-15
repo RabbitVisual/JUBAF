@@ -137,10 +137,7 @@ class AdminServiceProvider extends ServiceProvider
 
     protected function registerViewComposers(): void
     {
-        View::composer(
-            ['admin::layouts.admin', 'admin::layouts.app'],
-            AdminLayoutComposer::class
-        );
+        View::composer('layouts.app', AdminLayoutComposer::class);
     }
 
     /**

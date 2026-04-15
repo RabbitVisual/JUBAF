@@ -24,7 +24,7 @@ class ReportController extends Controller
 
         return view('financeiro::paineldiretoria.reports.index', array_merge(
             [
-                'layout' => 'paineldiretoria::components.layouts.app',
+                'layout' => 'layouts.app',
                 'routePrefix' => 'diretoria.financeiro',
             ],
             $this->buildReportData($request)

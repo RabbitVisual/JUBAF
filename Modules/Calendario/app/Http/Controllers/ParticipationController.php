@@ -60,7 +60,7 @@ class ParticipationController extends Controller
         $event->load(['batches', 'priceRules']);
 
         $registration = CalendarRegistration::query()
-            ->where('evento_id', $event->id)
+            ->where('event_id', $event->id)
             ->where('user_id', $user->id)
             ->first();
 
@@ -110,7 +110,7 @@ class ParticipationController extends Controller
         ]);
 
         $existing = CalendarRegistration::query()
-            ->where('evento_id', $event->id)
+            ->where('event_id', $event->id)
             ->where('user_id', $user->id)
             ->first();
 
@@ -150,7 +150,7 @@ class ParticipationController extends Controller
                 $reg = $existing->fresh();
             } else {
                 $reg = CalendarRegistration::query()->create([
-                    'evento_id' => $event->id,
+                    'event_id' => $event->id,
                     'user_id' => $user->id,
                     'status' => CalendarRegistration::STATUS_PENDING_PAYMENT,
                     'payment_status' => 'pending',
@@ -205,7 +205,7 @@ class ParticipationController extends Controller
             $confirmedRegistration = $existing->fresh();
         } else {
             $confirmedRegistration = CalendarRegistration::query()->create(array_merge([
-                'evento_id' => $event->id,
+                'event_id' => $event->id,
                 'user_id' => $user->id,
                 'status' => $status,
                 'payment_status' => 'not_required',
@@ -231,7 +231,7 @@ class ParticipationController extends Controller
         $user = $request->user();
 
         $reg = CalendarRegistration::query()
-            ->where('evento_id', $event->id)
+            ->where('event_id', $event->id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 

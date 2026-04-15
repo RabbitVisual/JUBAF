@@ -1,4 +1,4 @@
-@extends('painellider::components.layouts.app')
+@extends('layouts.app')
 
 @section('title', "Dia {$day->day_number}: {$subscription->plan->title}")
 

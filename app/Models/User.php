@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -196,6 +197,16 @@ class User extends Authenticatable
     public function talentProfile()
     {
         return $this->hasOne(\Modules\Talentos\App\Models\TalentProfile::class);
+    }
+
+    /**
+     * Perfil estendido do painel de jovens (estado civil, profissão, bio, redes sociais).
+     *
+     * @return HasOne<\Modules\PainelJovens\App\Models\JovemPerfil, $this>
+     */
+    public function jovemPerfil(): HasOne
+    {
+        return $this->hasOne(\Modules\PainelJovens\App\Models\JovemPerfil::class);
     }
 
     public function talentAssignments()

@@ -783,7 +783,9 @@ $descContent = trim($descContent);
 
                                                                                                                 <!-- Back to Top Button -->
                                                                                                                 <button id="backToTop"
-                                                                                                                    class="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-r from-[#0047AB] to-blue-800 dark:from-blue-600 dark:to-slate-800 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 opacity-0 invisible z-50 flex items-center justify-center group">
+                                                                                                                    type="button"
+                                                                                                                    class="fixed bottom-8 right-28 sm:right-32 w-14 h-14 bg-gradient-to-r from-[#0047AB] to-blue-800 dark:from-blue-600 dark:to-slate-800 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 opacity-0 invisible z-[100] flex items-center justify-center group"
+                                                                                                                    aria-label="Voltar ao topo">
                                                                                                                     <x-icon name="arrow-up"
                                                                                                                         class="w-6 h-6 group-hover:-translate-y-1 transition-transform" />
                                                                                                                 </button>

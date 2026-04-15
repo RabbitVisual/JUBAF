@@ -1,4 +1,4 @@
-@extends('pastor.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Congregações JUBAF')
 

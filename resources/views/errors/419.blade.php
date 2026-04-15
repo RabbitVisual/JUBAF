@@ -1,4 +1,8 @@
-<x-layouts.app title="Sessão expirada — {{ \App\Support\SiteBranding::siteName() }}">
+@extends('layouts.app')
+
+@section('title', 'Sessão expirada — ' . \App\Support\SiteBranding::siteName())
+
+@section('content')
     <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12">
         <div class="text-center max-w-lg">
             <x-icon name="clock-rotate-left" class="h-24 w-24 text-indigo-500 mx-auto mb-6 opacity-90" style="duotone" />
@@ -24,4 +28,4 @@
             </p>
         </div>
     </div>
-</x-layouts.app>
+@endsection

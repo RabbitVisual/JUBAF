@@ -20,7 +20,7 @@ class DevotionalController extends AdminDevotionalController
 
     protected function panelLayout(): string
     {
-        return 'paineldiretoria::components.layouts.app';
+        return 'layouts.app';
     }
 
     public function index(): View

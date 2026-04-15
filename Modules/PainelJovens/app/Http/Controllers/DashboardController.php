@@ -29,7 +29,7 @@ class DashboardController extends Controller
                     ]);
                 })
                 ->orderByDesc('is_featured')
-                ->orderBy('starts_at')
+                ->orderBy('start_date')
                 ->limit(6)
                 ->get();
 
@@ -40,7 +40,7 @@ class DashboardController extends Controller
                     CalendarRegistration::STATUS_WAITLIST,
                 ])
                 ->whereHas('event', function ($q): void {
-                    $q->where('starts_at', '<', now());
+                    $q->where('start_date', '<', now());
                 })
                 ->with('event')
                 ->orderByDesc('updated_at')

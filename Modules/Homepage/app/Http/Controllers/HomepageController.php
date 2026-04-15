@@ -145,9 +145,16 @@ class HomepageController extends Controller
 
         $events = collect();
         if (module_enabled('Calendario') && (bool) SystemConfig::get('homepage_portal_eventos_enabled', true)) {
-            $events = Cache::remember('homepage.portal.upcoming_events', $ttl, function () {
-                return app(EventService::class)->upcomingPublicFeatured(6);
+            $ids = Cache::remember('homepage.portal.upcoming_event_ids', $ttl, function () {
+                return app(EventService::class)->upcomingPublicFeatured(6)->pluck('id')->all();
             });
+            if ($ids !== []) {
+                $events = CalendarEvent::query()
+                    ->whereIn('id', $ids)
+                    ->get()
+                    ->sortBy(fn (CalendarEvent $e) => array_search($e->id, $ids, true))
+                    ->values();
+            }
         }
 
         return [$churchStats, $churchByState, $events];

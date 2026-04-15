@@ -1,4 +1,4 @@
-@extends('paineldiretoria::components.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Comentários - Blog Diretoria')
 

@@ -24,7 +24,7 @@ class AdminChurchController extends Controller
 
     protected function panelLayout(): string
     {
-        return 'admin::layouts.admin';
+        return 'layouts.app';
     }
 
     /**

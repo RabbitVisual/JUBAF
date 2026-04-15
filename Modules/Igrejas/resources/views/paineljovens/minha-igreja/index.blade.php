@@ -1,4 +1,4 @@
-@extends('paineljovens::components.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'A minha igreja')
 

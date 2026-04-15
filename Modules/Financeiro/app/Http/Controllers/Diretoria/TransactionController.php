@@ -96,7 +96,7 @@ class TransactionController extends Controller
             ->get(['id', 'name', 'direction']);
 
         return view('financeiro::paineldiretoria.transactions.index', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'transactions' => $transactions,
             'churches' => $churches,
@@ -112,7 +112,7 @@ class TransactionController extends Controller
         $user = $request->user();
 
         return view('financeiro::paineldiretoria.transactions.create', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'categories' => FinCategory::query()
                 ->where('is_active', true)
@@ -169,7 +169,7 @@ class TransactionController extends Controller
         $user = $request->user();
 
         return view('financeiro::paineldiretoria.transactions.edit', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'categories' => FinCategory::query()
                 ->where('is_active', true)

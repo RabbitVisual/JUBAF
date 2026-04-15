@@ -1,4 +1,8 @@
-<x-layouts.app title="Página não encontrada — {{ \App\Support\SiteBranding::siteName() }}">
+@extends('layouts.app')
+
+@section('title', 'Página não encontrada — ' . \App\Support\SiteBranding::siteName())
+
+@section('content')
     <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
         <div class="text-center">
             <x-icon name="map-location-dot" class="h-24 w-24 text-indigo-500 mx-auto mb-6 opacity-80" />
@@ -13,4 +17,4 @@
             </a>
         </div>
     </div>
-</x-layouts.app>
+@endsection

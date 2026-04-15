@@ -221,7 +221,7 @@ class FinanceiroDashboardController extends Controller
         }
 
         return view('financeiro::paineldiretoria.dashboard', [
-            'layout' => 'paineldiretoria::components.layouts.app',
+            'layout' => 'layouts.app',
             'routePrefix' => 'diretoria.financeiro',
             'monthIn' => $in,
             'monthOut' => $out,

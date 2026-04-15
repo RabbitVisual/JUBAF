@@ -52,8 +52,8 @@ class DashboardController extends Controller
         $upcomingEvents = CalendarEvent::query()
             ->where('status', CalendarEvent::STATUS_PUBLISHED)
             ->whereIn('visibility', [CalendarEvent::VIS_PUBLIC, CalendarEvent::VIS_AUTH, CalendarEvent::VIS_LIDERES])
-            ->where('starts_at', '>=', now()->startOfDay())
-            ->orderBy('starts_at')
+            ->where('start_date', '>=', now()->startOfDay())
+            ->orderBy('start_date')
             ->limit(8)
             ->get();
 
