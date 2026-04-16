@@ -31,7 +31,7 @@ class TalentProfile extends Model
     public function skills(): BelongsToMany
     {
         return $this->belongsToMany(TalentSkill::class, 'talent_profile_skill')
-            ->withPivot('level')
+            ->withPivot(['level', 'validated_at', 'validated_by'])
             ->withTimestamps();
     }
 

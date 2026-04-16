@@ -11,22 +11,22 @@
     $formAccent =
         $panel === 'lider'
             ? 'border-emerald-200/70 ring-emerald-500/10 dark:border-emerald-900/40'
-            : 'border-violet-200/70 ring-violet-500/10 dark:border-violet-900/40';
+            : 'border-blue-200/70 ring-blue-500/10 dark:border-blue-900/40';
     $inputClass =
         $panel === 'lider'
-            ? 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-400'
-            : 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/25 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:focus:border-violet-400';
+            ? 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-emerald-400'
+            : 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/25 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400';
     $consentBox =
         $panel === 'lider'
             ? 'rounded-xl border border-emerald-200/80 bg-emerald-50/50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/20'
-            : 'rounded-xl border border-violet-200/80 bg-violet-50/50 p-4 dark:border-violet-900/40 dark:bg-violet-950/20';
+            : 'rounded-xl border border-blue-200/80 bg-blue-50/50 p-4 dark:border-blue-900/40 dark:bg-blue-950/20';
     $submitClass =
         $panel === 'lider'
             ? 'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700'
-            : 'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700';
+            : 'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700';
 @endphp
 <form method="post" action="{{ route($routePrefix . '.profile.update') }}"
-    class="space-y-6 rounded-2xl border bg-white p-6 shadow-sm ring-1 dark:bg-slate-800 {{ $formAccent }}">
+    class="space-y-6 rounded-2xl border bg-white p-6 shadow-sm ring-1 dark:bg-gray-800 {{ $formAccent }}">
     @csrf
     @method('PUT')
 
@@ -55,7 +55,7 @@
         <div class="flex items-start gap-3">
             <input type="hidden" name="is_searchable" value="0">
             <input type="checkbox" id="is_searchable" name="is_searchable" value="1"
-                class="mt-1 rounded border-gray-300 dark:border-slate-600" @checked(old('is_searchable', $profile->is_searchable))>
+                class="mt-1 rounded border-gray-300 dark:border-gray-600" @checked(old('is_searchable', $profile->is_searchable))>
             <div>
                 <label for="is_searchable" class="text-sm font-semibold text-gray-900 dark:text-white">Quero integrar o
                     banco de talentos da JUBAF</label>
@@ -70,14 +70,14 @@
         <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Competências que posso oferecer</p>
         <p class="mb-2 text-xs text-gray-500 dark:text-gray-400">Opcional: indique o nível em cada competência selecionada.</p>
         <div
-            class="space-y-2 max-h-72 overflow-y-auto rounded-lg border border-gray-200 dark:border-slate-600 p-3">
+            class="max-h-72 space-y-2 overflow-y-auto rounded-lg border border-gray-200 p-3 dark:border-gray-600">
             @foreach ($skills as $skill)
                 @php
                     $oldLevels = old('skill_levels', []);
                     $pivotLevel = $profile->exists ? $profile->skills->firstWhere('id', $skill->id)?->pivot?->level : null;
                     $levelVal = $oldLevels[$skill->id] ?? $oldLevels[(string) $skill->id] ?? $pivotLevel;
                 @endphp
-                <div class="flex flex-col gap-2 rounded-lg bg-gray-50/80 px-2 py-2 sm:flex-row sm:items-center sm:justify-between dark:bg-slate-900/40">
+                <div class="flex flex-col gap-2 rounded-lg bg-gray-50/80 px-2 py-2 sm:flex-row sm:items-center sm:justify-between dark:bg-gray-900/40">
                     <label class="flex min-w-0 flex-1 items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                         <input type="checkbox" name="skill_ids[]" value="{{ $skill->id }}" @checked(in_array($skill->id, old('skill_ids', $profile->exists ? $profile->skills->pluck('id')->all() : []), true))>
                         <span class="truncate">{{ $skill->name }}</span>
@@ -102,7 +102,7 @@
     <div>
         <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Áreas onde quero servir</p>
         <div
-            class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-52 overflow-y-auto rounded-lg border border-gray-200 dark:border-slate-600 p-3">
+            class="grid max-h-52 grid-cols-1 gap-2 overflow-y-auto rounded-lg border border-gray-200 p-3 sm:grid-cols-2 dark:border-gray-600">
             @foreach ($areas as $area)
                 <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input type="checkbox" name="area_ids[]" value="{{ $area->id }}" @checked(in_array($area->id, old('area_ids', $profile->exists ? $profile->areas->pluck('id')->all() : []), true))>
@@ -116,7 +116,7 @@
     </div>
 
     <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
+        class="flex flex-col gap-3 border-t border-gray-100 pt-2 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
         <p class="text-xs text-gray-500 dark:text-gray-400">Ao guardar, confirma que os dados são verdadeiros e autoriza
             o contacto institucional para convites de serviço.</p>
         <button type="submit" class="{{ $submitClass }}">

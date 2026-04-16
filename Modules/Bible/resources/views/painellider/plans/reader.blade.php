@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', "Dia {$day->day_number}: {$subscription->plan->title}")
 
@@ -131,7 +131,8 @@
 </style>
 @endpush
 
-@section('content')
+@section('lideres_content')
+<x-ui.lideres::page-shell noPadding class="w-full max-w-none !mx-0 !space-y-0 !pb-0">
 <div class="bible-reader-container" id="reader-root">
 
     <!-- TOP NAVIGATION -->
@@ -615,5 +616,6 @@
 
     })();
 </script>
+</x-ui.lideres::page-shell>
 @endsection
 

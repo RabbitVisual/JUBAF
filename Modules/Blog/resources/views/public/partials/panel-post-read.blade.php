@@ -9,17 +9,17 @@
 <article class="space-y-6 pb-8 max-w-3xl">
     <div class="flex flex-wrap items-center gap-2 text-sm">
         <span class="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 font-semibold text-blue-900 dark:bg-blue-950/50 dark:text-blue-200">{{ $post->category->name }}</span>
-        <span class="text-slate-500 dark:text-slate-400">{{ $post->published_at?->translatedFormat('d M Y, H:i') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ $post->published_at?->translatedFormat('d M Y, H:i') }}</span>
         @if($post->author)
-            <span class="text-slate-400">·</span>
-            <span class="text-slate-600 dark:text-slate-300">{{ $post->author->name }}</span>
+            <span class="text-gray-400">·</span>
+            <span class="text-gray-600 dark:text-gray-300">{{ $post->author->name }}</span>
         @endif
     </div>
 
-    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{{ $post->title }}</h1>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $post->title }}</h1>
 
     @if($post->excerpt)
-        <p class="text-slate-600 dark:text-slate-400 border-l-4 border-blue-500 pl-4 italic">{{ strip_tags($post->excerpt) }}</p>
+        <p class="text-gray-600 dark:text-gray-400 border-l-4 border-blue-500 pl-4 italic">{{ strip_tags($post->excerpt) }}</p>
     @endif
 
     <div class="flex flex-wrap gap-3">
@@ -31,12 +31,12 @@
     </div>
 
     @if($post->featured_image)
-        <div class="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+        <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
             <img src="{{ Storage::url($post->featured_image) }}" alt="{{ $post->title }}" class="w-full max-h-80 object-cover" loading="lazy" />
         </div>
     @endif
 
-    <div class="prose prose-slate dark:prose-invert max-w-none prose-a:text-blue-600 dark:prose-a:text-blue-400">
+    <div class="prose prose-gray dark:prose-invert max-w-none prose-a:text-blue-600 dark:prose-a:text-blue-400">
         {!! $post->content !!}
     </div>
 </article>

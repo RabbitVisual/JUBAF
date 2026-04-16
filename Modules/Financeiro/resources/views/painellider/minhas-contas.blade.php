@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Minhas contas JUBAF')
 
@@ -7,22 +7,19 @@
     <span class="text-emerald-700 dark:text-emerald-300">Tesouraria</span>
 @endsection
 
-@section('content')
-<div class="max-w-6xl space-y-8">
-    <div class="relative overflow-hidden rounded-3xl border border-emerald-200/80 bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-900 p-6 text-white shadow-xl md:p-8">
-        <div class="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div class="flex items-start gap-4">
-                <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-                    <x-module-icon module="Financeiro" class="h-8 w-8 text-white" />
-                </span>
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-emerald-100/90">Transparência</p>
-                    <h1 class="mt-1 text-2xl font-bold tracking-tight md:text-3xl">Minhas contas JUBAF</h1>
-                    <p class="mt-2 max-w-xl text-sm text-emerald-50/95">Cotas associativas e faturas mensais da(s) sua(s) congregação(ões). Para pagamentos online, utilize o link enviado pela tesouraria ou o checkout do Gateway quando disponível.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+@section('lideres_content')
+<x-ui.lideres::page-shell class="max-w-6xl space-y-8">
+    <x-ui.lideres::hero
+        variant="gradient"
+        eyebrow="Transparência"
+        title="Minhas contas JUBAF"
+        description="Cotas associativas e faturas mensais da(s) sua(s) congregação(ões). Para pagamentos online, utilize o link enviado pela tesouraria ou o checkout do Gateway quando disponível.">
+        <x-slot name="actions">
+            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+                <x-module-icon module="Financeiro" class="h-8 w-8 text-white" />
+            </span>
+        </x-slot>
+    </x-ui.lideres::hero>
 
     @if(empty($churchIds))
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-50">
@@ -48,7 +45,7 @@
                             <tr>
                                 <td class="py-2.5 pr-4 font-medium text-slate-900 dark:text-white">{{ $o->assoc_start_year }}</td>
                                 <td class="py-2.5 pr-4 text-slate-700 dark:text-slate-300">{{ $o->church?->name ?? '—' }}</td>
-                                <td class="py-2.5 pr-4 tabular-nums">R$ {{ number_format((float) $o->amount, 2, ',', '.') }}</td>
+                                <td class="tabular-nums py-2.5 pr-4">R$ {{ number_format((float) $o->amount, 2, ',', '.') }}</td>
                                 <td class="py-2.5">
                                     <span class="inline-flex rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-800 dark:bg-slate-900 dark:text-slate-200">{{ $o->status }}</span>
                                 </td>
@@ -80,7 +77,7 @@
                             <tr>
                                 <td class="py-2.5 pr-4 font-mono text-xs text-slate-800 dark:text-slate-200">{{ $inv->billing_month }}</td>
                                 <td class="py-2.5 pr-4 text-slate-700 dark:text-slate-300">{{ $inv->church?->name ?? '—' }}</td>
-                                <td class="py-2.5 pr-4 tabular-nums">R$ {{ number_format((float) $inv->amount, 2, ',', '.') }}</td>
+                                <td class="tabular-nums py-2.5 pr-4">R$ {{ number_format((float) $inv->amount, 2, ',', '.') }}</td>
                                 <td class="py-2.5 pr-4">{{ $inv->due_on?->format('d/m/Y') ?? '—' }}</td>
                                 <td class="py-2.5">
                                     <span class="inline-flex rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-800 dark:bg-slate-900 dark:text-slate-200">{{ $inv->status }}</span>
@@ -98,5 +95,5 @@
             <p class="text-center text-xs text-slate-500 dark:text-slate-400">Pagamentos online: utilize o URL de checkout enviado pela tesouraria (Gateway).</p>
         @endif
     @endif
-</div>
+</x-ui.lideres::page-shell>
 @endsection

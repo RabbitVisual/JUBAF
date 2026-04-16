@@ -1,57 +1,47 @@
-@extends('layouts.app')
+@extends('paineljovens::layouts.jovens')
 
 @section('title', 'Blog JUBAF')
 
-@section('breadcrumbs')
-    <x-icon name="chevron-right" class="w-3 h-3 shrink-0 opacity-50" />
-    <span class="text-emerald-600 dark:text-emerald-400">Blog</span>
-@endsection
 
-@section('content')
-<div class="space-y-6 md:space-y-8 animate-fade-in pb-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 md:pb-6 border-b border-slate-200 dark:border-slate-800">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3 mb-2">
-                <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-slate-700 shadow-lg shadow-blue-600/25">
-                    <x-module-icon module="blog" class="h-6 w-6 text-white" alt="" />
-                </span>
-                Blog institucional
-            </h1>
-            <p class="text-sm md:text-base text-slate-600 dark:text-slate-400">
-                Notícias e artigos oficiais da JUBAF. Abre um texto para ler no painel ou no site público.
-            </p>
-        </div>
-        <form method="get" action="{{ route('jovens.blog.index') }}" class="flex w-full sm:w-auto gap-2">
-            <input type="search" name="q" value="{{ request('q') }}" placeholder="Pesquisar…"
-                   class="flex-1 min-w-0 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500" />
-            <button type="submit" class="shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Buscar</button>
-        </form>
-    </div>
+@section('jovens_content')
+    <x-ui.jovens::page-shell class="space-y-6 md:space-y-8">
+        <x-ui.jovens::hero
+            title="Blog institucional"
+            description="Notícias e artigos oficiais da JUBAF. Abre um texto para ler no painel ou no site público."
+            eyebrow="Blog JUBAF">
+            <x-slot:actions>
+                <form method="get" action="{{ route('jovens.blog.index') }}" class="flex w-full flex-col gap-2 sm:flex-row sm:items-center" role="search">
+                    <input type="search" name="q" value="{{ request('q') }}" placeholder="Pesquisar…"
+                        class="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/25 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500" />
+                    <button type="submit" class="shrink-0 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">Buscar</button>
+                </form>
+            </x-slot:actions>
+        </x-ui.jovens::hero>
 
-    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/40 overflow-hidden shadow-sm p-4 md:p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            @forelse($posts as $post)
-                @include('blog::public.partials.post-card', [
-                    'post' => $post,
-                    'postUrl' => route('jovens.blog.show', $post->slug),
-                ])
-            @empty
-                <div class="md:col-span-2 py-16 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-                    <x-icon name="newspaper" class="mx-auto h-12 w-12 text-slate-400 mb-3" />
-                    <p class="text-sm font-medium text-slate-900 dark:text-white">Sem publicações por agora</p>
-                    <p class="mt-1 text-sm text-slate-500">Quando a direção publicar no blog, aparece aqui.</p>
-                </div>
-            @endforelse
-        </div>
-        @if($posts->hasPages())
-            <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-                {{ $posts->links() }}
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900/40 md:p-6">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                @forelse($posts as $post)
+                    @include('blog::public.partials.post-card', [
+                        'post' => $post,
+                        'postUrl' => route('jovens.blog.show', $post->slug),
+                    ])
+                @empty
+                    <div class="rounded-lg border border-dashed border-gray-200 bg-white py-16 text-center dark:border-gray-700 dark:bg-gray-800 md:col-span-2">
+                        <x-icon name="newspaper" class="mx-auto mb-3 h-12 w-12 text-gray-400" />
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">Sem publicações por agora</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Quando a direção publicar no blog, aparece aqui.</p>
+                    </div>
+                @endforelse
             </div>
-        @endif
-    </div>
+            @if ($posts->hasPages())
+                <div class="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
+                    {{ $posts->links() }}
+                </div>
+            @endif
+        </div>
 
-    <p class="text-center text-sm text-slate-500">
-        <a href="{{ route('blog.index') }}" target="_blank" rel="noopener" class="font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400">Abrir blog no site público</a>
-    </p>
-</div>
+        <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+            <a href="{{ route('blog.index') }}" target="_blank" rel="noopener" class="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">Abrir blog no site público</a>
+        </p>
+    </x-ui.jovens::page-shell>
 @endsection

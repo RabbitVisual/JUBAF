@@ -14,7 +14,17 @@ class SecretariaLeituraController extends Controller
 {
     protected function layout(): string
     {
-        return 'layouts.app';
+        return request()->routeIs('lideres.*') ? 'layouts.app' : 'paineljovens::layouts.jovens';
+    }
+
+    /** View Blade: líderes mantém ficheiros na raiz; jovens usa subpasta `jovens/`. */
+    protected function operacionalView(string $slug): string
+    {
+        if (request()->routeIs('lideres.*')) {
+            return 'secretaria::painel-operacional.'.$slug;
+        }
+
+        return 'secretaria::painel-operacional.jovens.'.$slug;
     }
 
     protected function homeRoute(): string
@@ -38,7 +48,7 @@ class SecretariaLeituraController extends Controller
         $minutes = $minutesQuery->limit(5)->get();
         $convocations = Convocation::query()->where('status', 'published')->where('assembly_at', '>=', now()->startOfDay())->orderBy('assembly_at')->limit(5)->get();
 
-        return view('secretaria::painel-operacional.index', [
+        return view($this->operacionalView('index'), [
             'layout' => $this->layout(),
             'homeRoute' => $this->homeRoute(),
             'namePrefix' => $this->namePrefix(),
@@ -56,7 +66,7 @@ class SecretariaLeituraController extends Controller
         }
         $minutes = $minutesQuery->paginate(15);
 
-        return view('secretaria::painel-operacional.minutes-index', [
+        return view($this->operacionalView('minutes-index'), [
             'layout' => $this->layout(),
             'homeRoute' => $this->homeRoute(),
             'namePrefix' => $this->namePrefix(),
@@ -69,7 +79,7 @@ class SecretariaLeituraController extends Controller
         $this->authorize('view', $minute);
         $minute->load(['meeting', 'church', 'attachments']);
 
-        return view('secretaria::painel-operacional.minute-show', [
+        return view($this->operacionalView('minute-show'), [
             'layout' => $this->layout(),
             'homeRoute' => $this->homeRoute(),
             'namePrefix' => $this->namePrefix(),
@@ -102,7 +112,7 @@ class SecretariaLeituraController extends Controller
         $this->authorize('viewAny', Convocation::class);
         $convocations = Convocation::query()->where('status', 'published')->orderByDesc('assembly_at')->paginate(15);
 
-        return view('secretaria::painel-operacional.convocations-index', [
+        return view($this->operacionalView('convocations-index'), [
             'layout' => $this->layout(),
             'homeRoute' => $this->homeRoute(),
             'namePrefix' => $this->namePrefix(),
@@ -114,7 +124,7 @@ class SecretariaLeituraController extends Controller
     {
         $this->authorize('view', $convocation);
 
-        return view('secretaria::painel-operacional.convocation-show', [
+        return view($this->operacionalView('convocation-show'), [
             'layout' => $this->layout(),
             'homeRoute' => $this->homeRoute(),
             'namePrefix' => $this->namePrefix(),
@@ -143,7 +153,7 @@ class SecretariaLeituraController extends Controller
         }
         $documents = $q->paginate(15);
 
-        return view('secretaria::painel-operacional.documents-index', [
+        return view($this->operacionalView('documents-index'), [
             'layout' => $this->layout(),
             'homeRoute' => $this->homeRoute(),
             'namePrefix' => $this->namePrefix(),

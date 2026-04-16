@@ -89,9 +89,6 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr>
-                                    <td colspan="4" class="px-3 py-5 text-center text-slate-500 dark:text-slate-400">Sem transacoes para o periodo.</td>
-                                </tr>
                             @endforelse
                         </tbody>
                         </table>

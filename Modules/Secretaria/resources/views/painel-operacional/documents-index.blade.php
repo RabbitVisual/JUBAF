@@ -1,11 +1,22 @@
-@extends($layout)
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Documentos')
 
-@section('content')
-<div class="max-w-4xl space-y-4">
-    <div class="flex justify-between"><h1 class="text-2xl font-bold text-slate-900 dark:text-white">Documentos</h1><a href="{{ route($namePrefix.'.index') }}" class="text-sm text-indigo-600">Secretaria</a></div>
-    <ul class="space-y-2">@forelse($documents as $d)<li class="flex justify-between border dark:border-slate-700 rounded-lg p-3"><span>{{ $d->title }}</span>@can('download', $d)<a href="{{ route($namePrefix.'.documentos.download', $d) }}" class="text-indigo-600 text-sm">Download</a>@endcan</li>@empty<li class="text-slate-500">Nenhum documento.</li>@endforelse</ul>
-    {{ $documents->links() }}
-</div>
+@section('lideres_content')
+    <x-ui.lideres::page-shell class="space-y-8 md:space-y-10">
+        <a
+            href="{{ route($namePrefix.'.index') }}"
+            class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 transition-all hover:gap-2.5 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+        >
+            <x-icon name="arrow-left" class="h-4 w-4" style="duotone" />
+            Voltar à secretaria
+        </a>
+
+        <x-ui.lideres::hero
+            title="Documentos"
+            eyebrow="Painel de líderes · Secretaria"
+            description="Documentos públicos disponíveis para consulta ou download." />
+
+        @include('secretaria::painel-operacional.partials.lider-documents-index-inner')
+    </x-ui.lideres::page-shell>
 @endsection

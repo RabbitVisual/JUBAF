@@ -43,7 +43,7 @@ O sistema é **Modular (nwidart/laravel-modules)** para que o código seja limpo
 4.  O **Tesoureiro** registra as ofertas dessa igreja no módulo financeiro.
 5.  O **Presidente** visualiza o gráfico de crescimento de jovens e a saúde financeira no Dashboard principal.
 
-**Implementação (passo 3):** no sistema ERP, o líder com papel `lider`, igreja principal (`church_id`) e permissão `igrejas.jovens.provision` acede a **Painel de líderes → Congregação → Adicionar jovem** (`/lideres/congregacao/jovens/create`). São criadas contas com papel `jovens` na mesma igreja; por defeito envia-se e-mail de definição de palavra-passe (alternativa: definir palavra-passe no momento, com confirmação). Edição e reenvio de link ficam na lista da congregação. Isto substitui a dependência exclusiva do painel `/admin` para criar jovens no dia a dia do campo.
+**Implementação (passo 3):** no sistema ERP, o líder com papel `lider` e igreja principal (`church_id`) atribuída pela diretoria acede a **Painel de líderes → Congregação → Cadastrar jovem** (`/lideres/congregacao/jovens/create`). São criadas contas com papel `jovens` na mesma igreja; por defeito envia-se e-mail de definição de palavra-passe (alternativa: definir palavra-passe no momento, com confirmação). Edição e reenvio de link ficam na lista da congregação. Isto substitui a dependência exclusiva do painel `/admin` para criar jovens no dia a dia do campo.
 
 ---
 

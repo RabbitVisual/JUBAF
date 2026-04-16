@@ -1,8 +1,9 @@
 /**
- * Service Worker — JUBAF Painel de Líderes (PWA)
- * Cache do shell e rotas autenticadas do prefixo /lideres.
+ * Service Worker — JUBAF
+ * Suporte a instalação PWA e cache leve apenas para os painéis autenticados
+ * `/jovens/*` e `/lideres/*` (não é um ERP “100% offline”; dados em tempo real exigem rede).
  *
- * @version 6.0.0
+ * @version 8.0.0
  */
 
 // Sistema de Logging Condicional - Apenas em desenvolvimento
@@ -17,10 +18,10 @@ const logger = {
     info: (...args) => isDevelopment && console.info(...args)
 };
 
-const CACHE_VERSION = 'jubaf-lideres-v6.0';
-const SHELL_CACHE = 'jubaf-shell-v6.0';
-const DATA_CACHE = 'jubaf-data-v6.0';
-const IMAGES_CACHE = 'jubaf-images-v6.0';
+const CACHE_VERSION = 'jubaf-panels-v8.0';
+const SHELL_CACHE = 'jubaf-shell-v8.0';
+const DATA_CACHE = 'jubaf-data-v8.0';
+const IMAGES_CACHE = 'jubaf-images-v8.0';
 
 // App Shell - recursos críticos que devem estar sempre disponíveis
 const APP_SHELL = [
@@ -31,6 +32,7 @@ const APP_SHELL = [
     '/lideres/chat/page',
     '/offline.html',
     '/manifest.json',
+    '/manifest-jovens.json',
     '/icons/icon.svg',
 ];
 
@@ -40,6 +42,15 @@ const LIDERES_ROUTES = [
     '/lideres/dashboard',
     '/lideres/profile',
     '/lideres/chat/page',
+];
+
+const JOVENS_ROUTES = [
+    '/jovens',
+    '/jovens/dashboard',
+    '/jovens/perfil',
+    '/jovens/eventos',
+    '/jovens/wallet',
+    '/jovens/chat/page',
 ];
 
 // APIs opcionais para pré-cache (vazio: sem painel legado)
@@ -62,13 +73,13 @@ self.addEventListener('install', (event) => {
             cacheAppShell(),
             // 2. Pré-cachear rotas do painel de líderes
             preCacheLideresRoutes(),
+            preCacheJovensRoutes(),
             // 3. Pré-cachear APIs
             preCacheAPIs(),
             // 4. Pré-cachear assets estáticos
             preCacheStaticAssets()
         ]).then(() => {
-            logger.log('[SW v5.1] ✅ Instalação completa - PWA 100% offline habilitada');
-            logger.log('[SW v5.1] 📦 Sidebar e todas as rotas cacheadas');
+            logger.log('[SW] Instalação concluída — cache de shell e rotas dos painéis Jovens/Líderes');
             return self.skipWaiting();
         }).catch((error) => {
             logger.error('[SW v5.1] ❌ Erro na instalação:', error);
@@ -129,6 +140,34 @@ async function preCacheLideresRoutes() {
 
     await Promise.all(promises);
     logger.log('[SW v5.1] Rotas /lideres pré-cacheadas');
+}
+
+// Pré-cachear rotas do painel de jovens (Unijovem)
+async function preCacheJovensRoutes() {
+    const cache = await caches.open(CACHE_VERSION);
+    logger.log('[SW v5.1] Pré-cacheando rotas /jovens...');
+
+    const promises = JOVENS_ROUTES.map(async (route) => {
+        try {
+            const response = await fetch(route, {
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.ok) {
+                await cache.put(route, response.clone());
+                logger.log('[SW v5.1] ✅ Rota jovens cacheada:', route);
+                return true;
+            }
+        } catch (error) {
+            logger.warn('[SW v5.1] ⚠️ Falha ao cachear rota jovens:', route, error);
+        }
+        return false;
+    });
+
+    await Promise.all(promises);
+    logger.log('[SW v5.1] Rotas /jovens pré-cacheadas');
 }
 
 // Pré-cachear APIs
@@ -204,8 +243,7 @@ self.addEventListener('activate', (event) => {
                 })
             );
         }).then(() => {
-            logger.log('[SW v5.1] ✅ Ativação completa - Cache atualizado');
-            // Forçar atualização de todas as páginas principais para garantir sidebar atualizado
+            logger.log('[SW] Ativação concluída — caches atualizados');
             return Promise.all([
                 self.clients.claim(),
                 cachePages([
@@ -213,7 +251,17 @@ self.addEventListener('activate', (event) => {
                     '/lideres/dashboard',
                     '/lideres/profile',
                     '/lideres/chat/page',
-                ])
+                    '/jovens',
+                    '/jovens/dashboard',
+                    '/jovens/perfil',
+                    '/jovens/eventos',
+                    '/jovens/wallet',
+                ]),
+                self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
+                    clients.forEach((client) => {
+                        client.postMessage({ type: 'SW_ACTIVATED', version: CACHE_VERSION });
+                    });
+                }),
             ]);
         })
     );
@@ -273,6 +321,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Painel de jovens - Cache First
+    if (url.pathname.startsWith('/jovens')) {
+        event.respondWith(cacheFirstWithNetwork(request, CACHE_VERSION));
+        return;
+    }
+
     // Assets estáticos - Cache First
     if (isStaticAsset(url.pathname)) {
         event.respondWith(cacheFirstWithNetwork(request, SHELL_CACHE));
@@ -294,7 +348,8 @@ function isStaticAsset(pathname) {
     return /\.(js|css|woff|woff2|ttf|eot|json)$/i.test(pathname) ||
         pathname.startsWith('/build/') ||
         pathname.startsWith('/icons/') ||
-        pathname === '/manifest.json';
+        pathname === '/manifest.json' ||
+        pathname === '/manifest-jovens.json';
 }
 
 // Verificar se é imagem
@@ -391,174 +446,72 @@ async function serveOfflinePage(request) {
     return createOfflinePage(url.pathname);
 }
 
-// Criar página offline inline
+// Página offline inline (fallback se /offline.html não estiver em cache)
 function createOfflinePage(pathname) {
+    const esc = (s) => String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    const safePath = esc(pathname);
+    const pathHint = pathname && pathname !== '/' ? `<p style="opacity:.85;font-size:14px;margin-bottom:20px;">Rota pedida: <code style="background:rgba(0,0,0,.25);padding:2px 8px;border-radius:6px;">${safePath}</code></p>` : '';
     const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JUBAF — Offline</title>
+    <meta name="theme-color" content="#4c1d95">
+    <title>JUBAF — Sem conexão</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
+            color: #f8fafc;
+            background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 45%, #4c1d95 100%);
             display: flex;
             flex-direction: column;
-            color: white;
             padding: 20px;
         }
-        .header {
-            background: rgba(0,0,0,0.2);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .top { max-width: 28rem; margin: 0 auto 1.25rem; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-weight: 800; font-size: 1.1rem; }
+        .badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 0.35rem 0.65rem; border-radius: 9999px; background: rgba(248,113,113,.25); color: #fecaca; border: 1px solid rgba(248,113,113,.35); }
+        .wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 28rem; margin: 0 auto; width: 100%; text-align: center; }
+        .icon { width: 72px; height: 72px; margin: 0 auto 1rem; opacity: .9; }
+        h1 { font-size: 1.45rem; font-weight: 800; margin-bottom: .75rem; line-height: 1.25; }
+        p { color: #cbd5e1; line-height: 1.6; font-size: .95rem; margin-bottom: 1.25rem; }
+        .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        a.btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: .85rem;
+            text-decoration: none; transition: transform .15s ease;
         }
-        .logo { font-size: 20px; font-weight: bold; }
-        .badge {
-            background: #ef4444;
-            padding: 6px 12px;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        .icon {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 24px;
-            opacity: 0.9;
-        }
-        h1 { font-size: 28px; margin-bottom: 12px; font-weight: 700; }
-        p { opacity: 0.95; margin-bottom: 32px; line-height: 1.6; font-size: 16px; }
-        .btn {
-            background: white;
-            color: #f97316;
-            padding: 14px 28px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 8px;
-            display: inline-block;
-            transition: transform 0.2s;
-        }
-        .btn:hover { transform: scale(1.05); }
-        .info {
-            background: rgba(255,255,255,0.15);
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 32px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-        }
-        #ordens-list {
-            margin-top: 32px;
-            width: 100%;
-        }
-        .ordem-item {
-            background: rgba(255,255,255,0.2);
-            padding: 16px;
-            margin: 12px 0;
-            border-radius: 12px;
-            text-align: left;
-            backdrop-filter: blur(10px);
-        }
-        .ordem-numero { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
-        .ordem-status { font-size: 14px; opacity: 0.9; }
+        a.btn:hover { transform: translateY(-1px); }
+        .primary { background: #fff; color: #4c1d95; }
+        .ghost { background: rgba(255,255,255,.12); color: #f1f5f9; border: 1px solid rgba(255,255,255,.2); }
+        .note { margin-top: 1.5rem; padding: 14px 16px; border-radius: 10px; background: rgba(15,23,42,.55); border: 1px solid rgba(148,163,184,.2); text-align: left; font-size: .8rem; color: #94a3b8; line-height: 1.55; }
+        .note strong { color: #e2e8f0; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">📱 JUBAF</div>
-        <div class="badge">OFFLINE</div>
-    </div>
-
-    <div class="container">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="top"><span class="brand">JUBAF</span><span class="badge">Sem internet</span></div>
+    <div class="wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
             <path d="M18.364 5.636a9 9 0 010 12.728m-3.536-3.536a4 4 0 000-5.656m-7.071 7.071a9 9 0 010-12.728m3.536 3.536a4 4 0 000 5.656"/>
-            <line x1="2" y1="2" x2="22" y2="22" stroke-width="3"/>
+            <line x1="2" y1="2" x2="22" y2="22" stroke-width="2.25"/>
         </svg>
-
-        <h1>Você está Offline</h1>
-        <p>Não se preocupe! O aplicativo funciona completamente offline. Seus dados estão salvos localmente e serão sincronizados automaticamente quando a conexão voltar.</p>
-
-        <div>
-            <a href="javascript:location.reload()" class="btn">🔄 Tentar Novamente</a>
-            <a href="/lideres/dashboard" class="btn" style="background: rgba(255,255,255,0.2); color: white;">📋 Painel</a>
+        <h1>Não foi possível carregar</h1>
+        ${pathHint}
+        <p>A JUBAF depende do servidor para dados em tempo real. Sem rede, inscrições, pagamentos e avisos não atualizam. Páginas já visitadas podem aparecer do cache do navegador.</p>
+        <div class="row">
+            <a href="javascript:location.reload()" class="btn primary">Tentar de novo</a>
+            <a href="/" class="btn ghost">Início</a>
+            <a href="/jovens/dashboard" class="btn ghost">Painel Jovens</a>
+            <a href="/lideres/dashboard" class="btn ghost">Painel Líderes</a>
         </div>
-
-        <div class="info">
-            <strong>💡 Dica:</strong> O aplicativo foi pré-carregado e funciona 100% offline. Você pode trabalhar normalmente mesmo sem internet!
-        </div>
-
-        <div id="ordens-list">
-            <h3 style="margin-bottom: 16px; font-size: 18px;">📋 Ordens Disponíveis Offline:</h3>
-            <div id="ordens-container">Carregando...</div>
-        </div>
+        <div class="note"><strong>PWA</strong> — Só os painéis <strong>Jovens</strong> e <strong>Líderes</strong> usam instalação e este service worker; não é um sistema de ordens de campo nem ERP offline completo.</div>
     </div>
-
-    <script>
-        async function loadCachedOrdens() {
-            try {
-                const request = indexedDB.open('JubafOfflineShellDB', 2);
-                request.onsuccess = function() {
-                    const db = request.result;
-                    if (!db.objectStoreNames.contains('ordensCache')) {
-                        document.getElementById('ordens-container').innerHTML =
-                            '<p style="opacity:0.8; font-size: 14px;">Nenhuma ordem em cache ainda.</p>';
-                        return;
-                    }
-                    const tx = db.transaction('ordensCache', 'readonly');
-                    const store = tx.objectStore('ordensCache');
-                    const getAllRequest = store.getAll();
-
-                    getAllRequest.onsuccess = function() {
-                        const ordens = getAllRequest.result || [];
-                        const container = document.getElementById('ordens-container');
-
-                        if (ordens.length === 0) {
-                            container.innerHTML = '<p style="opacity:0.8; font-size: 14px;">Nenhuma ordem disponível offline.</p>';
-                            return;
-                        }
-
-                        container.innerHTML = ordens.slice(0, 5).map(o =>
-                            '<div class="ordem-item">' +
-                                '<div class="ordem-numero">' + (o.numero || 'OS #' + o.id) + '</div>' +
-                                '<div class="ordem-status">Status: ' + (o.status_texto || o.status || 'Pendente') + '</div>' +
-                            '</div>'
-                        ).join('');
-
-                        if (ordens.length > 5) {
-                            container.innerHTML += '<p style="opacity:0.8; margin-top: 12px; font-size: 14px;">E mais ' + (ordens.length - 5) + ' ordem(ns)...</p>';
-                        }
-                    };
-                };
-            } catch (e) {
-                console.log('Erro ao carregar ordens:', e);
-            }
-        }
-
-        loadCachedOrdens();
-
-        // Verificar conexão e recarregar quando voltar
-        window.addEventListener('online', () => {
-            setTimeout(() => location.reload(), 1000);
-        });
-    </script>
+    <script>window.addEventListener('online', function () { setTimeout(function () { location.reload(); }, 600); });</script>
 </body>
 </html>`;
 
@@ -623,10 +576,10 @@ async function saveForLaterSync(request) {
     }
 }
 
-// Abrir IndexedDB
+// IndexedDB — apenas fila de mutações offline (legado “ordens/OS” removido)
 function openDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('JubafOfflineShellDB', 2);
+        const request = indexedDB.open('JubafOfflineShellDB', 3);
 
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
@@ -634,30 +587,18 @@ function openDB() {
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
 
+            if (event.oldVersion < 3) {
+                ['ordensCache', 'materiaisCache', 'fotosPendentes', 'syncHistory'].forEach((name) => {
+                    if (db.objectStoreNames.contains(name)) {
+                        db.deleteObjectStore(name);
+                    }
+                });
+            }
+
             if (!db.objectStoreNames.contains('pendingActions')) {
                 const store = db.createObjectStore('pendingActions', { keyPath: 'uuid' });
                 store.createIndex('synced', 'synced', { unique: false });
                 store.createIndex('timestamp', 'timestamp', { unique: false });
-            }
-
-            if (!db.objectStoreNames.contains('ordensCache')) {
-                const ordensStore = db.createObjectStore('ordensCache', { keyPath: 'id' });
-                ordensStore.createIndex('status', 'status', { unique: false });
-            }
-
-            if (!db.objectStoreNames.contains('materiaisCache')) {
-                db.createObjectStore('materiaisCache', { keyPath: 'id' });
-            }
-
-            if (!db.objectStoreNames.contains('fotosPendentes')) {
-                const fotosStore = db.createObjectStore('fotosPendentes', { keyPath: 'uuid' });
-                fotosStore.createIndex('ordemId', 'ordemId', { unique: false });
-                fotosStore.createIndex('synced', 'synced', { unique: false });
-            }
-
-            if (!db.objectStoreNames.contains('syncHistory')) {
-                const historyStore = db.createObjectStore('syncHistory', { keyPath: 'uuid' });
-                historyStore.createIndex('syncedAt', 'syncedAt', { unique: false });
             }
         };
     });
@@ -670,13 +611,16 @@ self.addEventListener('message', (event) => {
     }
 
     if (event.data && event.data.type === 'CACHE_PAGES') {
-        const pages = event.data.pages || LIDERES_ROUTES;
+        const pages = event.data.pages || [...LIDERES_ROUTES, ...JOVENS_ROUTES];
         cachePages(pages);
     }
 
     if (event.data && event.data.type === 'FORCE_SYNC') {
-        // Forçar sincronização em background
         syncPendingData();
+    }
+
+    if (event.data && event.data.type === 'GET_VERSION' && event.ports && event.ports[0]) {
+        event.ports[0].postMessage({ version: CACHE_VERSION });
     }
 });
 
@@ -759,61 +703,6 @@ self.addEventListener('sync', (event) => {
 // Background sync quando voltar online
 self.addEventListener('online', () => {
     syncPendingData();
-});
-
-// Mensagens do Service Worker para o cliente
-self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-
-    if (event.data && event.data.type === 'CACHE_PAGES') {
-        const pages = event.data.pages || LIDERES_ROUTES;
-        cachePages(pages);
-    }
-
-    if (event.data && event.data.type === 'FORCE_SYNC') {
-        syncPendingData();
-    }
-
-    if (event.data && event.data.type === 'GET_VERSION') {
-        event.ports[0].postMessage({ version: CACHE_VERSION });
-    }
-});
-
-// Notificar clientes sobre atualizações
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
-            clients.forEach((client) => {
-                client.postMessage({
-                    type: 'SW_ACTIVATED',
-                    version: CACHE_VERSION
-                });
-            });
-        })
-    );
-});
-
-// Limpeza automática de cache antigo (manter apenas últimos 5 caches)
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            const currentCaches = [CACHE_VERSION, SHELL_CACHE, DATA_CACHE, IMAGES_CACHE];
-            const oldCaches = cacheNames.filter(name => !currentCaches.includes(name));
-
-            // Ordenar por data e manter apenas os 5 mais recentes
-            return Promise.all(
-                oldCaches.map((name) => {
-                    console.log('[SW v4] 🗑️ Removendo cache antigo:', name);
-                    return caches.delete(name);
-                })
-            );
-        }).then(() => {
-            console.log('[SW v4] ✅ Ativação completa');
-            return self.clients.claim();
-        })
-    );
 });
 
 // Verificar atualizações periodicamente

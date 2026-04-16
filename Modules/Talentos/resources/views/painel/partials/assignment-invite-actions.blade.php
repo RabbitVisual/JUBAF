@@ -9,12 +9,12 @@
     $accentConfirm =
         ($panel ?? 'jovens') === 'lider'
             ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/25'
-            : 'bg-violet-600 hover:bg-violet-700 shadow-violet-600/25';
+            : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/25';
     $accentDecline =
-        'border-gray-300 bg-white text-gray-800 hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700';
+        'border-gray-300 bg-white text-gray-800 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700';
 @endphp
 @if ($a->status === TalentAssignment::STATUS_INVITED)
-    <div class="mt-3 flex flex-wrap gap-2 border-t border-gray-200/80 pt-3 dark:border-slate-600/80">
+    <div class="mt-3 flex flex-wrap gap-2 border-t border-gray-200/80 pt-3 dark:border-gray-600/80">
         <form method="post" action="{{ route($routePrefix . '.assignments.respond', $a) }}" class="inline">
             @csrf
             <input type="hidden" name="status" value="{{ TalentAssignment::STATUS_CONFIRMED }}">

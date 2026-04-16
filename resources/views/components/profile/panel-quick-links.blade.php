@@ -1,6 +1,6 @@
 {{--
     Atalhos para módulos do painel (perfil estilo rede social — integração com o resto da app).
-    @props context: diretoria|admin|jovens|lider|pastor, accent: indigo|violet|emerald
+    @props context: diretoria|admin|jovens|lider|pastor, accent: indigo|violet|emerald|blue
 --}}
 @props([
     'context' => 'diretoria',
@@ -91,7 +91,7 @@
             $add('Bíblia', 'book-bible', 'jovens.bible.index');
         }
         if (module_enabled('Calendario')) {
-            $add('Calendário', 'calendar-days', 'jovens.calendario.index');
+            $add('Calendário', 'calendar-days', 'jovens.eventos.index');
         }
         if (module_enabled('Talentos')) {
             $add('Talentos', 'star', 'jovens.talentos.profile.edit');
@@ -130,6 +130,7 @@
     }
 
     $accentRing = [
+        'blue' => 'border-blue-200/80 bg-blue-50/80 text-blue-900 hover:bg-blue-100 dark:border-blue-800/60 dark:bg-blue-950/40 dark:text-blue-200 dark:hover:bg-blue-900/50',
         'indigo' => 'border-indigo-200/80 bg-indigo-50/80 text-indigo-800 hover:bg-indigo-100 dark:border-indigo-800/60 dark:bg-indigo-950/40 dark:text-indigo-200 dark:hover:bg-indigo-900/50',
         'violet' => 'border-violet-200/80 bg-violet-50/80 text-violet-900 hover:bg-violet-100 dark:border-violet-800/60 dark:bg-violet-950/40 dark:text-violet-200 dark:hover:bg-violet-900/50',
         'emerald' => 'border-emerald-200/80 bg-emerald-50/80 text-emerald-900 hover:bg-emerald-100 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200 dark:hover:bg-emerald-900/50',
@@ -138,8 +139,8 @@
 @endphp
 
 @if(count($items))
-    <div {{ $attributes->merge(['class' => 'rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80']) }}>
-        <p class="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+    <div {{ $attributes->merge(['class' => 'rounded-2xl border border-gray-200/80 bg-white/90 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/80']) }}>
+        <p class="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
             <x-icon name="bookmark" class="h-3.5 w-3.5 opacity-80" />
             Atalhos do painel
         </p>

@@ -1,12 +1,15 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Pedido #'.$req->id)
 
-@section('content')
-<div class="mx-auto max-w-2xl space-y-6">
+@section('lideres_content')
+<x-ui.lideres::page-shell class="mx-auto max-w-2xl space-y-6">
     <a href="{{ route('lideres.igrejas.requests.index') }}" class="text-sm font-semibold text-emerald-700 hover:underline dark:text-emerald-400">← Voltar</a>
-    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Pedido #{{ $req->id }}</h1>
-    <p class="text-sm text-slate-600 dark:text-slate-400">{{ $req->type }} · {{ $req->status }}</p>
+
+    <x-ui.lideres::hero
+        variant="surface"
+        title="Pedido #{{ $req->id }}"
+        description="{{ $req->type }} · {{ $req->status }}" />
 
     @if(session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200">{{ session('success') }}</div>
@@ -34,5 +37,5 @@
             </form>
         @endcan
     </div>
-</div>
+</x-ui.lideres::page-shell>
 @endsection

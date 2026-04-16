@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Minha Jornada Bíblica')
 
@@ -13,56 +13,20 @@
 <style>[x-cloak]{display:none!important}</style>
 @endpush
 
-@section('content')
-    <div class="max-w-7xl mx-auto space-y-12">
-
-        <!-- Hero Section -->
-        <div class="relative rounded-3xl overflow-hidden shadow-2xl">
-            <div class="absolute inset-0 bg-linear-to-br from-emerald-900 via-teal-900 to-slate-900 opacity-95 z-10"></div>
-            <!-- Decorative Background -->
-            <div class="absolute inset-0 z-0 opacity-20">
-                <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <defs>
-                        <pattern id="grid-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
-                            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100" height="100" fill="url(#grid-pattern)" />
-                </svg>
-            </div>
-
-            <div class="relative z-20 px-8 py-12 md:px-12 md:py-16 flex flex-col md:flex-row items-center justify-between gap-10">
-                <div class="max-w-2xl text-center md:text-left">
-                    <span class="inline-block py-1 px-3 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-200 text-xs font-semibold uppercase tracking-wider mb-4">
-                        Discipulado Digital
-                    </span>
-                    <h1 class="text-4xl md:text-5xl font-black text-white leading-tight mb-4 tracking-tight">
-                        Sua Jornada <br>
-                        <span class="text-transparent bg-clip-text bg-linear-to-r from-purple-300 to-indigo-300">Pelas Escrituras</span>
-                    </h1>
-                    <p class="text-lg text-indigo-100 leading-relaxed max-w-xl mx-auto md:mx-0">
-                        "Lâmpada para os meus pés é a tua palavra e luz para o meu caminho." <br>
-                        <span class="text-sm opacity-70">- Salmos 119:105</span>
-                    </p>
-                </div>
-
-                <!-- Action Card -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl w-full md:w-auto min-w-[300px] text-center md:text-left">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="p-3 bg-indigo-500/30 rounded-xl text-white">
-                            <x-icon name="plus" class="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-white">Começar Novo Plano</h3>
-                            <p class="text-xs text-indigo-200">Explore novos temas e livros</p>
-                        </div>
-                    </div>
-                    <a href="{{ route('lideres.bible.plans.catalog') }}" class="block w-full py-3 bg-white text-indigo-900 rounded-xl font-bold text-center hover:bg-indigo-50 transition-colors shadow-lg">
-                        Explorar Catálogo
-                    </a>
-                </div>
-            </div>
-        </div>
+@section('lideres_content')
+    <x-ui.lideres::page-shell class="space-y-12">
+        <x-ui.lideres::hero
+            variant="gradient"
+            eyebrow="Discipulado digital"
+            title="Sua jornada pelas Escrituras"
+            description="«Lâmpada para os meus pés é a tua palavra e luz para o meu caminho.» — Salmos 119:105">
+            <x-slot name="actions">
+                <a href="{{ route('lideres.bible.plans.catalog') }}" class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-emerald-900 shadow-lg hover:bg-emerald-50">
+                    <x-icon name="plus" class="h-5 w-5" />
+                    Explorar catálogo
+                </a>
+            </x-slot>
+        </x-ui.lideres::hero>
 
         <!-- Content Area -->
         <div>
@@ -171,6 +135,6 @@
                 </div>
             @endif
         </div>
-    </div>
+    </x-ui.lideres::page-shell>
 @endsection
 

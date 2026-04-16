@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', __('Bíblia interlinear — :app', ['app' => config('app.name')]))
 
@@ -9,7 +9,8 @@
     <span class="text-slate-600 dark:text-slate-300">Interlinear</span>
 @endsection
 
-@section('content')
+@section('lideres_content')
+    <x-ui.lideres::page-shell noPadding class="w-full max-w-none !mx-0 !space-y-0 !pb-0">
     @include('bible::public.partials.sacred-reader-theme')
     <script>
     window.__interlinearConfig = {
@@ -29,4 +30,5 @@
     };
     </script>
     @include('bible::public.partials.interlinear-body')
+    </x-ui.lideres::page-shell>
 @endsection

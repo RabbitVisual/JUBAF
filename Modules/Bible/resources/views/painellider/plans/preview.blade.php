@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', $plan->title)
 
@@ -11,8 +11,8 @@
     <span class="text-slate-600 dark:text-slate-300 line-clamp-1">{{ $plan->title }}</span>
 @endsection
 
-@section('content')
-<div class="max-w-5xl mx-auto pb-20">
+@section('lideres_content')
+<x-ui.lideres::page-shell class="max-w-5xl pb-20">
     <!-- Back Link -->
     <a href="{{ route('lideres.bible.plans.catalog') }}" class="inline-flex items-center text-sm text-gray-500 hover:text-purple-600 mb-6 transition-colors group">
         <x-icon name="chevron-left" style="duotone" class="h-4 w-4 mr-1 group-hover:-translate-x-1 transition-transform" />
@@ -125,6 +125,6 @@
             </div>
         </div>
     </div>
-</div>
+</x-ui.lideres::page-shell>
 @endsection
 

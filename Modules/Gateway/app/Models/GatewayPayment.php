@@ -88,6 +88,19 @@ class GatewayPayment extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function qrCodeDataUri(): ?string
+    {
+        $raw = $this->qr_code_base64;
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+        if (str_starts_with($raw, 'data:')) {
+            return $raw;
+        }
+
+        return 'data:image/png;base64,'.$raw;
+    }
+
     public function statusLabel(): string
     {
         return match ($this->status) {

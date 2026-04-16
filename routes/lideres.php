@@ -1,20 +1,22 @@
 <?php
 
+use App\Http\Controllers\Profile\DataChangeRequestController;
 use Illuminate\Support\Facades\Route;
+use Modules\Avisos\App\Http\Controllers\AvisosPainelController;
 use Modules\Bible\App\Http\Controllers\InterlinearController;
 use Modules\Bible\App\Http\Controllers\PainelJovens\FavoriteController as BibleFavoriteController;
 use Modules\Bible\App\Http\Controllers\PainelLider\BibleController as LiderBibleController;
 use Modules\Bible\App\Http\Controllers\PainelLider\PlanReaderController as LiderPlanReaderController;
 use Modules\Bible\App\Http\Controllers\PainelLider\ReadingPlanController as LiderReadingPlanController;
-use Modules\Avisos\App\Http\Controllers\AvisosPainelController;
 use Modules\Blog\App\Http\Controllers\BlogPainelController;
-use Modules\PainelLider\App\Http\Controllers\ChatController;
 use Modules\Igrejas\App\Http\Controllers\PainelLider\CongregacaoController;
 use Modules\Igrejas\App\Http\Controllers\PainelLider\CongregacaoJovensController;
+use Modules\PainelJovens\App\Http\Controllers\PainelLider\YouthMetricsController;
+use Modules\PainelLider\App\Http\Controllers\ChatController;
 use Modules\PainelLider\App\Http\Controllers\DashboardController;
 use Modules\PainelLider\App\Http\Controllers\NotificacoesController as LiderNotificacoesController;
-use App\Http\Controllers\Profile\DataChangeRequestController;
 use Modules\PainelLider\App\Http\Controllers\ProfileController;
+use Modules\Talentos\App\Http\Controllers\PainelLider\TalentSkillValidationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,8 +47,8 @@ Route::prefix('lideres')->name('lideres.')->middleware(['auth', 'role:lider', 'l
 
         Route::prefix('congregacao/jovens')
             ->name('congregacao.jovens.')
-            ->middleware(['permission:igrejas.jovens.provision'])
             ->group(function () {
+                Route::get('/export/csv', [CongregacaoJovensController::class, 'exportCsv'])->name('export');
                 Route::get('/create', [CongregacaoJovensController::class, 'create'])->name('create');
                 Route::post('/', [CongregacaoJovensController::class, 'store'])->name('store');
                 Route::get('/{youth}/edit', [CongregacaoJovensController::class, 'edit'])->name('edit');
@@ -130,9 +132,25 @@ Route::prefix('lideres')->name('lideres.')->middleware(['auth', 'role:lider', 'l
     }
 
     if (module_enabled('Talentos')) {
-        Route::prefix('talentos')->name('talentos.')->middleware(['permission:talentos.profile.edit'])->group(function () {
-            require module_path('Talentos', 'routes/talentos-panel.php');
+        Route::prefix('talentos')->name('talentos.')->group(function () {
+            Route::middleware(['permission:talentos.profile.edit'])->group(function () {
+                require module_path('Talentos', 'routes/talentos-panel.php');
+            });
+
+            Route::middleware(['permission:paineljovens.talentos.validate'])
+                ->prefix('validacao')
+                ->name('validation.')
+                ->group(function () {
+                    Route::get('/', [TalentSkillValidationController::class, 'index'])->name('index');
+                    Route::post('/', [TalentSkillValidationController::class, 'store'])->name('store');
+                });
         });
+    }
+
+    if (module_enabled('PainelJovens')) {
+        Route::get('/juventude/metricas', [YouthMetricsController::class, 'index'])
+            ->middleware(['permission:paineljovens.dashboard.metrics'])
+            ->name('juventude.metrics');
     }
 
     if (module_enabled('Avisos')) {

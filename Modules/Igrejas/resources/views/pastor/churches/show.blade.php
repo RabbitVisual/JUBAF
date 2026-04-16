@@ -46,6 +46,33 @@
         @endif
     </div>
 
+    @if($jovens->isNotEmpty())
+        <div>
+            <h2 class="font-bold text-slate-900 dark:text-white mb-3">Jovens na plataforma (só leitura)</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Lista informativa da mesma congregação. A gestão de contas e convites é feita pelo líder Unijovem no painel de líderes.</p>
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="bg-slate-50 dark:bg-slate-900/80 text-xs font-bold uppercase text-slate-500">
+                        <tr>
+                            <th class="px-4 py-3">Nome</th>
+                            <th class="px-4 py-3">E-mail</th>
+                            <th class="px-4 py-3">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @foreach($jovens as $j)
+                            <tr>
+                                <td class="px-4 py-3 font-medium text-slate-900 dark:text-white">{{ $j->name }}</td>
+                                <td class="px-4 py-3 text-sky-600 dark:text-sky-400"><a href="mailto:{{ $j->email }}" class="hover:underline break-all">{{ $j->email }}</a></td>
+                                <td class="px-4 py-3">{{ ($j->active ?? true) ? 'Ativo' : 'Inativo' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+
     @if($leaders->isNotEmpty())
         <div>
             <h2 class="font-bold text-slate-900 dark:text-white mb-3">Líderes de jovens (contacto)</h2>

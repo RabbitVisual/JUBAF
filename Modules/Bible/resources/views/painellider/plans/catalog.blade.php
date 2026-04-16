@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Catálogo de Planos | Bíblia')
 
@@ -9,28 +9,27 @@
     <span class="text-slate-600 dark:text-slate-300">Catálogo</span>
 @endsection
 
-@section('content')
-    <div class="max-w-7xl mx-auto space-y-10 pb-12">
+@section('lideres_content')
+    <x-ui.lideres::page-shell class="space-y-10 pb-12">
+        <a href="{{ route('lideres.bible.plans.index') }}" class="inline-flex items-center text-sm text-slate-500 transition-colors hover:text-emerald-600 dark:text-slate-400">
+            <x-icon name="chevron-left" style="duotone" class="mr-1 h-4 w-4" />
+            Voltar aos meus planos
+        </a>
 
-        <!-- Search & Filter Header -->
-        <div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-gray-200 dark:border-gray-700 pb-6">
-            <div>
-                <a href="{{ route('lideres.bible.plans.index') }}" class="inline-flex items-center text-sm text-gray-500 hover:text-purple-600 mb-2 transition-colors">
-                    <x-icon name="chevron-left" style="duotone" class="h-4 w-4 mr-1" />
-                    Voltar aos meus planos
-                </a>
-                <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Explorar Planos</h1>
-                <p class="text-gray-500 dark:text-gray-400 mt-1">Descubra novos roteiros para aprofundar seu conhecimento bíblico.</p>
-            </div>
-
-            <!-- Search Bar -->
-            <form action="{{ route('lideres.bible.plans.catalog') }}" method="GET" class="w-full md:w-auto relative">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar planos..." class="w-full md:w-64 pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all dark:text-white">
-                <div class="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
-                    <x-icon name="magnifying-glass" style="duotone" class="h-5 w-5" />
-                </div>
-            </form>
-        </div>
+        <x-ui.lideres::hero
+            variant="gradient"
+            eyebrow="Planos de leitura"
+            title="Explorar planos"
+            description="Descubra novos roteiros para aprofundar o seu conhecimento bíblico.">
+            <x-slot name="actions">
+                <form action="{{ route('lideres.bible.plans.catalog') }}" method="GET" class="relative w-full min-w-0 sm:max-w-xs">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar planos…" class="w-full rounded-xl border border-white/25 bg-white/10 py-2.5 pl-10 pr-4 text-sm text-white placeholder-emerald-100/80 backdrop-blur focus:ring-2 focus:ring-white/40">
+                    <div class="pointer-events-none absolute left-3 top-2.5 text-emerald-100/80">
+                        <x-icon name="magnifying-glass" style="duotone" class="h-5 w-5" />
+                    </div>
+                </form>
+            </x-slot>
+        </x-ui.lideres::hero>
 
         @if($featuredPlans->isNotEmpty())
             <!-- Featured Section -->
@@ -136,6 +135,6 @@
                 {{ $allPlans->links() }}
             </div>
         </section>
-    </div>
+    </x-ui.lideres::page-shell>
 @endsection
 

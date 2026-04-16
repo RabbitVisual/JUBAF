@@ -2,6 +2,7 @@
 
 namespace App\View\Composers;
 
+use App\Support\SiteBranding;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
@@ -26,11 +27,18 @@ class ErpShellComposer
             || str_starts_with($name, 'diretoria.blog')
             || str_starts_with($name, 'admin.blog');
 
+        $manifestUrl = match ($shell) {
+            'jovens' => asset('manifest-jovens.json'),
+            'lideres' => asset('manifest.json'),
+            default => asset('manifest.json'),
+        };
+
         $view->with([
             'erpShell' => $shell,
+            'erpManifestUrl' => $manifestUrl,
             'erpTitleSuffix' => match ($shell) {
-                'admin' => \App\Support\SiteBranding::siteName(),
-                'pastor' => \App\Support\SiteBranding::siteName(),
+                'admin' => SiteBranding::siteName(),
+                'pastor' => SiteBranding::siteName(),
                 'lideres' => 'JUBAF',
                 'jovens' => 'JUBAF',
                 default => 'Painel da Diretoria',

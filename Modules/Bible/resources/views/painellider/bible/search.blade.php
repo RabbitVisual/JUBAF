@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Busca Bíblica Inteligente')
 
@@ -35,7 +35,7 @@
 </style>
 @endpush
 
-@section('content')
+@section('lideres_content')
 @php
     $liderBibleSearchOpts = [
         'chapterTpl' => route('lideres.bible.chapter', ['version' => '__V__', 'book' => '__B__', 'chapter' => '__C__']),
@@ -43,6 +43,7 @@
     ];
 @endphp
 {{-- Aspas simples no atributo: JSON com " não pode ir dentro de x-data="..." --}}
+<x-ui.lideres::page-shell noPadding class="w-full max-w-none !mx-0 !space-y-0 !pb-0">
 <div class="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors pb-20"
      x-data='bibleSearch(@json($liderBibleSearchOpts))'>
 
@@ -154,6 +155,7 @@
 
     </main>
 </div>
+</x-ui.lideres::page-shell>
 
 <script>
     function bibleSearch(opts = {}) {

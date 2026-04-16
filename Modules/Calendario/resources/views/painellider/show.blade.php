@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', $event->title)
 
-@section('content')
+@section('lideres_content')
 @php
     $regLabels = [
         'confirmed' => 'Inscrição confirmada',
@@ -13,18 +13,18 @@
         ? ($regLabels[$registration->status] ?? $registration->status)
         : '';
 @endphp
-<div class="space-y-8 md:space-y-10 animate-fade-in pb-8">
-    <a href="{{ route($routePrefix.'.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 transition-all hover:gap-2.5">
+<x-ui.lideres::page-shell class="animate-fade-in space-y-8 pb-8 md:space-y-10">
+    <a href="{{ route($routePrefix.'.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-700 transition-all hover:gap-2.5 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300">
         <x-icon name="arrow-left" class="h-4 w-4" style="duotone" />
         Voltar aos eventos
     </a>
 
-    <article class="overflow-hidden rounded-[2rem] border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 shadow-2xl shadow-emerald-900/10">
-        <div class="relative overflow-hidden border-b border-white/10 bg-gradient-to-br from-emerald-600 via-teal-600 to-slate-900 px-8 py-10 md:px-12 text-white">
-            <div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.12\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    <article class="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-2xl shadow-emerald-900/10 dark:border-slate-800 dark:bg-slate-800">
+        <div class="relative overflow-hidden border-b border-white/10 bg-gradient-to-br from-emerald-600 via-teal-600 to-slate-900 px-8 py-10 text-white md:px-12">
+            <div class="pointer-events-none absolute inset-0 opacity-15" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.12\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
             <div class="relative">
                 <p class="text-xs font-bold uppercase tracking-wider text-emerald-100/90">{{ $event->starts_at->format('d/m/Y · H:i') }}</p>
-                <h1 class="mt-3 text-2xl md:text-3xl font-bold tracking-tight leading-tight">{{ $event->title }}</h1>
+                <h1 class="mt-3 text-2xl font-bold leading-tight tracking-tight md:text-3xl">{{ $event->title }}</h1>
                 @if($event->type)
                     <p class="mt-2 text-sm font-medium capitalize text-teal-100/95">{{ $event->type }}</p>
                 @endif
@@ -40,7 +40,7 @@
             @endif
             @if($event->location)
                 <p class="flex items-start gap-3 text-gray-700 dark:text-gray-300">
-                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
                         <x-icon name="location-dot" class="h-5 w-5" style="duotone" />
                     </span>
                     <span><strong class="text-gray-900 dark:text-white">Local:</strong><br>{{ $event->location }}</span>
@@ -48,7 +48,7 @@
             @endif
             @if($event->description)
                 <div class="rounded-2xl border border-emerald-100 bg-emerald-50/40 px-5 py-4 dark:border-emerald-900/40 dark:bg-emerald-950/20">
-                    <div class="prose prose-sm max-w-none text-gray-700 dark:prose-invert dark:text-gray-300 whitespace-pre-wrap">{{ $event->description }}</div>
+                    <div class="prose prose-sm max-w-none whitespace-pre-wrap text-gray-700 dark:prose-invert dark:text-gray-300">{{ $event->description }}</div>
                 </div>
             @endif
             @if($event->registration_fee)
@@ -107,5 +107,5 @@
             @endif
         </div>
     </article>
-</div>
+</x-ui.lideres::page-shell>
 @endsection

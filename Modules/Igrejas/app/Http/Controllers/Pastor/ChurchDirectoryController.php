@@ -75,9 +75,16 @@ class ChurchDirectoryController extends Controller
             ->orderBy('name')
             ->get(['name', 'email', 'phone']);
 
+        $jovens = User::query()
+            ->role('jovens')
+            ->where('church_id', $church->id)
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'phone', 'active', 'provisioned_at']);
+
         return view('igrejas::pastor.churches.show', [
             'church' => $church,
             'leaders' => $leaders,
+            'jovens' => $jovens,
         ]);
     }
 }

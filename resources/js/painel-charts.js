@@ -59,6 +59,7 @@ function initTables() {
                     previous: 'Anterior',
                     next: 'Proximo',
                 },
+                emptyTable: 'Sem transacoes para o periodo.',
                 zeroRecords: 'Nenhum resultado encontrado',
             },
         });

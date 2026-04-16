@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Chat interno — Líder')
 
@@ -18,8 +18,14 @@
 @vite(['resources/js/erp-chat.js'])
 @endpush
 
-@section('content')
-<div class="space-y-4">
+@section('lideres_content')
+<x-ui.lideres::page-shell class="max-w-none space-y-4">
+    <x-ui.lideres::hero
+        variant="gradient"
+        eyebrow="Equipa e diretoria"
+        title="Chat interno"
+        description="Contacte a diretoria e o suporte institucional em tempo real quando disponível." />
+
     <div id="erp-chat-root"
          class="flex min-h-[calc(100vh-10rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:flex-row">
         <aside class="w-full shrink-0 border-b border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/80 lg:w-80 lg:border-b-0 lg:border-r">
@@ -52,5 +58,5 @@
             </form>
         </section>
     </div>
-</div>
+</x-ui.lideres::page-shell>
 @endsection

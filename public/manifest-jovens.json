@@ -1,0 +1,44 @@
+{
+    "name": "JUBAF — Painel de Jovens",
+    "short_name": "JUBAF Jovens",
+    "description": "Unijovem: eventos, perfil, carteira e recursos JUBAF.",
+    "start_url": "/jovens/dashboard",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0f172a",
+    "theme_color": "#2563eb",
+    "dir": "ltr",
+    "lang": "pt-BR",
+    "categories": ["education", "lifestyle"],
+    "icons": [
+        {
+            "src": "/icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Início",
+            "short_name": "Início",
+            "url": "/jovens/dashboard",
+            "icons": [{ "src": "/icons/icon.svg", "sizes": "96x96", "type": "image/svg+xml" }]
+        },
+        {
+            "name": "Eventos",
+            "short_name": "Eventos",
+            "url": "/jovens/eventos",
+            "icons": [{ "src": "/icons/icon.svg", "sizes": "96x96", "type": "image/svg+xml" }]
+        },
+        {
+            "name": "Perfil",
+            "short_name": "Perfil",
+            "url": "/jovens/perfil",
+            "icons": [{ "src": "/icons/icon.svg", "sizes": "96x96", "type": "image/svg+xml" }]
+        }
+    ],
+    "display_override": ["standalone", "fullscreen", "minimal-ui"],
+    "id": "/jovens/dashboard"
+}

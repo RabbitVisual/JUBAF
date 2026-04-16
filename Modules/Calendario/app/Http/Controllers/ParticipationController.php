@@ -7,9 +7,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
+use Modules\Calendario\App\Events\InscricaoConfirmada;
 use Modules\Calendario\App\Models\CalendarEvent;
 use Modules\Calendario\App\Models\CalendarRegistration;
-use Modules\Calendario\App\Events\InscricaoConfirmada;
 use Modules\Calendario\App\Services\CalendarPricingService;
 use Modules\Calendario\App\Services\EventService;
 use Modules\Gateway\App\Models\GatewayPayment;
@@ -35,10 +35,10 @@ class ParticipationController extends Controller
             return $e->churchScopeAllows($user);
         });
 
-        if ($request->routeIs('jovens.*')) {
+        if ($request->routeIs('jovens.eventos.*')) {
             return view('calendario::paineljovens.index', [
                 'events' => $events,
-                'routePrefix' => 'jovens.calendario',
+                'routePrefix' => 'jovens.eventos',
                 'hasPublicCalendar' => Route::has('eventos.index'),
             ]);
         }
@@ -64,11 +64,11 @@ class ParticipationController extends Controller
             ->where('user_id', $user->id)
             ->first();
 
-        if ($request->routeIs('jovens.*')) {
+        if ($request->routeIs('jovens.eventos.*')) {
             return view('calendario::paineljovens.show', [
                 'event' => $event,
                 'registration' => $registration,
-                'routePrefix' => 'jovens.calendario',
+                'routePrefix' => 'jovens.eventos',
                 'hasPublicCalendar' => Route::has('eventos.index'),
             ]);
         }

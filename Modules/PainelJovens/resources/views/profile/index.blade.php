@@ -1,276 +1,290 @@
-@extends('layouts.app')
+@extends('paineljovens::layouts.jovens')
 
 @section('title', 'Perfil')
 
-@section('breadcrumbs')
-    <x-icon name="chevron-right" class="w-3 h-3 shrink-0 opacity-50" />
-    <span class="text-violet-600 dark:text-violet-400">Perfil</span>
-@endsection
+@section('jovens_content')
+    @php
+        $jp = $user->jovemPerfil;
+        $sl = $jp?->social_links ?? [];
+        $card = 'rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800';
+        $stepperSteps = [
+            ['key' => 'perfil', 'label' => 'Perfil'],
+            ['key' => 'censo', 'label' => 'Censo e redes'],
+            ['key' => 'seguranca', 'label' => 'Emergência e segurança'],
+        ];
+        $completenessItems = [
+            ['label' => 'Telefone pessoal', 'done' => filled($user->phone)],
+            ['label' => 'Data de nascimento', 'done' => (bool) $user->birth_date],
+            ['label' => 'Contacto de emergência', 'done' => filled($user->emergency_contact_name) && filled($user->emergency_contact_phone)],
+            ['label' => 'Censo ou redes (opcional)', 'done' => filled($jp?->profession) || filled($jp?->marital_status) || filled($jp?->census_bio) || filled($sl['instagram'] ?? null) || filled($sl['youtube'] ?? null) || filled($sl['outro'] ?? null)],
+        ];
+        $completenessDone = collect($completenessItems)->where('done')->count();
+        $completenessPct = (int) round(100 * $completenessDone / max(1, count($completenessItems)));
+        $fieldBase = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/25 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20';
+    @endphp
 
-@section('content')
-@php
-    $fbBg = 'bg-[#f0f2f5] dark:bg-slate-950';
-    $fbCard = 'rounded-xl bg-white dark:bg-slate-900 shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-none ring-1 ring-black/[0.06] dark:ring-white/10';
-@endphp
-<div class="-mx-4 -mt-2 md:-mx-6 md:-mt-2 lg:-mx-8 {{ $fbBg }} min-h-[calc(100vh-6rem)] px-3 py-4 sm:px-4 md:px-6 pb-16">
-    @if(session('error'))
-        <div class="mx-auto mb-4 max-w-5xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/40 dark:bg-red-950/40 dark:text-red-200">
-            {{ session('error') }}
-        </div>
-    @endif
+    <x-ui.jovens::page-shell class="space-y-6 md:space-y-8 pb-28 lg:pb-10">
+        <header
+            class="relative overflow-hidden rounded-[2rem] border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-blue-700 via-blue-800 to-gray-900 text-white shadow-xl">
+            <div class="pointer-events-none absolute inset-0 opacity-[0.12]"
+                style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.2\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
+            </div>
+            <div class="relative flex flex-col gap-6 px-6 py-8 md:flex-row md:items-end md:justify-between md:px-10 md:py-10">
+                <div class="max-w-2xl">
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-200/90">Unijovem · Conta</p>
+                    <h1 class="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Perfil e dados pessoais</h1>
+                    <p class="mt-3 text-sm leading-relaxed text-blue-100/95 md:text-base">
+                        Capa, fotos, dados visíveis, censo da juventude e segurança — organize por etapas e guarde quando terminar.
+                    </p>
+                </div>
+                <div class="flex w-full shrink-0 flex-col gap-2 sm:flex-row sm:justify-end md:w-auto">
+                    <a href="{{ route('jovens.dashboard') }}"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20">
+                        <x-icon name="grid-2-plus" class="h-4 w-4" style="duotone" />
+                        Painel
+                    </a>
+                    @if (module_enabled('Calendario') && Route::has('jovens.wallet.index') && auth()->user()?->can('calendario.participate'))
+                        <a href="{{ route('jovens.wallet.index') }}"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-900 shadow-lg transition hover:bg-blue-50">
+                            <x-icon name="ticket" class="h-4 w-4" />
+                            Carteira
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </header>
 
-    <div class="mx-auto max-w-5xl space-y-3">
-        {{-- Formulário único: capa, fotos e todos os campos editáveis (sem aninhar outro <form>) --}}
-        <form method="POST" action="{{ route('jovens.profile.update') }}" enctype="multipart/form-data" id="profileForm" class="space-y-3">
+        @if ($errors->any())
+            <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200"
+                role="alert" aria-live="polite">
+                <p class="font-semibold">Corrija os campos assinalados antes de guardar.</p>
+                <ul class="mt-2 list-inside list-disc space-y-0.5 text-xs">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('jovens.profile.update') }}" enctype="multipart/form-data" id="profileForm"
+            class="space-y-6 md:space-y-8">
             @csrf
             @method('PUT')
 
-            <x-profile.avatar-studio :user="$user" accent="violet" variant="hero" />
+            <x-profile.avatar-studio :user="$user" accent="blue" variant="hero" show-identity />
 
-            {{-- Barra tipo Facebook: nome + meta --}}
-            <div class="flex flex-col gap-4 border-b border-slate-200/80 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-900 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-5 {{ $fbCard }} border-0 shadow-none ring-0">
-                <div class="min-w-0 pt-1">
-                    <h1 class="truncate text-2xl font-bold tracking-tight text-[#050505] dark:text-white sm:text-[28px]">{{ $user->name }}</h1>
-                    <p class="mt-0.5 text-[15px] text-[#65676B] dark:text-slate-400">
-                        @if($user->church)
-                            <span class="font-medium text-slate-700 dark:text-slate-300">{{ $user->church->name }}</span>
-                            <span class="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
-                        @endif
-                        <span>Unijovem · ID {{ $user->id }}</span>
-                    </p>
-                    @if($user->roles->isNotEmpty())
-                        <div class="mt-2 flex flex-wrap gap-1.5">
-                            @foreach($user->roles as $role)
-                                <span class="inline-flex rounded-md bg-[#E7F3FF] px-2 py-0.5 text-xs font-semibold text-[#1877F2] dark:bg-violet-950/50 dark:text-violet-300">{{ jubaf_role_label($role->name) }}</span>
+            <x-profile.panel-quick-links context="jovens" accent="blue"
+                class="rounded-lg border border-gray-200/90 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900" />
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+                <div class="min-w-0 space-y-6 lg:col-span-8">
+                    <div class="{{ $card }} p-4 sm:p-6">
+                        <x-ui.jovens::stepper :steps="$stepperSteps" :initial="0">
+                            <div x-show="step === 0" x-cloak class="space-y-5">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Detalhes do perfil</h2>
+                                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                        Informações visíveis na sua conta. A ficha institucional da igreja é gerida no módulo Igrejas.
+                                    </p>
+                                </div>
+                                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                    <x-ui.input label="Nome *" name="first_name" :value="old('first_name', $user->first_name)" required maxlength="120" />
+                                    <x-ui.input label="Sobrenome" name="last_name" :value="old('last_name', $user->last_name)" maxlength="120" />
+                                    <div class="space-y-1.5 md:col-span-2">
+                                        <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">E-mail de login</span>
+                                        <div
+                                            class="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-800 dark:border-gray-600 dark:bg-gray-900/80 dark:text-gray-200">
+                                            {{ $user->email }}
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-500">Alteração apenas com aprovação da diretoria — use o pedido no final desta página.</p>
+                                    </div>
+                                    <x-ui.input label="Data de nascimento" name="birth_date" type="date" :value="old('birth_date', $user->birth_date?->format('Y-m-d'))" />
+                                    <x-ui.input label="Telefone pessoal" name="phone" id="phone" :value="old('phone', $user->phone)" />
+                                    <x-ui.input class="md:col-span-2" label="Telefone na função / igreja" name="church_phone" :value="old('church_phone', $user->church_phone)" maxlength="32" />
+                                    <div class="space-y-1.5 md:col-span-2">
+                                        <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">CPF</span>
+                                        <div
+                                            class="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300">
+                                            {{ $user->cpf ? format_cpf_pt($user->cpf) : '—' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div x-show="step === 1" x-cloak class="space-y-5">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Censo juventude</h2>
+                                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                        Dados para o mapeamento da Unijovem (estado civil, profissão e redes). Opcional.
+                                    </p>
+                                </div>
+                                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                    <x-ui.input label="Estado civil" name="marital_status" id="marital_status" :value="old('marital_status', $jp?->marital_status)" maxlength="48" hint="Ex.: solteiro(a)" />
+                                    <x-ui.input label="Profissão / ocupação" name="profession" id="profession" :value="old('profession', $jp?->profession)" maxlength="160" />
+                                    <div class="space-y-1.5 md:col-span-2">
+                                        <label for="census_bio" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Nota para o censo</label>
+                                        <textarea id="census_bio" name="census_bio" rows="3" maxlength="2000"
+                                            placeholder="Breve descrição para a equipa regional (opcional)."
+                                            class="{{ $fieldBase }}">{{ old('census_bio', $jp?->census_bio) }}</textarea>
+                                        @error('census_bio')
+                                            <p class="text-xs font-medium text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <x-ui.jovens::social-link-input class="md:col-span-1" label="Instagram" name="social_instagram" icon="hashtag"
+                                        placeholder="@utilizador ou URL" :value="old('social_instagram', $sl['instagram'] ?? '')" />
+                                    <x-ui.jovens::social-link-input class="md:col-span-1" label="YouTube" name="social_youtube" icon="video"
+                                        :value="old('social_youtube', $sl['youtube'] ?? '')" />
+                                    <x-ui.jovens::social-link-input class="md:col-span-2" label="Outra rede ou portfólio" name="social_outro" icon="link"
+                                        :value="old('social_outro', $sl['outro'] ?? '')" />
+                                </div>
+                                @if (module_enabled('Talentos') && Route::has('jovens.talentos.profile.edit'))
+                                    <p class="rounded-lg border border-blue-100 bg-blue-50/80 p-4 text-sm text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-100">
+                                        <x-icon name="star" class="mr-1 inline h-4 w-4 opacity-80" style="duotone" />
+                                        Competências e disponibilidade para equipas regionais:
+                                        <a href="{{ route('jovens.talentos.profile.edit') }}" class="font-semibold underline decoration-blue-600/30 hover:decoration-blue-600">Banco de talentos</a>
+                                    </p>
+                                @endif
+                            </div>
+
+                            <div x-show="step === 2" x-cloak class="space-y-6">
+                                <section class="rounded-lg border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-900/40 sm:p-5">
+                                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Contacto de emergência</h2>
+                                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Para eventos e situações urgentes da organização.</p>
+                                    <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+                                        <x-ui.input label="Nome" name="emergency_contact_name" id="emergency_contact_name" :value="old('emergency_contact_name', $user->emergency_contact_name)" maxlength="120" />
+                                        <x-ui.input label="Telefone" name="emergency_contact_phone" id="emergency_contact_phone" :value="old('emergency_contact_phone', $user->emergency_contact_phone)" maxlength="32" />
+                                        <x-ui.input label="Parentesco" name="emergency_contact_relationship" id="emergency_contact_relationship" :value="old('emergency_contact_relationship', $user->emergency_contact_relationship)" maxlength="80" hint="Ex.: mãe, cônjuge" />
+                                    </div>
+                                </section>
+
+                                <section class="rounded-lg border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-900/40 sm:p-5">
+                                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Palavra-passe</h2>
+                                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Deixe em branco para manter a palavra-passe actual.</p>
+                                    <div class="mt-4 max-w-xl space-y-4">
+                                        <div class="space-y-1.5">
+                                            <label for="current_password" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Palavra-passe atual</label>
+                                            <input type="password" id="current_password" name="current_password" autocomplete="current-password" class="{{ $fieldBase }}" />
+                                            @error('current_password')
+                                                <p class="text-xs font-medium text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div class="space-y-1.5">
+                                                <label for="password" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Nova palavra-passe</label>
+                                                <input type="password" id="password" name="password" autocomplete="new-password" class="{{ $fieldBase }}" />
+                                                @error('password')
+                                                    <p class="text-xs font-medium text-red-600 dark:text-red-400">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <label for="password_confirmation" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Confirmar</label>
+                                                <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password" class="{{ $fieldBase }}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </x-ui.jovens::stepper>
+                    </div>
+                </div>
+
+                <aside class="space-y-6 lg:col-span-4">
+                    <div class="{{ $card }} p-5 sm:p-6">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Completude do perfil</h3>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Sugestões para manter a conta útil para a equipa.</p>
+                        <div class="mt-4" role="progressbar" aria-valuenow="{{ $completenessPct }}" aria-valuemin="0" aria-valuemax="100"
+                            aria-label="Percentagem de campos sugeridos preenchidos">
+                            <div class="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                <div class="h-full rounded-full bg-blue-600 transition-all dark:bg-blue-500" style="width: {{ $completenessPct }}%"></div>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-600 dark:text-gray-300">{{ $completenessPct }}% · {{ $completenessDone }}/{{ count($completenessItems) }} itens</p>
+                        </div>
+                        <ul class="mt-4 space-y-2 text-sm">
+                            @foreach ($completenessItems as $row)
+                                <li class="flex items-start gap-2">
+                                    @if ($row['done'])
+                                        <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300" aria-hidden="true">
+                                            <x-icon name="check" class="h-3 w-3" style="solid" />
+                                        </span>
+                                    @else
+                                        <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-400 dark:border-gray-600 dark:bg-gray-800" aria-hidden="true">
+                                            <span class="sr-only">Por fazer</span>
+                                        </span>
+                                    @endif
+                                    <span @class([
+                                        'text-gray-900 dark:text-gray-100' => $row['done'],
+                                        'text-gray-600 dark:text-gray-400' => ! $row['done'],
+                                    ])>{{ $row['label'] }}</span>
+                                </li>
                             @endforeach
-                        </div>
-                    @endif
-                </div>
-                <div class="flex shrink-0 gap-2">
-                    <a href="{{ route('jovens.dashboard') }}" class="inline-flex h-9 items-center justify-center rounded-lg bg-[#E4E6EB] px-4 text-sm font-semibold text-[#050505] transition hover:bg-[#D8DADF] dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">
-                        Voltar ao painel
-                    </a>
-                </div>
-            </div>
-
-            <x-profile.panel-quick-links context="jovens" accent="violet" class="!rounded-xl !border-0 !bg-white !p-4 !shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:!bg-slate-900 dark:!ring-1 dark:!ring-white/10" />
-
-            <div class="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:gap-4">
-                <div class="space-y-3 lg:col-span-8">
-                    <section class="{{ $fbCard }} p-4 sm:p-6">
-                        <h2 class="mb-1 text-xl font-bold text-[#050505] dark:text-white">Detalhes do perfil</h2>
-                        <p class="mb-6 text-[15px] text-[#65676B] dark:text-slate-400">Atualize as informações visíveis na sua conta. A ficha institucional da igreja é gerida no módulo Igrejas.</p>
-
-                        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="first_name">Nome <span class="text-red-500">*</span></label>
-                                <input id="first_name" type="text" name="first_name" value="{{ old('first_name', $user->first_name) }}" required maxlength="120"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] text-[#050505] placeholder:text-slate-400 focus:border-[#1877F2] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1877F2] dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:focus:border-violet-500 dark:focus:ring-violet-500">
-                                @error('first_name')
-                                    <p class="text-xs font-medium text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="last_name">Sobrenome</label>
-                                <input id="last_name" type="text" name="last_name" value="{{ old('last_name', $user->last_name) }}" maxlength="120"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] text-[#050505] focus:border-[#1877F2] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1877F2] dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:focus:border-violet-500 dark:focus:ring-violet-500">
-                                @error('last_name')
-                                    <p class="text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="space-y-1.5 md:col-span-2">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400">E-mail de login</label>
-                                <div class="rounded-lg border border-dashed border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] text-[#050505] dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200">
-                                    {{ $user->email }}
-                                </div>
-                                <p class="text-xs text-[#65676B] dark:text-slate-500">Alteração apenas com aprovação da diretoria — use o pedido no final desta página.</p>
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="birth_date">Data de nascimento</label>
-                                <input id="birth_date" type="date" name="birth_date" value="{{ old('birth_date', $user->birth_date?->format('Y-m-d')) }}"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] text-[#050505] focus:border-[#1877F2] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1877F2] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('birth_date')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="phone">Telefone pessoal</label>
-                                <input id="phone" type="text" name="phone" value="{{ old('phone', $user->phone) }}"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] text-[#050505] focus:border-[#1877F2] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1877F2] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                            </div>
-                            <div class="space-y-1.5 md:col-span-2">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="church_phone">Telefone na função / igreja</label>
-                                <input id="church_phone" type="text" name="church_phone" value="{{ old('church_phone', $user->church_phone) }}" maxlength="32"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] text-[#050505] focus:border-[#1877F2] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1877F2] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('church_phone')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                            <div class="space-y-1.5 md:col-span-2">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400">CPF</label>
-                                <div class="rounded-lg border border-dashed border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] text-[#65676B] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                                    {{ $user->cpf ? format_cpf_pt($user->cpf) : '—' }}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="{{ $fbCard }} p-4 sm:p-6">
-                        <h2 class="mb-1 text-xl font-bold text-[#050505] dark:text-white">Censo juventude</h2>
-                        <p class="mb-6 text-[15px] text-[#65676B] dark:text-slate-400">Dados para o mapeamento da Unijovem (estado civil, profissão e redes). Opcional.</p>
-                        @php $jp = $user->jovemPerfil; $sl = $jp?->social_links ?? []; @endphp
-                        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="marital_status">Estado civil</label>
-                                <input id="marital_status" type="text" name="marital_status" value="{{ old('marital_status', $jp?->marital_status) }}" maxlength="48" placeholder="Ex.: solteiro(a)"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('marital_status')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="profession">Profissão / ocupação</label>
-                                <input id="profession" type="text" name="profession" value="{{ old('profession', $jp?->profession) }}" maxlength="160"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('profession')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                            <div class="space-y-1.5 md:col-span-2">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="census_bio">Nota para o censo</label>
-                                <textarea id="census_bio" name="census_bio" rows="3" maxlength="2000" placeholder="Breve descrição para a equipa regional (opcional)."
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">{{ old('census_bio', $jp?->census_bio) }}</textarea>
-                                @error('census_bio')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="social_instagram">Instagram</label>
-                                <input id="social_instagram" type="text" name="social_instagram" value="{{ old('social_instagram', $sl['instagram'] ?? '') }}"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white" placeholder="@utilizador ou URL">
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="social_youtube">YouTube</label>
-                                <input id="social_youtube" type="text" name="social_youtube" value="{{ old('social_youtube', $sl['youtube'] ?? '') }}"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                            </div>
-                            <div class="space-y-1.5 md:col-span-2">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="social_outro">Outra rede ou portfólio</label>
-                                <input id="social_outro" type="text" name="social_outro" value="{{ old('social_outro', $sl['outro'] ?? '') }}"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                            </div>
-                        </div>
-                        @if(module_enabled('Talentos') && Route::has('jovens.talentos.profile.edit'))
-                            <p class="mt-6 text-sm text-[#65676B] dark:text-slate-400">
-                                Competências e disponibilidade para equipas regionais:
-                                <a href="{{ route('jovens.talentos.profile.edit') }}" class="font-semibold text-[#1877F2] hover:underline dark:text-violet-400">Banco de talentos</a>
-                            </p>
-                        @endif
-                    </section>
-
-                    <section class="{{ $fbCard }} p-4 sm:p-6">
-                        <h2 class="mb-4 text-lg font-bold text-[#050505] dark:text-white">Contacto de emergência</h2>
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="emergency_contact_name">Nome</label>
-                                <input id="emergency_contact_name" type="text" name="emergency_contact_name" value="{{ old('emergency_contact_name', $user->emergency_contact_name) }}" maxlength="120"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('emergency_contact_name')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="emergency_contact_phone">Telefone</label>
-                                <input id="emergency_contact_phone" type="text" name="emergency_contact_phone" value="{{ old('emergency_contact_phone', $user->emergency_contact_phone) }}" maxlength="32"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('emergency_contact_phone')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                            <div class="space-y-1.5 md:col-span-1">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="emergency_contact_relationship">Parentesco</label>
-                                <input id="emergency_contact_relationship" type="text" name="emergency_contact_relationship" value="{{ old('emergency_contact_relationship', $user->emergency_contact_relationship) }}" maxlength="80" placeholder="Ex.: mãe, cônjuge"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('emergency_contact_relationship')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="{{ $fbCard }} p-4 sm:p-6">
-                        <h2 class="mb-1 text-lg font-bold text-[#050505] dark:text-white">Segurança</h2>
-                        <p class="mb-5 text-[15px] text-[#65676B] dark:text-slate-400">Deixe em branco para manter a palavra-passe atual.</p>
-                        <div class="max-w-xl space-y-4">
-                            <div class="space-y-1.5">
-                                <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="current_password">Palavra-passe atual</label>
-                                <input type="password" id="current_password" name="current_password" autocomplete="current-password"
-                                    class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                @error('current_password')
-                                    <p class="text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div class="space-y-1.5">
-                                    <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="password">Nova palavra-passe</label>
-                                    <input type="password" id="password" name="password" autocomplete="new-password"
-                                        class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                    @error('password')
-                                        <p class="text-xs text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                <div class="space-y-1.5">
-                                    <label class="text-[13px] font-semibold text-[#606770] dark:text-slate-400" for="password_confirmation">Confirmar</label>
-                                    <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password"
-                                        class="w-full rounded-lg border border-[#CCD0D5] bg-[#F5F6F7] px-3 py-2.5 text-[15px] dark:border-slate-600 dark:bg-slate-800 dark:text-white">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <aside class="space-y-3 lg:col-span-4">
-                    <div class="{{ $fbCard }} p-5">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-[#65676B] dark:text-slate-500">Resumo</p>
-                        <p class="mt-2 text-[15px] text-[#050505] dark:text-slate-200">Membro desde <span class="font-semibold">{{ $user->created_at->translatedFormat('F Y') }}</span></p>
-                        <p class="mt-3 text-sm text-[#65676B] dark:text-slate-400">Última atividade: {{ $user->updated_at->diffForHumans() }}</p>
-                        @if(module_enabled('Igrejas') && Route::has('jovens.igreja.index'))
-                            <a href="{{ route('jovens.igreja.index') }}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#1877F2] hover:underline dark:text-violet-400">
-                                <x-icon name="building-columns" class="h-4 w-4" style="duotone" />
-                                Ver dados da minha igreja
-                            </a>
-                        @endif
+                        </ul>
                     </div>
 
-                    <div class="{{ $fbCard }} sticky top-4 space-y-3 p-4">
-                        <button type="submit" class="flex h-11 w-full items-center justify-center rounded-lg bg-[#1877F2] text-[15px] font-semibold text-white shadow-sm transition hover:bg-[#166fe5] active:scale-[0.99] dark:bg-violet-600 dark:hover:bg-violet-500">
+                    <div class="{{ $card }} hidden p-4 sm:p-5 lg:block lg:sticky lg:top-4">
+                        <button type="submit"
+                            class="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 active:scale-[0.99] dark:focus-visible:ring-offset-gray-900">
+                            <x-icon name="floppy-disk" class="h-4 w-4" style="duotone" />
                             Guardar alterações
                         </button>
-                        <p class="text-center text-xs text-[#65676B] dark:text-slate-500">Inclui capa, fotos e dados acima.</p>
+                        <p class="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">Inclui capa, fotos da galeria e todos os dados do formulário.</p>
+                        <p class="mt-4 border-t border-gray-100 pt-4 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                            Membro desde <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $user->created_at->translatedFormat('F Y') }}</span>
+                        </p>
+                        @if (module_enabled('Igrejas') && Route::has('jovens.igreja.index'))
+                            <a href="{{ route('jovens.igreja.index') }}"
+                                class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                                <x-icon name="building-columns" class="h-4 w-4" style="duotone" />
+                                Dados da minha igreja
+                            </a>
+                        @endif
                     </div>
                 </aside>
             </div>
         </form>
 
-        {{-- Pedido e-mail/CPF: mesma largura da coluna principal (8/12) que Detalhes / Segurança --}}
-        <div class="grid grid-cols-1 pt-2 lg:grid-cols-12 lg:gap-4">
+        <div class="lg:hidden fixed inset-x-0 z-30 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-gray-700 dark:bg-gray-900/95"
+            style="bottom: calc(5rem + env(safe-area-inset-bottom, 0px))">
+            <button type="submit" form="profileForm"
+                class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900">
+                <x-icon name="floppy-disk" class="h-4 w-4" style="duotone" />
+                Guardar alterações
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
             <div class="min-w-0 lg:col-span-8">
-                <x-profile-sensitive-data-request :action="route('jovens.profile.sensitive-data-request.store')" accent="violet" />
+                <x-profile-sensitive-data-request :action="route('jovens.profile.sensitive-data-request.store')" accent="blue" />
             </div>
         </div>
-    </div>
-</div>
+    </x-ui.jovens::page-shell>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var phone = document.getElementById('phone');
-        if (!phone) return;
-        phone.addEventListener('input', function (e) {
-            var v = e.target.value.replace(/\D/g, '');
-            if (v.length > 11) v = v.substring(0, 11);
-            if (v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
-            else v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
-            e.target.value = v;
-        });
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var phone = document.getElementById('phone');
+                if (phone) {
+                    phone.addEventListener('input', function(e) {
+                        var v = e.target.value.replace(/\D/g, '');
+                        if (v.length > 11) v = v.substring(0, 11);
+                        if (v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                        else v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+                        e.target.value = v;
+                    });
+                }
 
-        var form = document.getElementById('profileForm');
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                var pw = document.getElementById('password');
-                var pwc = document.getElementById('password_confirmation');
-                if (pw && pwc && pw.value && pw.value !== pwc.value) {
-                    e.preventDefault();
-                    alert('As palavras-passe não coincidem.');
-                    return false;
+                var form = document.getElementById('profileForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        var pw = document.getElementById('password');
+                        var pwc = document.getElementById('password_confirmation');
+                        if (pw && pwc && pw.value && pw.value !== pwc.value) {
+                            e.preventDefault();
+                            alert('As palavras-passe não coincidem.');
+                            pwc.focus();
+                        }
+                    });
                 }
             });
-        }
-    });
-</script>
-@endpush
+        </script>
+    @endpush
 @endsection

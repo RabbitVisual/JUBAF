@@ -11,7 +11,7 @@ class StoreYouthMemberRequest extends FormRequest
     {
         $u = $this->user();
 
-        return $u && $u->can('igrejas.jovens.provision') && (bool) $u->church_id;
+        return (bool) $u?->can('igrejasProvisionYouth');
     }
 
     /**

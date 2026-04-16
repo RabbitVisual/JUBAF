@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Parabéns!')
 
@@ -9,8 +9,8 @@
     <span class="text-slate-600 dark:text-slate-300">Plano</span>
 @endsection
 
-@section('content')
-<div class="min-h-[80vh] flex items-center justify-center -mt-10">
+@section('lideres_content')
+<x-ui.lideres::page-shell class="flex min-h-[80vh] flex-col items-center justify-center -mt-4">
     <div class="max-w-xl w-full mx-4">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden text-center relative p-8 md:p-12">
 
@@ -56,6 +56,6 @@
             </div>
         </div>
     </div>
-</div>
+</x-ui.lideres::page-shell>
 @endsection
 

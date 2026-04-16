@@ -9,9 +9,8 @@
     <link href="{{ asset('vendor/fontawesome-pro/css/all.css') }}" rel="stylesheet">
     <style>
         :root {
-            --jubaf-teal: #0d9488;
-            --jubaf-teal-dark: #0f766e;
-            --jubaf-violet: #6d28d9;
+            --jubaf-blue: #2563eb;
+            --jubaf-blue-dark: #1e40af;
             --primary: #1c1917;
             --secondary: #64748b;
             --border: #e7e5e4;
@@ -42,7 +41,7 @@
             padding: 14mm 15mm;
             box-shadow:
                 0 25px 50px -12px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(13, 148, 136, 0.08);
+                0 0 0 1px rgba(37, 99, 235, 0.08);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -56,7 +55,7 @@
             left: 0;
             right: 0;
             height: 5px;
-            background: linear-gradient(90deg, var(--jubaf-teal) 0%, var(--jubaf-violet) 100%);
+            background: linear-gradient(90deg, var(--jubaf-blue) 0%, var(--jubaf-blue-dark) 100%);
             border-radius: 4px 4px 0 0;
         }
 
@@ -65,7 +64,7 @@
             margin-bottom: 8mm;
             padding-bottom: 5mm;
             padding-top: 2mm;
-            border-bottom: 2px solid var(--jubaf-teal);
+            border-bottom: 2px solid var(--jubaf-blue);
         }
 
         .brand-lockup {
@@ -73,7 +72,7 @@
             font-weight: 800;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: var(--jubaf-teal);
+            color: var(--jubaf-blue);
             margin-bottom: 3mm;
         }
 
@@ -95,7 +94,7 @@
         }
 
         .subtitle span {
-            color: var(--jubaf-teal);
+            color: var(--jubaf-blue);
         }
 
         .content-grid {
@@ -108,7 +107,7 @@
         .reading-card {
             background: #fff;
             border: 1px solid var(--border);
-            border-top: 2px solid rgba(13, 148, 136, 0.35);
+            border-top: 2px solid rgba(37, 99, 235, 0.35);
             padding: 3mm;
             break-inside: avoid;
             page-break-inside: avoid;
@@ -122,7 +121,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--jubaf-teal);
+            border-bottom: 1px solid var(--jubaf-blue);
             padding-bottom: 2px;
             margin-bottom: 2px;
         }
@@ -130,7 +129,7 @@
         .day-label {
             font-size: 8pt;
             font-weight: 800;
-            color: var(--jubaf-teal-dark, #0f766e);
+            color: var(--jubaf-blue-dark, #0f766e);
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
@@ -175,7 +174,7 @@
 
         footer .jubaf {
             font-weight: 800;
-            color: var(--jubaf-teal);
+            color: var(--jubaf-blue);
             letter-spacing: 0.06em;
         }
 
@@ -183,7 +182,7 @@
             position: fixed;
             bottom: 28px;
             right: 28px;
-            background: var(--jubaf-teal);
+            background: var(--jubaf-blue);
             color: white;
             width: 56px;
             height: 56px;
@@ -191,7 +190,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 12px 30px -8px rgba(13, 148, 136, 0.55);
+            box-shadow: 0 12px 30px -8px rgba(37, 99, 235, 0.45);
             cursor: pointer;
             transition: transform 0.2s;
             border: none;
@@ -219,7 +218,7 @@
             text-align: center;
         }
         .screen-hint strong {
-            color: var(--jubaf-teal);
+            color: var(--jubaf-blue);
         }
 
         @media print {

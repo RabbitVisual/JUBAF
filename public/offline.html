@@ -2,643 +2,207 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>JUBAF — Modo offline</title>
-    <link rel="manifest" href="/manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4c1d95">
+    <title>JUBAF — Sem conexão</title>
     <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --orange: #f97316;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-600: #4b5563;
-            --gray-800: #1f2937;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 50%, var(--primary-dark) 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            color: white;
-        }
-        
-        /* Header */
-        .header {
-            background: rgba(0,0,0,0.15);
-            backdrop-filter: blur(10px);
-            padding: 1rem 1.5rem;
+            color: #f8fafc;
+            background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 45%, #4c1d95 100%);
             display: flex;
+            flex-direction: column;
+            padding: 1.25rem;
+        }
+        .top {
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            max-width: 32rem;
+            margin: 0 auto 1.5rem;
+            width: 100%;
         }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.25rem;
+        .brand { font-weight: 800; font-size: 1.125rem; letter-spacing: -0.02em; }
+        .badge {
+            font-size: 0.7rem;
             font-weight: 700;
-        }
-        
-        .logo svg {
-            width: 32px;
-            height: 32px;
-        }
-        
-        .badge-offline {
-            background: var(--orange);
-            color: white;
-            padding: 0.25rem 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.35rem 0.65rem;
             border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            background: rgba(248, 113, 113, 0.25);
+            color: #fecaca;
+            border: 1px solid rgba(248, 113, 113, 0.4);
+        }
+        main {
+            flex: 1;
             display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        /* Main Content */
-        .main {
-            max-width: 600px;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 32rem;
             margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-        
-        /* Status Card */
-        .status-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 1rem;
-            padding: 2rem;
+            width: 100%;
             text-align: center;
+        }
+        .icon {
+            width: 4.5rem;
+            height: 4.5rem;
+            margin: 0 auto 1.25rem;
+            opacity: 0.9;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            line-height: 1.25;
+        }
+        p {
+            color: #cbd5e1;
+            line-height: 1.65;
+            font-size: 0.95rem;
             margin-bottom: 1.5rem;
         }
-        
-        .status-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.5rem;
-            background: rgba(255,255,255,0.15);
-            border-radius: 50%;
+        .actions {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
             justify-content: center;
         }
-        
-        .status-icon svg {
-            width: 40px;
-            height: 40px;
-            stroke: white;
-        }
-        
-        .status-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .status-text {
-            opacity: 0.9;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Buttons */
-        .btn {
+        a.btn, button.btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.875rem 1.5rem;
-            border-radius: 0.5rem;
+            justify-content: center;
+            padding: 0.65rem 1.1rem;
+            border-radius: 0.75rem;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.875rem;
             text-decoration: none;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-        
+        a.btn:focus-visible, button.btn:focus-visible {
+            outline: 2px solid #a78bfa;
+            outline-offset: 2px;
+        }
         .btn-primary {
-            background: white;
-            color: var(--primary);
+            background: #fff;
+            color: #4c1d95;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        .btn-primary:hover { transform: translateY(-1px); }
+        .btn-ghost {
+            background: rgba(255,255,255,0.12);
+            color: #f1f5f9;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        
-        .btn-secondary {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        /* Info Box */
-        .info-box {
-            background: rgba(255,255,255,0.1);
+        .btn-ghost:hover { background: rgba(255,255,255,0.18); }
+        .note {
+            margin-top: 1.75rem;
+            padding: 1rem 1.1rem;
             border-radius: 0.75rem;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            text-align: left;
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            line-height: 1.55;
         }
-        
-        .info-box svg {
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-            color: var(--warning);
-        }
-        
-        .info-box-content {
-            flex: 1;
-        }
-        
-        .info-box-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .info-box-text {
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-        
-        /* Ordens Section */
-        .ordens-section {
-            background: rgba(255,255,255,0.1);
-            border-radius: 1rem;
-            overflow: hidden;
-        }
-        
-        .section-header {
-            background: rgba(0,0,0,0.1);
-            padding: 1rem 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .section-title {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .count-badge {
-            background: var(--orange);
-            padding: 0.125rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-        }
-        
-        .ordens-list {
-            padding: 0.75rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .ordem-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .ordem-card:last-child {
-            margin-bottom: 0;
-        }
-        
-        .ordem-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-        }
-        
-        .ordem-numero {
-            font-weight: 700;
-            font-size: 1rem;
-        }
-        
-        .ordem-status {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-weight: 500;
-        }
-        
-        .status-pendente { background: var(--warning); color: black; }
-        .status-em_execucao { background: #3b82f6; }
-        .status-concluida { background: var(--success); }
-        
-        .ordem-info {
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-        
-        .ordem-local {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-        
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            opacity: 0.8;
-        }
-        
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .stat-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-        }
-        
-        .stat-label {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            margin-top: 0.25rem;
-        }
-        
-        /* Pending Badge */
-        .pending-banner {
-            background: var(--warning);
-            color: black;
-            padding: 0.75rem 1rem;
-            text-align: center;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 2rem;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Responsive */
-        @media (max-width: 480px) {
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+        .note strong { color: #e2e8f0; }
+        #pending-line {
+            display: none;
+            margin-top: 1rem;
+            font-size: 0.8125rem;
+            color: #fde68a;
         }
     </style>
 </head>
 <body>
-    <!-- Banner de ações pendentes -->
-    <div class="pending-banner" id="pending-banner" style="display: none;">
-        ⏳ <span id="pending-count">0</span> ações aguardando sincronização
+    <div class="top">
+        <span class="brand">JUBAF</span>
+        <span class="badge">Sem internet</span>
     </div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="logo">
-            <svg viewBox="0 0 64 64" fill="none">
-                <rect width="64" height="64" rx="12" fill="#f97316"/>
-                <path d="M32 18 Q18 18, 18 32 Q18 40, 24 46 Q30 52, 32 52 Q34 52, 40 46 Q46 40, 46 32 Q46 18, 32 18 Z" fill="#28a745"/>
-                <path d="M32 18 L32 52" stroke="#20c997" stroke-width="2.5"/>
-                <circle cx="32" cy="28" r="4" fill="#ffc107"/>
-            </svg>
-            JUBAF
+    <main>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+            <path d="M18.364 5.636a9 9 0 010 12.728m-3.536-3.536a4 4 0 000-5.656m-7.071 7.071a9 9 0 010-12.728m3.536 3.536a4 4 0 000 5.656"/>
+            <line x1="2" y1="2" x2="22" y2="22" stroke-width="2.25"/>
+        </svg>
+        <h1>Não foi possível carregar esta página</h1>
+        <p>
+            O site da JUBAF precisa de conexão para dados em tempo real (inscrições, pagamentos, avisos).
+            Se já visitaste algumas páginas com o painel instalado, o navegador pode mostrar uma versão em cache — mas não substitui o servidor.
+        </p>
+        <div class="actions">
+            <button type="button" class="btn btn-primary" onclick="location.reload()">Tentar de novo</button>
+            <a class="btn btn-ghost" href="/">Início do site</a>
+            <a class="btn btn-ghost" href="/jovens/dashboard">Painel Jovens</a>
+            <a class="btn btn-ghost" href="/lideres/dashboard">Painel Líderes</a>
         </div>
-        <div class="badge-offline">
-            <span>●</span> OFFLINE
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main">
-        <!-- Status Card -->
-        <div class="status-card">
-            <div class="status-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18.364 5.636a9 9 0 010 12.728m-3.536-3.536a4 4 0 000-5.656m-7.071 7.071a9 9 0 010-12.728m3.536 3.536a4 4 0 000 5.656"/>
-                    <line x1="2" y1="2" x2="22" y2="22" stroke-width="2.5"/>
-                </svg>
-            </div>
-            <h1 class="status-title">Modo Offline Ativo</h1>
-            <p class="status-text">
-                Você está sem conexão com a internet. Seus dados estão salvos localmente e serão sincronizados automaticamente quando a conexão voltar.
-            </p>
-            <div class="btn-group">
-                <button onclick="location.reload()" class="btn btn-primary">
-                    🔄 Tentar Reconectar
-                </button>
-            </div>
-        </div>
-
-        <!-- Info Box -->
-        <div class="info-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4M12 8h.01"/>
-            </svg>
-            <div class="info-box-content">
-                <div class="info-box-title">Como funciona o modo offline?</div>
-                <div class="info-box-text">
-                    Quando você acessar o sistema estando online, as ordens serão cacheadas. 
-                    Depois disso, você poderá visualizá-las mesmo sem internet!
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-value" id="stat-ordens">-</div>
-                <div class="stat-label">Ordens em Cache</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="stat-materiais">-</div>
-                <div class="stat-label">Materiais</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="stat-pendentes">-</div>
-                <div class="stat-label">Pendentes</div>
-            </div>
-        </div>
-
-        <!-- Ordens Section -->
-        <div class="ordens-section">
-            <div class="section-header">
-                <div class="section-title">
-                    📋 Ordens em Cache
-                    <span class="count-badge" id="ordens-count">0</span>
-                </div>
-            </div>
-            <div class="ordens-list" id="ordens-list">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <div>Carregando dados locais...</div>
-                </div>
-            </div>
+        <p id="pending-line" role="status"></p>
+        <div class="note">
+            <strong>O que é PWA aqui?</strong>
+            Apenas os painéis <strong>Jovens</strong> e <strong>Líderes</strong> usam meta de instalação e este service worker.
+            O painel da diretoria e outras áreas não são “app offline” completo.
         </div>
     </main>
-
     <script>
-        // Constantes
-        const DB_NAME = 'JubafOfflineShellDB';
-        const DB_VERSION = 2;
+        (function () {
+            const DB_NAME = 'JubafOfflineShellDB';
+            const DB_VERSION = 3;
 
-        // Abrir IndexedDB
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve(request.result);
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains('ordensCache')) {
-                        const store = db.createObjectStore('ordensCache', { keyPath: 'id' });
-                        store.createIndex('status', 'status', { unique: false });
-                    }
-                    if (!db.objectStoreNames.contains('materiaisCache')) {
-                        db.createObjectStore('materiaisCache', { keyPath: 'id' });
-                    }
-                    if (!db.objectStoreNames.contains('pendingActions')) {
-                        const store = db.createObjectStore('pendingActions', { keyPath: 'uuid' });
-                        store.createIndex('synced', 'synced', { unique: false });
-                    }
-                };
+            function openDB() {
+                return new Promise(function (resolve, reject) {
+                    var req = indexedDB.open(DB_NAME, DB_VERSION);
+                    req.onerror = function () { reject(req.error); };
+                    req.onsuccess = function () { resolve(req.result); };
+                    req.onupgradeneeded = function (event) {
+                        var db = event.target.result;
+                        if (event.oldVersion < 3) {
+                            ['ordensCache', 'materiaisCache', 'fotosPendentes', 'syncHistory'].forEach(function (name) {
+                                if (db.objectStoreNames.contains(name)) {
+                                    db.deleteObjectStore(name);
+                                }
+                            });
+                        }
+                        if (!db.objectStoreNames.contains('pendingActions')) {
+                            var store = db.createObjectStore('pendingActions', { keyPath: 'uuid' });
+                            store.createIndex('synced', 'synced', { unique: false });
+                            store.createIndex('timestamp', 'timestamp', { unique: false });
+                        }
+                    };
+                });
+            }
+
+            function countPending() {
+                openDB().then(function (db) {
+                    if (!db.objectStoreNames.contains('pendingActions')) return;
+                    var tx = db.transaction('pendingActions', 'readonly');
+                    var store = tx.objectStore('pendingActions');
+                    var r = store.getAll();
+                    r.onsuccess = function () {
+                        var items = (r.result || []).filter(function (i) { return !i.synced; });
+                        if (items.length > 0) {
+                            var el = document.getElementById('pending-line');
+                            el.style.display = 'block';
+                            el.textContent = items.length + ' ação(ões) enviada(s) offline aguardam sincronização quando a rede voltar.';
+                        }
+                    };
+                }).catch(function () {});
+            }
+
+            window.addEventListener('online', function () {
+                setTimeout(function () { location.reload(); }, 600);
             });
-        }
 
-        // Carregar ordens do cache
-        async function loadOrdens() {
-            try {
-                const db = await openDB();
-                
-                if (!db.objectStoreNames.contains('ordensCache')) {
-                    showEmptyState();
-                    return;
-                }
-                
-                const tx = db.transaction('ordensCache', 'readonly');
-                const store = tx.objectStore('ordensCache');
-                const request = store.getAll();
-                
-                request.onsuccess = () => {
-                    const ordens = request.result || [];
-                    renderOrdens(ordens);
-                    updateStats('ordens', ordens.length);
-                    document.getElementById('ordens-count').textContent = ordens.length;
-                };
-                
-                request.onerror = () => {
-                    showEmptyState();
-                };
-            } catch (e) {
-                console.error('Erro ao carregar ordens:', e);
-                showEmptyState();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', countPending);
+            } else {
+                countPending();
             }
-        }
-
-        // Carregar materiais
-        async function loadMateriais() {
-            try {
-                const db = await openDB();
-                
-                if (!db.objectStoreNames.contains('materiaisCache')) {
-                    updateStats('materiais', 0);
-                    return;
-                }
-                
-                const tx = db.transaction('materiaisCache', 'readonly');
-                const store = tx.objectStore('materiaisCache');
-                const request = store.count();
-                
-                request.onsuccess = () => {
-                    updateStats('materiais', request.result || 0);
-                };
-            } catch (e) {
-                updateStats('materiais', 0);
-            }
-        }
-
-        // Carregar pendentes
-        async function loadPendentes() {
-            try {
-                const db = await openDB();
-                
-                if (!db.objectStoreNames.contains('pendingActions')) {
-                    updateStats('pendentes', 0);
-                    return;
-                }
-                
-                const tx = db.transaction('pendingActions', 'readonly');
-                const store = tx.objectStore('pendingActions');
-                const request = store.getAll();
-                
-                request.onsuccess = () => {
-                    const items = (request.result || []).filter(i => !i.synced);
-                    const count = items.length;
-                    updateStats('pendentes', count);
-                    
-                    // Mostrar banner se tiver pendentes
-                    if (count > 0) {
-                        document.getElementById('pending-banner').style.display = 'block';
-                        document.getElementById('pending-count').textContent = count;
-                    }
-                };
-            } catch (e) {
-                updateStats('pendentes', 0);
-            }
-        }
-
-        // Renderizar ordens
-        function renderOrdens(ordens) {
-            const container = document.getElementById('ordens-list');
-            
-            if (ordens.length === 0) {
-                showEmptyState();
-                return;
-            }
-            
-            container.innerHTML = ordens.map(ordem => {
-                const statusClass = 'status-' + (ordem.status || 'pendente');
-                const statusText = ordem.status_texto || ordem.status || 'Pendente';
-                const demanda = ordem.demanda || {};
-                
-                return `
-                    <div class="ordem-card">
-                        <div class="ordem-header">
-                            <div class="ordem-numero">${ordem.numero || 'OS #' + ordem.id}</div>
-                            <div class="ordem-status ${statusClass}">${statusText}</div>
-                        </div>
-                        <div class="ordem-info">
-                            ${demanda.motivo || ordem.descricao || 'Sem descrição'}
-                        </div>
-                        ${demanda.localidade ? `
-                            <div class="ordem-local">
-                                📍 ${demanda.localidade.nome || 'Local não informado'}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Estado vazio
-        function showEmptyState() {
-            const container = document.getElementById('ordens-list');
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📭</div>
-                    <div><strong>Nenhuma ordem em cache</strong></div>
-                    <div style="margin-top: 0.5rem; font-size: 0.875rem;">
-                        Acesse o sistema quando estiver online para cachear suas ordens.
-                    </div>
-                </div>
-            `;
-        }
-
-        // Atualizar estatísticas
-        function updateStats(type, value) {
-            const el = document.getElementById('stat-' + type);
-            if (el) {
-                el.textContent = value;
-            }
-        }
-
-        // Verificar conexão
-        function checkConnection() {
-            if (navigator.onLine) {
-                // Conexão voltou - recarregar página
-                location.reload();
-            }
-        }
-
-        // Event listeners
-        window.addEventListener('online', checkConnection);
-        
-        // Verificar periodicamente
-        setInterval(checkConnection, 5000);
-
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadOrdens();
-            loadMateriais();
-            loadPendentes();
-        });
+        })();
     </script>
 </body>
 </html>

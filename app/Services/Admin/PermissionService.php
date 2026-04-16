@@ -40,7 +40,7 @@ class PermissionService
         foreach ($permissions as $permission) {
             $parts = explode('.', $permission->name);
             $module = $parts[0] ?? 'other';
-            
+
             // Para permissões com múltiplos pontos (ex: lider-comunidade.usuarios.create)
             // Pegar apenas a primeira parte como módulo
             // Se tiver mais de 2 partes, agrupar as partes intermediárias
@@ -50,7 +50,7 @@ class PermissionService
             $moduleDisplay = str_replace('-', ' ', $module);
             $moduleDisplay = ucwords($moduleDisplay);
 
-            if (!isset($grouped[$module])) {
+            if (! isset($grouped[$module])) {
                 $grouped[$module] = [];
             }
 
@@ -74,6 +74,16 @@ class PermissionService
      */
     protected function getPermissionDisplayName(string $permissionName): string
     {
+        if ($permissionName === 'igrejas.jovens.provision') {
+            return 'Igrejas — Criar contas de jovens na congregação (censo / convites)';
+        }
+        if ($permissionName === 'igrejas.requests.submit') {
+            return 'Igrejas — Submeter pedidos de alteração de dados à diretoria';
+        }
+        if ($permissionName === 'igrejas.requests.review') {
+            return 'Igrejas — Analisar e aprovar pedidos de alteração';
+        }
+
         // Mapear ações comuns para nomes legíveis
         $actionMap = [
             'view' => 'Visualizar',
@@ -85,17 +95,19 @@ class PermissionService
             'manage' => 'Gerenciar',
             'index' => 'Listar',
             'show' => 'Visualizar Detalhes',
+            'provision' => 'Provisão de contas',
+            'activate' => 'Activar / desactivar cadastro',
         ];
 
         $parts = explode('.', $permissionName);
-        
+
         if (count($parts) === 1) {
             return ucfirst(str_replace(['-', '_'], ' ', $permissionName));
         }
 
         $module = str_replace(['-', '_'], ' ', $parts[0]);
         $module = ucwords($module);
-        
+
         $action = end($parts);
         $actionDisplay = $actionMap[$action] ?? ucfirst(str_replace(['-', '_'], ' ', $action));
 
@@ -103,6 +115,7 @@ class PermissionService
         if (count($parts) > 2) {
             $submodule = implode(' ', array_slice($parts, 1, -1));
             $submodule = ucwords(str_replace(['-', '_'], ' ', $submodule));
+
             return "{$module} - {$submodule} - {$actionDisplay}";
         }
 
@@ -264,4 +277,3 @@ class PermissionService
         return true;
     }
 }
-

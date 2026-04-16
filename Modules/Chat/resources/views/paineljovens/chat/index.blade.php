@@ -1,31 +1,27 @@
-@extends('layouts.app')
+@extends('paineljovens::layouts.jovens')
 
 @section('title', 'Chat')
 
-@section('breadcrumbs')
-    <x-icon name="chevron-right" class="w-3 h-3 shrink-0 opacity-50" />
-    <span class="text-violet-600 dark:text-violet-400">Comunicação com a JUBAF</span>
-@endsection
 
-@section('content')
-    <div class="h-[calc(100vh-14rem)] flex flex-col space-y-8 animate-fade-in">
+@section('jovens_content')
+    <div class="mx-auto flex h-[calc(100vh-14rem)] max-w-6xl flex-col space-y-8 pb-12 -mt-2 animate-fade-in">
         <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-slate-800">
+            class="flex flex-col gap-4 border-b border-gray-200 pb-6 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-5">
                 <div
-                    class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl flex items-center justify-center text-white shadow-2xl transform rotate-3 hover:rotate-0 transition-all">
-                    <x-icon name="comment-dots" style="duotone" class="w-7 h-7" />
+                    class="flex h-14 w-14 items-center justify-center rounded-lg bg-blue-600 text-white shadow-md transition-transform hover:scale-[1.02]">
+                    <x-icon name="comment-dots" style="duotone" class="h-7 w-7" />
                 </div>
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+                    <h1 class="text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-3xl">
                         Mensagens JUBAF</h1>
-                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">Canal interno com a
+                    <p class="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-400">Canal interno com a
                         diretoria, líderes e equipe — dúvidas, avisos e acompanhamento da sua participação.</p>
                 </div>
             </div>
 
             <button type="button" onclick="abrirNovaConversa()"
-                class="h-12 px-6 sm:px-8 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 flex items-center gap-2 shrink-0">
+                class="flex h-12 shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98] sm:px-8">
                 <x-icon name="plus" class="w-4 h-4" />
                 Nova conversa
             </button>
@@ -33,30 +29,30 @@
 
         <div class="flex-1 flex flex-col lg:flex-row gap-8 min-h-0 overflow-hidden">
             <div
-                class="w-full lg:w-80 flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm max-h-64 lg:max-h-none">
+                class="w-full lg:w-80 flex flex-col rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-sm max-h-64 lg:max-h-none">
                 <div
-                    class="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 flex items-center justify-between">
-                    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Conversas</span>
+                    class="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex items-center justify-between">
+                    <span class="text-sm font-semibold text-gray-600 dark:text-gray-300">Conversas</span>
                     <span id="online-status" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
                         aria-hidden="true"></span>
                 </div>
 
                 <div id="lista-conversas"
-                    class="flex-1 overflow-y-auto divide-y divide-gray-50 dark:divide-slate-800/50 min-h-[8rem]">
+                    class="flex-1 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-800/50 min-h-[8rem]">
                     <div class="p-12 text-center">
-                        <x-icon name="spinner" class="w-6 h-6 text-indigo-500 animate-spin mx-auto mb-4" />
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Carregando…</p>
+                        <x-icon name="spinner" class="w-6 h-6 text-blue-500 animate-spin mx-auto mb-4" />
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Carregando…</p>
                     </div>
                 </div>
             </div>
 
             <div
-                class="flex-1 flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm min-h-[20rem]">
+                class="flex-1 flex flex-col rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-sm min-h-[20rem]">
                 <div id="chat-header"
-                    class="p-6 border-b border-gray-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md flex items-center justify-between z-10 hidden">
+                    class="p-6 border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md flex items-center justify-between z-10 hidden">
                     <div class="flex items-center gap-4">
                         <div
-                            class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl flex items-center justify-center text-indigo-600 shadow-inner">
+                            class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-blue-600 shadow-inner">
                             <x-icon name="user" style="duotone" class="w-6 h-6" />
                         </div>
                         <div>
@@ -69,28 +65,28 @@
                 </div>
 
                 <div id="chat-mensagens-container"
-                    class="flex-1 p-8 overflow-y-auto flex flex-col space-y-6 bg-slate-50/50 dark:bg-slate-950/30">
+                    class="flex-1 p-8 overflow-y-auto flex flex-col space-y-6 bg-gray-50/50 dark:bg-gray-950/30">
                     <div class="flex-1 flex flex-col items-center justify-center text-center py-20">
                         <div
-                            class="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 shadow-inner">
+                            class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-[2.5rem] flex items-center justify-center text-gray-300 dark:text-gray-700 mb-6 shadow-inner">
                             <x-icon name="comments" style="duotone" class="w-10 h-10" />
                         </div>
-                        <h3 class="text-base font-semibold text-slate-600 dark:text-slate-300">Escolha uma conversa</h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-xs leading-relaxed">Selecione um
+                        <h3 class="text-base font-semibold text-gray-600 dark:text-gray-300">Escolha uma conversa</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-xs leading-relaxed">Selecione um
                             contato à esquerda ou inicie uma nova conversa com a equipe.</p>
                     </div>
                 </div>
 
                 <div id="chat-input-container"
-                    class="p-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-100 dark:border-slate-800 z-10 hidden">
+                    class="p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-100 dark:border-gray-800 z-10 hidden">
                     <form id="chat-form" class="flex items-center gap-4">
                         <div class="flex-1 relative">
                             <label for="chat-message-input" class="sr-only">Mensagem</label>
                             <input type="text" id="chat-message-input" placeholder="Digite sua mensagem…"
-                                class="w-full pl-6 pr-6 py-5 bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-white placeholder:text-slate-400 transition-all">
+                                class="w-full pl-6 pr-6 py-5 bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 dark:text-white placeholder:text-gray-400 transition-all">
                         </div>
                         <button type="submit"
-                            class="w-16 h-16 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 group shrink-0"
+                            class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 group shrink-0"
                             aria-label="Enviar">
                             <x-icon name="paper-plane" class="w-6 h-6 group-hover:rotate-12 transition-transform" />
                         </button>
@@ -101,24 +97,24 @@
     </div>
 
     <div id="modal-nova-conversa"
-        class="hidden fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-6">
+        class="hidden fixed inset-0 z-[100] bg-gray-950/80 backdrop-blur-sm flex items-center justify-center p-6">
         <div
-            class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-white/10 overflow-hidden">
+            class="w-full max-w-lg bg-white dark:bg-gray-900 rounded-[2rem] shadow-2xl border border-white/10 overflow-hidden">
             <div
-                class="p-8 border-b border-gray-100 dark:border-slate-800 bg-indigo-500/5 flex items-center justify-between gap-4">
+                class="p-8 border-b border-gray-100 dark:border-gray-800 bg-blue-500/5 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4 min-w-0">
                     <div
-                        class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-600/20 shrink-0">
+                        class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-600/20 shrink-0">
                         <x-icon name="message-plus" style="duotone" class="w-7 h-7" />
                     </div>
                     <div class="min-w-0">
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">Nova conversa</h2>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Destinatário na rede JUBAF (diretoria ou
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Destinatário na rede JUBAF (diretoria ou
                             líder)</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalNovaConversa()"
-                    class="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-slate-800 text-slate-400 hover:text-rose-600 transition-colors flex items-center justify-center shrink-0"
+                    class="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-rose-600 transition-colors flex items-center justify-center shrink-0"
                     aria-label="Fechar">
                     <x-icon name="xmark" class="w-5 h-5" />
                 </button>
@@ -126,27 +122,27 @@
 
             <form id="form-nova-conversa" class="p-8 space-y-8">
                 <div class="space-y-2">
-                    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1"
+                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
                         for="usuario-select">Destinatário</label>
                     <select id="usuario-select" required
-                        class="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-base text-slate-900 focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 dark:text-white transition-all appearance-none cursor-pointer">
+                        class="w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-base text-gray-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 dark:text-white transition-all appearance-none cursor-pointer">
                         <option value="">A carregar contactos…</option>
                     </select>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1"
+                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
                         for="mensagem-inicial">Primeira mensagem</label>
                     <textarea id="mensagem-inicial" required rows="4"
                         placeholder="Ex.: dúvida sobre calendário, talentos ou avisos da igreja…"
-                        class="w-full p-6 bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-300 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"></textarea>
+                        class="w-full p-6 bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm font-medium text-gray-600 dark:text-gray-300 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"></textarea>
                 </div>
 
                 <div class="pt-4 flex gap-4">
                     <button type="button" onclick="fecharModalNovaConversa()"
-                        class="flex-1 h-14 text-base font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 transition-colors">Cancelar</button>
+                        class="flex-1 h-14 text-base font-semibold text-gray-500 dark:text-gray-400 hover:text-rose-600 transition-colors">Cancelar</button>
                     <button type="submit" id="btn-criar-conversa"
-                        class="flex-[2] h-14 bg-indigo-600 text-white rounded-2xl text-base font-semibold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Iniciar</button>
+                        class="flex-[2] h-14 bg-blue-600 text-white rounded-2xl text-base font-semibold hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20 active:scale-95">Iniciar</button>
                 </div>
             </form>
         </div>
@@ -190,7 +186,7 @@
                         const sessoes = data.sessoes.data || [];
                         if (sessoes.length === 0) {
                             container.innerHTML =
-                                '<div class="p-12 text-center text-sm text-slate-500 dark:text-slate-400 font-medium">Nenhuma conversa ainda. Use <strong>Nova conversa</strong> para falar com a diretoria ou um líder.</div>';
+                                '<div class="p-12 text-center text-sm text-gray-500 dark:text-gray-400 font-medium">Nenhuma conversa ainda. Use <strong>Nova conversa</strong> para falar com a diretoria ou um líder.</div>';
                             return;
                         }
 
@@ -201,12 +197,12 @@
                             const unread = (s.unread_for_me ?? 0) > 0;
 
                             return `
-                        <div onclick="abrirConversa('${s.session_id}')" class="p-6 transition-all cursor-pointer ${active ? 'bg-indigo-500/10 border-l-4 border-indigo-500' : 'hover:bg-gray-50 dark:hover:bg-slate-800/30'}">
+                        <div onclick="abrirConversa('${s.session_id}')" class="p-6 transition-all cursor-pointer ${active ? 'bg-blue-500/10 border-l-4 border-blue-500' : 'hover:bg-gray-50 dark:hover:bg-gray-800/30'}">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold text-gray-900 dark:text-white truncate flex-1 ${unread ? 'text-indigo-600 dark:text-indigo-400' : ''}">${escapeHtml(nome)}</span>
-                                ${unread ? `<span class="min-w-[1.25rem] h-5 px-1 rounded-full bg-indigo-600 text-xs font-bold text-white flex items-center justify-center">${s.unread_for_me}</span>` : ''}
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white truncate flex-1 ${unread ? 'text-blue-600 dark:text-blue-400' : ''}">${escapeHtml(nome)}</span>
+                                ${unread ? `<span class="min-w-[1.25rem] h-5 px-1 rounded-full bg-blue-600 text-xs font-bold text-white flex items-center justify-center">${s.unread_for_me}</span>` : ''}
                             </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">${escapeHtml(msg)}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">${escapeHtml(msg)}</p>
                         </div>
                     `;
                         }).join('');
@@ -236,7 +232,7 @@
                         const container = document.getElementById('chat-mensagens-container');
                         if (!data.messages.length) {
                             container.innerHTML =
-                                '<p class="text-center text-slate-400 text-sm py-8">Sem mensagens nesta conversa.</p>';
+                                '<p class="text-center text-gray-400 text-sm py-8">Sem mensagens nesta conversa.</p>';
                         } else {
                             container.innerHTML = data.messages.map(m => {
                                 const isMe = m.sender && m.sender.id === currentUserId;
@@ -244,8 +240,8 @@
                                 return `
                         <div class="flex ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in">
                             <div class="max-w-[80%]">
-                                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 ${isMe ? 'text-right' : ''}">${escapeHtml(label)}</p>
-                                <div class="px-5 py-3 rounded-2xl ${isMe ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-gray-100 dark:border-slate-700 shadow-sm'}">
+                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ${isMe ? 'text-right' : ''}">${escapeHtml(label)}</p>
+                                <div class="px-5 py-3 rounded-2xl ${isMe ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-gray-700 shadow-sm'}">
                                     <p class="text-base font-medium leading-relaxed">${escapeHtml(m.message)}</p>
                                     <p class="text-xs mt-2 opacity-70">${new Date(m.created_at).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</p>
                                 </div>

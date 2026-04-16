@@ -112,8 +112,8 @@
     </p>
     @if($event->registration_open && $event->isRegistrationPeriodOpen())
         <div class="flex flex-col gap-2 text-sm sm:flex-row sm:flex-wrap sm:gap-4">
-            @if(Route::has('jovens.calendario.show'))
-                <a href="{{ route('jovens.calendario.show', $event) }}" class="inline-flex items-center gap-2 font-bold text-teal-700 underline dark:text-teal-400">
+            @if(Route::has('jovens.eventos.show'))
+                <a href="{{ route('jovens.eventos.show', $event) }}" class="inline-flex items-center gap-2 font-bold text-teal-700 underline dark:text-teal-400">
                     <x-icon name="arrow-right" class="h-4 w-4" style="duotone" />
                     Inscrição — painel de jovens
                 </a>

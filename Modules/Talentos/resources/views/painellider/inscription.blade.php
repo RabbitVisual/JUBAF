@@ -1,57 +1,55 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Banco de talentos — inscrição')
 
-@section('content')
+@section('lideres_content')
 @php
     use Modules\Talentos\App\Models\TalentAssignment;
 @endphp
-<div class="space-y-8 max-w-3xl mx-auto pb-4">
+<x-ui.lideres::page-shell class="mx-auto max-w-3xl space-y-8 pb-4">
     @if(session('success'))
-        <div class="rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-200">
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200">
             {{ session('success') }}
         </div>
     @endif
 
-    <div class="relative overflow-hidden rounded-3xl border border-emerald-200/80 dark:border-emerald-900/40 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 p-6 sm:p-8 text-white shadow-lg shadow-emerald-900/20">
-        <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" aria-hidden="true"></div>
-        <div class="relative flex flex-col sm:flex-row sm:items-start gap-4">
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
+    <x-ui.lideres::hero
+        variant="gradient"
+        eyebrow="JUBAF · Liderança e serviço"
+        title="Inscrição no banco de talentos"
+        description="Como líder, a sua inscrição ajuda a diretoria regional JUBAF a coordenar equipas e a convocar voluntários alinhados com a congregação. Preencha as competências em que pode colaborar; poderá receber convites com função definida (por exemplo ligados a eventos no calendário).">
+        <x-slot name="actions">
+            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
                 <x-module-icon module="Talentos" class="h-9 w-9 text-white" />
-            </div>
-            <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold uppercase tracking-widest text-emerald-200">JUBAF · Liderança e serviço</p>
-                <h1 class="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Inscrição no banco de talentos</h1>
-                <p class="mt-3 text-sm leading-relaxed text-emerald-100">
-                    Como líder, a sua inscrição ajuda a diretoria regional JUBAF a coordenar equipas e a convocar voluntários alinhados com a congregação.
-                    Preencha as competências em que pode colaborar; quando a JUBAF organizar eventos ou precisar de reforço, poderá receber <strong class="font-semibold text-white">convites</strong> com função definida (por exemplo ligados a eventos no calendário).
-                </p>
-                @if($enrollmentComplete)
-                    <p class="mt-4 inline-flex items-center gap-2 rounded-lg bg-white/15 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">
-                        <x-icon name="circle-check" class="h-4 w-4" style="solid" />
-                        Inscrição ativa no banco de talentos
-                    </p>
-                @elseif($enrollmentStarted)
-                    <p class="mt-4 text-xs text-emerald-200">Complete apresentação ou áreas de serviço para facilitar convocações futuras.</p>
-                @else
-                    <p class="mt-4 text-xs text-emerald-200">Ainda sem ficha — registe-se para integrar o banco de talentos da JUBAF.</p>
-                @endif
-                <ol class="mt-5 grid gap-2 text-xs text-emerald-100/95 sm:grid-cols-3" aria-label="Passos da inscrição">
-                    <li class="flex items-start gap-2 rounded-lg bg-white/10 px-2.5 py-2 ring-1 ring-white/15">
-                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-[11px] font-bold">1</span>
-                        <span><span class="font-semibold text-white">Perfil</span> — apresentação e disponibilidade</span>
-                    </li>
-                    <li class="flex items-start gap-2 rounded-lg bg-white/10 px-2.5 py-2 ring-1 ring-white/15">
-                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-[11px] font-bold">2</span>
-                        <span><span class="font-semibold text-white">Competências</span> — níveis e áreas de serviço</span>
-                    </li>
-                    <li class="flex items-start gap-2 rounded-lg bg-white/10 px-2.5 py-2 ring-1 ring-white/15">
-                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-[11px] font-bold">3</span>
-                        <span><span class="font-semibold text-white">Visibilidade</span> — aparecer no diretório da diretoria</span>
-                    </li>
-                </ol>
-            </div>
-        </div>
+            </span>
+        </x-slot>
+    </x-ui.lideres::hero>
+
+    <div class="rounded-2xl border border-slate-200 bg-slate-50/90 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+        @if($enrollmentComplete)
+            <p class="inline-flex items-center gap-2 rounded-lg bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-100">
+                <x-icon name="circle-check" class="h-4 w-4" style="solid" />
+                Inscrição ativa no banco de talentos
+            </p>
+        @elseif($enrollmentStarted)
+            <p class="text-sm text-slate-600 dark:text-slate-400">Complete apresentação ou áreas de serviço para facilitar convocações futuras.</p>
+        @else
+            <p class="text-sm text-slate-600 dark:text-slate-400">Ainda sem ficha — registe-se para integrar o banco de talentos da JUBAF.</p>
+        @endif
+        <ol class="mt-4 grid gap-2 text-xs text-slate-700 dark:text-slate-300 sm:grid-cols-3" aria-label="Passos da inscrição">
+            <li class="flex items-start gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2 dark:border-slate-600 dark:bg-slate-800">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-bold text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-100">1</span>
+                <span><span class="font-semibold text-slate-900 dark:text-white">Perfil</span> — apresentação e disponibilidade</span>
+            </li>
+            <li class="flex items-start gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2 dark:border-slate-600 dark:bg-slate-800">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-bold text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-100">2</span>
+                <span><span class="font-semibold text-slate-900 dark:text-white">Competências</span> — níveis e áreas de serviço</span>
+            </li>
+            <li class="flex items-start gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2 dark:border-slate-600 dark:bg-slate-800">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-bold text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-100">3</span>
+                <span><span class="font-semibold text-slate-900 dark:text-white">Visibilidade</span> — aparecer no diretório da diretoria</span>
+            </li>
+        </ol>
     </div>
 
     @if($assignments->isNotEmpty())
@@ -110,5 +108,5 @@
             'panel' => 'lider',
         ])
     </section>
-</div>
+</x-ui.lideres::page-shell>
 @endsection

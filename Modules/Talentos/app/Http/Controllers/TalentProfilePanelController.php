@@ -29,6 +29,14 @@ class TalentProfilePanelController extends Controller
             $profile->load(['skills', 'areas']);
         }
 
+        $verifiedSkills = collect();
+        if ($profile->exists) {
+            $verifiedSkills = $profile->skills()
+                ->wherePivotNotNull('validated_at')
+                ->orderBy('name')
+                ->get();
+        }
+
         $routeName = $request->route()->getName() ?? '';
         $isJovens = str_contains($routeName, 'jovens.');
 
@@ -58,6 +66,7 @@ class TalentProfilePanelController extends Controller
             'assignments' => $user->talentAssignments,
             'enrollmentStarted' => $enrollmentStarted,
             'enrollmentComplete' => $enrollmentComplete,
+            'verifiedSkills' => $verifiedSkills,
         ]);
     }
 

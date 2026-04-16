@@ -37,6 +37,9 @@ final class LeaderYouthProvisioningService
                 'password' => $plainPassword,
                 'active' => array_key_exists('active', $data) ? (bool) $data['active'] : true,
                 'church_id' => $leader->church_id,
+                'provisioned_by_user_id' => $leader->id,
+                'provisioned_at' => now(),
+                'email_verified_at' => $setNow ? now() : null,
             ]);
             $user->assignRole('jovens');
 

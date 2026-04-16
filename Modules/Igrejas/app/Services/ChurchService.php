@@ -19,6 +19,7 @@ class ChurchService
             $church = Church::create($attributes);
             $church->refresh();
             ChurchLeadershipSync::syncFromChurch($church);
+            ChurchLeadershipSync::dispatchLeaderAssignedEventsForChurch($church, null, null);
 
             if ($church->jubaf_sector_id) {
                 event(new ChurchSectorAssigned($church, null));
@@ -38,10 +39,17 @@ class ChurchService
         return DB::transaction(function () use ($church, $attributes) {
             $originalCrm = $church->crm_status;
             $previousSectorId = $church->jubaf_sector_id;
+            $previousUnijovemLeaderId = $church->unijovem_leader_user_id;
+            $previousPastorUserId = $church->pastor_user_id;
 
             $church->update($attributes);
             $church->refresh();
             ChurchLeadershipSync::syncFromChurch($church);
+            ChurchLeadershipSync::dispatchLeaderAssignedEventsForChurch(
+                $church,
+                $previousUnijovemLeaderId,
+                $previousPastorUserId
+            );
 
             if ((int) $church->jubaf_sector_id !== (int) $previousSectorId) {
                 event(new ChurchSectorAssigned($church, $previousSectorId));

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'A minha congregação')
 
@@ -7,41 +7,43 @@
     <span class="text-emerald-700 dark:text-emerald-300">Congregação</span>
 @endsection
 
-@section('content')
-<div class="space-y-8 max-w-6xl">
-    <div class="relative overflow-hidden rounded-3xl border border-emerald-200/80 dark:border-emerald-900/50 bg-gradient-to-br from-emerald-600 via-teal-600 to-slate-900 text-white shadow-xl shadow-emerald-900/20">
-        <div class="absolute inset-0 opacity-25 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/30 via-transparent to-transparent"></div>
-        <div class="relative px-6 py-8 md:px-10 md:py-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-            <div class="max-w-2xl">
-                <p class="text-xs font-bold uppercase tracking-widest text-emerald-100/90 mb-2">JUBAF · Módulo Igrejas</p>
-                <h1 class="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-                    <span class="flex h-12 w-12 rounded-2xl bg-white/15 items-center justify-center shrink-0">
-                        <x-module-icon module="Igrejas" class="h-7 w-7 text-white" />
-                    </span>
-                    A tua congregação na associação
-                </h1>
-                <p class="mt-3 text-sm md:text-base text-emerald-50/95 leading-relaxed">
-                    Dados oficiais da igreja local vinculada à JUBAF/ASBAF, contactos institucionais e lista de jovens Unijovem da mesma congregação.
-                </p>
-            </div>
-            <div class="flex flex-wrap gap-2 shrink-0">
+@section('lideres_content')
+<x-ui.lideres::page-shell class="max-w-6xl space-y-8">
+    <x-ui.lideres::hero
+        variant="gradient"
+        eyebrow="JUBAF · Módulo Igrejas"
+        title="A tua congregação na associação"
+        description="Dados oficiais da igreja local vinculada à JUBAF/ASBAF, contactos institucionais e lista de jovens Unijovem da mesma congregação.">
+        <x-slot name="actions">
+            <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+                    <x-module-icon module="Igrejas" class="h-7 w-7 text-white" />
+                </span>
                 @can('create', \Modules\Igrejas\App\Models\ChurchChangeRequest::class)
                     @if(Route::has('lideres.igrejas.requests.index'))
-                        <a href="{{ route('lideres.igrejas.requests.index') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/20 text-sm font-semibold backdrop-blur-sm transition-all">
-                            <x-icon name="inbox" class="w-4 h-4" />
+                        <a href="{{ route('lideres.igrejas.requests.index') }}" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/15 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25">
+                            <x-icon name="inbox" class="h-4 w-4" />
                             Pedidos à diretoria
                         </a>
                     @endif
                 @endcan
                 @if($church && Route::has('igrejas.public.index'))
-                    <a href="{{ route('igrejas.public.index') }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/20 text-sm font-semibold backdrop-blur-sm transition-all">
-                        <x-icon name="globe" class="w-4 h-4" />
+                    <a href="{{ route('igrejas.public.index') }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/15 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25">
+                        <x-icon name="globe" class="h-4 w-4" />
                         Igrejas públicas JUBAF
                     </a>
                 @endif
+                @can('igrejasProvisionYouth')
+                    @if(Route::has('lideres.congregacao.jovens.create'))
+                        <a href="{{ route('lideres.congregacao.jovens.create') }}" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-emerald-800 shadow-md shadow-black/10 transition hover:bg-emerald-50">
+                            <x-icon name="user-plus" class="h-4 w-4" />
+                            Cadastrar jovem
+                        </a>
+                    @endif
+                @endcan
             </div>
-        </div>
-    </div>
+        </x-slot>
+    </x-ui.lideres::hero>
 
     @if($church)
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -128,18 +130,33 @@
     @endif
 
     <div>
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-4">
             <div>
                 <h3 class="text-lg font-bold text-slate-900 dark:text-white">Jovens da congregação</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-400">Contas com o papel <strong>Jovem JUBAF</strong> na mesma igreja. Trata os dados em conformidade com a privacidade e com o RGPD.</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">A diretoria associa o teu utilizador à igreja; aqui crias as contas <strong>Jovem JUBAF</strong> desta congregação e envias o convite (e-mail para definir palavra-passe). Trata os dados em conformidade com o RGPD.</p>
             </div>
             @can('igrejasProvisionYouth')
-                @if(Route::has('lideres.congregacao.jovens.create'))
-                    <a href="{{ route('lideres.congregacao.jovens.create') }}"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-emerald-700 shrink-0">
-                        <x-icon name="user-plus" class="h-4 w-4" />
-                        Adicionar jovem
-                    </a>
+                <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+                    @if(Route::has('lideres.congregacao.jovens.create'))
+                        <a href="{{ route('lideres.congregacao.jovens.create') }}"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow hover:bg-emerald-700 shrink-0">
+                            <x-icon name="user-plus" class="h-4 w-4" />
+                            Adicionar jovem
+                        </a>
+                    @endif
+                    @if(Route::has('lideres.congregacao.jovens.export'))
+                        <a href="{{ route('lideres.congregacao.jovens.export') }}"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 shrink-0">
+                            <x-icon name="download" class="h-4 w-4" style="duotone" />
+                            Exportar CSV
+                        </a>
+                    @endif
+                </div>
+            @else
+                @if(auth()->user()?->hasRole('lider') && ! auth()->user()?->church_id)
+                    <p class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100">
+                        Sem <strong>igreja associada</strong> ao teu perfil. Pede à diretoria/secretaria JUBAF para vincular a tua conta à congregação — depois poderás cadastrar jovens aqui.
+                    </p>
                 @endif
             @endcan
         </div>
@@ -149,7 +166,9 @@
                     <tr>
                         <th class="px-4 py-3">Nome</th>
                         <th class="px-4 py-3">E-mail</th>
-                        <th class="px-4 py-3">Estado</th>
+                        <th class="px-4 py-3">Acesso</th>
+                        <th class="px-4 py-3">Conta</th>
+                        <th class="px-4 py-3 hidden lg:table-cell">Censo</th>
                         <th class="px-4 py-3 text-right">Acções</th>
                     </tr>
                 </thead>
@@ -159,10 +178,31 @@
                             <td class="px-4 py-3 font-semibold text-slate-900 dark:text-white">{{ $j->name }}</td>
                             <td class="px-4 py-3 text-slate-600 dark:text-slate-400">{{ $j->email }}</td>
                             <td class="px-4 py-3">
+                                @if($j->provisioned_at)
+                                    @if($j->hasPendingInvitedAccess())
+                                        <span class="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-900/40 dark:text-amber-100" title="Aguarda definição da palavra-passe (convite por e-mail)">Convite pendente</span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-100">Acesso definido</span>
+                                    @endif
+                                @else
+                                    <span class="text-xs text-slate-400" title="Conta não criada pelo fluxo de provisão do painel">—</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3">
                                 @if($j->active ?? true)
                                     <span class="text-emerald-600 dark:text-emerald-400 font-medium">Ativo</span>
                                 @else
                                     <span class="text-slate-500">Inativo</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 hidden lg:table-cell text-slate-600 dark:text-slate-400 text-xs">
+                                @if($j->provisioned_at)
+                                    <span class="block">{{ $j->provisioned_at->format('d/m/Y H:i') }}</span>
+                                    @if($j->provisionedBy)
+                                        <span class="text-slate-500 dark:text-slate-500">por {{ $j->provisionedBy->name }}</span>
+                                    @endif
+                                @else
+                                    <span class="text-slate-400">—</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">
@@ -180,12 +220,26 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="px-4 py-10 text-center text-slate-500">Nenhum jovem com esta igreja associada.</td></tr>
+                        <tr>
+                            <td colspan="6" class="px-4 py-12 text-center">
+                                <p class="text-slate-600 dark:text-slate-400 mb-4">Ainda não há jovens com o papel <strong>Jovem JUBAF</strong> nesta igreja na plataforma.</p>
+                                @can('igrejasProvisionYouth')
+                                    @if(Route::has('lideres.congregacao.jovens.create'))
+                                        <a href="{{ route('lideres.congregacao.jovens.create') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white shadow hover:bg-emerald-700">
+                                            <x-icon name="user-plus" class="h-4 w-4" />
+                                            Cadastrar primeiro jovem
+                                        </a>
+                                    @endif
+                                @else
+                                    <p class="text-sm text-amber-800 dark:text-amber-200">Associa primeiro a tua conta a uma congregação para poder cadastrar jovens.</p>
+                                @endcan
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
         <div class="mt-4">{{ $jovens->links() }}</div>
     </div>
-</div>
+</x-ui.lideres::page-shell>
 @endsection

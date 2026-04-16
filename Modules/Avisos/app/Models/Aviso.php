@@ -3,11 +3,11 @@
 namespace Modules\Avisos\App\Models;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Igrejas\App\Policies\ChurchPolicy;
 
 class Aviso extends Model
 {
@@ -58,7 +58,7 @@ class Aviso extends Model
      */
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -94,11 +94,21 @@ class Aviso extends Model
     }
 
     /**
+     * Avisos institucionais em modo quadro com classificação urgente.
+     */
+    public function scopeUrgentInstitutional($query)
+    {
+        return $query
+            ->where('modo_quadro', true)
+            ->where('classificacao', 'urgente');
+    }
+
+    /**
      * Audiência por igreja: null ou [] = todas; caso contrário pelo menos um id em church_ids visível ao utilizador.
      */
     public function scopeForAudience($query, ?User $viewer)
     {
-        if ($viewer && \Modules\Igrejas\App\Policies\ChurchPolicy::canBrowseAllChurches($viewer)) {
+        if ($viewer && ChurchPolicy::canBrowseAllChurches($viewer)) {
             return $query;
         }
 
@@ -129,7 +139,7 @@ class Aviso extends Model
      */
     public function estaAtivo(): bool
     {
-        if (!$this->ativo) {
+        if (! $this->ativo) {
             return false;
         }
 
@@ -165,7 +175,7 @@ class Aviso extends Model
      */
     public function getTipoTextoAttribute(): string
     {
-        return match($this->tipo) {
+        return match ($this->tipo) {
             'info' => 'Informação',
             'success' => 'Sucesso',
             'warning' => 'Aviso',
@@ -182,7 +192,7 @@ class Aviso extends Model
      */
     public function getPosicaoTextoAttribute(): string
     {
-        return match($this->posicao) {
+        return match ($this->posicao) {
             'topo' => 'Topo da Página',
             'meio' => 'Meio da Página',
             'rodape' => 'Rodapé',
@@ -196,7 +206,7 @@ class Aviso extends Model
      */
     public function getEstiloTextoAttribute(): string
     {
-        return match($this->estilo) {
+        return match ($this->estilo) {
             'banner' => 'Banner',
             'announcement' => 'Anúncio',
             'cta' => 'Call to Action',
@@ -215,7 +225,7 @@ class Aviso extends Model
             return $this->cor_primaria;
         }
 
-        return match($this->tipo) {
+        return match ($this->tipo) {
             'info' => 'indigo',
             'success' => 'emerald',
             'warning' => 'amber',
@@ -236,7 +246,7 @@ class Aviso extends Model
             return $this->cor_secundaria;
         }
 
-        return match($this->tipo) {
+        return match ($this->tipo) {
             'info' => 'blue',
             'success' => 'green',
             'warning' => 'yellow',
@@ -248,4 +258,3 @@ class Aviso extends Model
         };
     }
 }
-

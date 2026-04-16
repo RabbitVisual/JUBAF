@@ -74,8 +74,8 @@ class FinanceCalendarTalentosTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->from(route('jovens.calendario.show', $event))
-            ->post(route('jovens.calendario.register', $event))
+            ->from(route('jovens.eventos.show', $event))
+            ->post(route('jovens.eventos.register', $event))
             ->assertRedirect();
 
         $this->assertDatabaseHas('evento_inscricoes', [

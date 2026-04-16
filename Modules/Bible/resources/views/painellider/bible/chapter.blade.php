@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', $book->name . ' ' . $chapter->chapter_number . ' - ' . $version->name)
 
@@ -11,7 +11,8 @@
     <span class="text-slate-600 dark:text-slate-300">{{ $book->name }} {{ $chapter->chapter_number }}</span>
 @endsection
 
-@section('content')
+@section('lideres_content')
+    <x-ui.lideres::page-shell noPadding class="w-full max-w-none !mx-0 !space-y-0 !pb-0">
     <div class="min-h-screen bg-white dark:bg-slate-950 transition-colors pb-20" id="bible-chapter" style="--bible-mobile-font-size: 1.25rem">
 
         <!-- Sticky Navigation Bar -->
@@ -230,11 +231,14 @@
         }
 
         function changeVersion(abbreviation) {
-            const tpl = @json(route('lideres.bible.chapter', [
-                'version' => '__V__',
-                'book' => $book->book_number,
-                'chapter' => $chapter->chapter_number,
-            ]));
+            @php
+                $lideresChapterUrlTemplate = route('lideres.bible.chapter', [
+                    'version' => '__V__',
+                    'book' => $book->book_number,
+                    'chapter' => $chapter->chapter_number,
+                ]);
+            @endphp
+            const tpl = @json($lideresChapterUrlTemplate);
             window.location.href = tpl.replace('__V__', encodeURIComponent(abbreviation));
         }
 
@@ -327,5 +331,6 @@
             });
         });
     </script>
+    </x-ui.lideres::page-shell>
 @endsection
 

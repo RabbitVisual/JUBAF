@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Perfil')
 
@@ -7,8 +7,8 @@
     <span class="text-emerald-600 dark:text-emerald-400">Identidade e segurança</span>
 @endsection
 
-@section('content')
-<div class="space-y-6 md:space-y-10 animate-fade-in pb-12">
+@section('lideres_content')
+<x-ui.lideres::page-shell class="space-y-6 md:space-y-10 pb-12">
     @if(session('success'))
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-200">
             {{ session('success') }}
@@ -216,7 +216,7 @@
     <div class="mt-8 max-w-6xl mx-auto px-0">
         <x-profile-sensitive-data-request :action="route('lideres.profile.sensitive-data-request.store')" accent="emerald" />
     </div>
-</div>
+</x-ui.lideres::page-shell>
 
 @push('scripts')
 <script>

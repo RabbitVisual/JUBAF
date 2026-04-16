@@ -14,12 +14,12 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
     @if(!empty($erpIncludePwaMeta))
-        <meta name="theme-color" content="{{ ($erpShell ?? '') === 'jovens' ? '#6d28d9' : '#047857' }}">
+        <meta name="theme-color" content="{{ ($erpShell ?? '') === 'jovens' ? '#2563eb' : '#047857' }}">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="msapplication-tap-highlight" content="no">
-        <link rel="manifest" href="{{ asset('manifest.json') }}">
+        <link rel="manifest" href="{{ $erpManifestUrl ?? asset('manifest.json') }}">
         <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
         <link rel="apple-touch-icon" href="{{ asset('icons/icon.svg') }}">
         <style>
@@ -72,7 +72,8 @@
 @endphp
 <body @class([
     'h-full antialiased overflow-x-hidden',
-    'bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col' => in_array($shell, ['lideres', 'jovens'], true),
+    'bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col' => $shell === 'lideres',
+    'bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col' => $shell === 'jovens',
     'h-full bg-gray-50 dark:bg-slate-900 transition-colors duration-200 antialiased' => $shell === 'admin',
     'h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased' => $shell === 'pastor',
     'h-full bg-gray-50 dark:bg-gray-900 antialiased' => $shell === 'diretoria',

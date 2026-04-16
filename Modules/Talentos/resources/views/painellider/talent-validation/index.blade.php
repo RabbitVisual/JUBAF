@@ -1,14 +1,14 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Validar competências')
 
-@section('content')
-<div class="mx-auto max-w-5xl space-y-8 px-4 pb-10 sm:px-6">
-    <div class="border-b border-gray-200 pb-6 dark:border-slate-700">
-        <p class="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800 dark:text-emerald-400">Juventude local</p>
-        <h1 class="mt-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Validação de talentos</h1>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Confirme as competências declaradas pelos jovens da sua congregação. Isto ajuda a diretoria regional a convocar equipas com segurança.</p>
-    </div>
+@section('lideres_content')
+<x-ui.lideres::page-shell class="max-w-5xl space-y-6 md:space-y-8 px-4 sm:px-6">
+    <x-ui.lideres::hero
+        variant="surface"
+        eyebrow="Juventude local"
+        title="Validação de talentos"
+        description="Confirme as competências declaradas pelos jovens da sua congregação. Isto ajuda a diretoria regional a convocar equipas com segurança." />
 
     @if(session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200">{{ session('success') }}</div>
@@ -54,5 +54,5 @@
             </div>
         @endforelse
     </div>
-</div>
+</x-ui.lideres::page-shell>
 @endsection

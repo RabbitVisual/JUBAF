@@ -13,6 +13,7 @@ use Modules\Financeiro\App\Models\FinBankAccount;
 use Modules\Financeiro\App\Models\FinCategory;
 use Modules\Financeiro\App\Models\FinObligation;
 use Modules\Financeiro\App\Models\FinTransaction;
+use Modules\Financeiro\App\Support\FinReportingPeriod;
 
 class FinanceiroService
 {
@@ -82,7 +83,15 @@ class FinanceiroService
     }
 
     /**
-     * @return array{total: int, overdue: int, pending: int, settled: int}
+     * @return array{
+     *   total: int,
+     *   overdue: int,
+     *   pending: int,
+     *   settled: int
+     * }
+     *  `FinObligation` usa estados: pending, paid, waived, cancelled (sem coluna "overdue").
+     *  Em atraso: pendentes cujo ciclo associativo (assoc_start_year) já é anterior ao ciclo atual.
+     *  Resolvidas: pagas ou isentas.
      */
     public function obligationsStatusForChurchIds(array $churchIds): array
     {
@@ -96,12 +105,22 @@ class FinanceiroService
         }
 
         $base = FinObligation::query()->whereIn('church_id', $churchIds);
+        $currentAssocYear = FinReportingPeriod::defaultAssociativeStartYear();
 
         return [
             'total' => (clone $base)->count(),
-            'overdue' => (clone $base)->where('status', FinObligation::STATUS_OVERDUE)->count(),
-            'pending' => (clone $base)->where('status', FinObligation::STATUS_PENDING)->count(),
-            'settled' => (clone $base)->where('status', FinObligation::STATUS_SETTLED)->count(),
+            'overdue' => (clone $base)
+                ->where('status', FinObligation::STATUS_PENDING)
+                ->where('assoc_start_year', '<', $currentAssocYear)
+                ->count(),
+            'pending' => (clone $base)
+                ->where('status', FinObligation::STATUS_PENDING)
+                ->where('assoc_start_year', '>=', $currentAssocYear)
+                ->count(),
+            'settled' => (clone $base)->whereIn('status', [
+                FinObligation::STATUS_PAID,
+                FinObligation::STATUS_WAIVED,
+            ])->count(),
         ];
     }
 

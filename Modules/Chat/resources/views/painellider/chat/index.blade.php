@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Chat')
 
@@ -7,26 +7,27 @@
     <span class="text-emerald-600 dark:text-emerald-400">Comunicação com a JUBAF</span>
 @endsection
 
-@section('content')
-<div class="h-[calc(100vh-14rem)] flex flex-col space-y-8 animate-fade-in">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-slate-800">
-        <div class="flex items-center gap-5">
-            <div class="w-14 h-14 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl flex items-center justify-center text-white shadow-2xl transform rotate-3 hover:rotate-0 transition-all">
-                <x-icon name="comment-dots" style="duotone" class="w-7 h-7" />
+@section('lideres_content')
+<x-ui.lideres::page-shell class="animate-fade-in flex max-w-none flex-col space-y-4">
+    <x-ui.lideres::hero
+        variant="gradient"
+        eyebrow="Comunicação JUBAF"
+        title="Canal do líder"
+        description="Articulação com a diretoria, outros líderes e apoio aos jovens — alinhado ao calendário, avisos e secretaria JUBAF.">
+        <x-slot name="actions">
+            <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/15 shadow-lg">
+                    <x-icon name="comment-dots" style="duotone" class="h-7 w-7 text-white" />
+                </span>
+                <button type="button" onclick="abrirNovaConversa()" class="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-semibold text-emerald-900 shadow-lg shadow-emerald-900/10 transition-all hover:bg-emerald-50 active:scale-95">
+                    <x-icon name="plus" class="h-4 w-4" />
+                    Nova conversa
+                </button>
             </div>
-            <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">Canal do líder</h1>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">Articulação com a diretoria, outros líderes e apoio aos jovens — alinhado ao calendário, avisos e secretaria JUBAF.</p>
-            </div>
-        </div>
+        </x-slot>
+    </x-ui.lideres::hero>
 
-        <button type="button" onclick="abrirNovaConversa()" class="h-12 px-6 sm:px-8 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 flex items-center gap-2 shrink-0">
-            <x-icon name="plus" class="w-4 h-4" />
-            Nova conversa
-        </button>
-    </div>
-
-    <div class="flex-1 flex flex-col lg:flex-row gap-8 min-h-0 overflow-hidden">
+    <div class="flex min-h-[min(28rem,calc(100vh-20rem))] flex-1 flex-col gap-6 overflow-hidden lg:flex-row lg:gap-8">
         <div class="w-full lg:w-80 flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm max-h-64 lg:max-h-none">
             <div class="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 flex items-center justify-between">
                 <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Conversas</span>
@@ -77,7 +78,7 @@
             </div>
         </div>
     </div>
-</div>
+</x-ui.lideres::page-shell>
 
 <div id="modal-nova-conversa" class="hidden fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-6">
     <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-white/10 overflow-hidden">

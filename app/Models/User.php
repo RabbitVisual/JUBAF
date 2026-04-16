@@ -3,22 +3,32 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\Bible\App\Models\BibleFavorite;
+use Modules\Blog\App\Models\BlogComment;
+use Modules\Blog\App\Models\BlogPost;
+use Modules\Igrejas\App\Models\Church;
+use Modules\Igrejas\App\Models\JubafSector;
+use Modules\PainelJovens\App\Models\JovemPerfil;
+use Modules\Talentos\App\Models\TalentAssignment;
+use Modules\Talentos\App\Models\TalentProfile;
 use Spatie\Permission\Traits\HasRoles;
-use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    /** @use HasFactory<UserFactory> */
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     protected static function booted(): void
     {
@@ -69,6 +79,8 @@ class User extends Authenticatable
         'cover_position_x',
         'cover_position_y',
         'church_id',
+        'provisioned_by_user_id',
+        'provisioned_at',
         'jubaf_sector_id',
     ];
 
@@ -93,38 +105,39 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'birth_date' => 'date',
+            'provisioned_at' => 'datetime',
         ];
     }
 
     // Relacionamentos
     public function blogPosts()
     {
-        return $this->hasMany(\Modules\Blog\App\Models\BlogPost::class, 'author_id');
+        return $this->hasMany(BlogPost::class, 'author_id');
     }
 
     public function blogComments()
     {
-        return $this->hasMany(\Modules\Blog\App\Models\BlogComment::class, 'user_id');
+        return $this->hasMany(BlogComment::class, 'user_id');
     }
 
     /**
      * Versículos da Bíblia marcados como favoritos pelo utilizador.
      *
-     * @return HasMany<\Modules\Bible\App\Models\BibleFavorite, $this>
+     * @return HasMany<BibleFavorite, $this>
      */
     public function bibleFavorites(): HasMany
     {
-        return $this->hasMany(\Modules\Bible\App\Models\BibleFavorite::class);
+        return $this->hasMany(BibleFavorite::class);
     }
 
     public function church()
     {
-        return $this->belongsTo(\Modules\Igrejas\App\Models\Church::class, 'church_id');
+        return $this->belongsTo(Church::class, 'church_id');
     }
 
     public function jubafSector()
     {
-        return $this->belongsTo(\Modules\Igrejas\App\Models\JubafSector::class, 'jubaf_sector_id');
+        return $this->belongsTo(JubafSector::class, 'jubaf_sector_id');
     }
 
     /**
@@ -136,7 +149,7 @@ class User extends Authenticatable
             && $this->jubaf_sector_id !== null;
     }
 
-    public function canAccessChurchInSectorScope(\Modules\Igrejas\App\Models\Church $church): bool
+    public function canAccessChurchInSectorScope(Church $church): bool
     {
         if (! $this->restrictsChurchDirectoryToSector()) {
             return true;
@@ -148,16 +161,34 @@ class User extends Authenticatable
     /**
      * Igrejas adicionais (líder/pastor com várias congregações).
      *
-     * @return BelongsToMany<\Modules\Igrejas\App\Models\Church, $this>
+     * @return BelongsToMany<Church, $this>
      */
     public function assignedChurches(): BelongsToMany
     {
         return $this->belongsToMany(
-            \Modules\Igrejas\App\Models\Church::class,
+            Church::class,
             'user_churches',
             'user_id',
             'church_id'
         )->withPivot('role_on_church')->withTimestamps();
+    }
+
+    /**
+     * Líder (ou outro utilizador) que criou esta conta no fluxo de provisão da congregação.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function provisionedBy(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'provisioned_by_user_id');
+    }
+
+    /**
+     * Convite por e-mail ainda não concluído (definição de palavra-passe / verificação).
+     */
+    public function hasPendingInvitedAccess(): bool
+    {
+        return $this->provisioned_at !== null && $this->email_verified_at === null;
     }
 
     /**
@@ -196,28 +227,28 @@ class User extends Authenticatable
 
     public function talentProfile()
     {
-        return $this->hasOne(\Modules\Talentos\App\Models\TalentProfile::class);
+        return $this->hasOne(TalentProfile::class);
     }
 
     /**
      * Perfil estendido do painel de jovens (estado civil, profissão, bio, redes sociais).
      *
-     * @return HasOne<\Modules\PainelJovens\App\Models\JovemPerfil, $this>
+     * @return HasOne<JovemPerfil, $this>
      */
     public function jovemPerfil(): HasOne
     {
-        return $this->hasOne(\Modules\PainelJovens\App\Models\JovemPerfil::class);
+        return $this->hasOne(JovemPerfil::class);
     }
 
     public function talentAssignments()
     {
-        return $this->hasMany(\Modules\Talentos\App\Models\TalentAssignment::class);
+        return $this->hasMany(TalentAssignment::class);
     }
 
     /**
      * Pedidos de alteração de dados sensíveis (e-mail, CPF) para análise da diretoria.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<ProfileSensitiveDataRequest, $this>
+     * @return HasMany<ProfileSensitiveDataRequest, $this>
      */
     public function profileSensitiveDataRequests()
     {
@@ -227,7 +258,7 @@ class User extends Authenticatable
     /**
      * Até 3 fotos alternáveis; uma marcada como ativa sincroniza com {@see $photo}.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<UserProfilePhoto, $this>
+     * @return HasMany<UserProfilePhoto, $this>
      */
     public function profilePhotos()
     {

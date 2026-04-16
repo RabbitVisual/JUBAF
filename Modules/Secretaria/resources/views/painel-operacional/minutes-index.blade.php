@@ -1,11 +1,22 @@
-@extends($layout)
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Atas')
 
-@section('content')
-<div class="max-w-4xl space-y-4">
-    <div class="flex justify-between"><h1 class="text-2xl font-bold text-slate-900 dark:text-white">Atas publicadas</h1><a href="{{ route($namePrefix.'.index') }}" class="text-sm text-indigo-600">Secretaria</a></div>
-    <ul class="space-y-2">@foreach($minutes as $m)<li class="border dark:border-slate-700 rounded-lg p-3"><a href="{{ route($namePrefix.'.atas.show', $m) }}" class="font-medium text-indigo-600">{{ $m->title }}</a><span class="text-xs text-slate-500 ml-2">{{ $m->published_at?->format('d/m/Y') }}</span></li>@endforeach</ul>
-    {{ $minutes->links() }}
-</div>
+@section('lideres_content')
+    <x-ui.lideres::page-shell class="space-y-8 md:space-y-10">
+        <a
+            href="{{ route($namePrefix.'.index') }}"
+            class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 transition-all hover:gap-2.5 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+        >
+            <x-icon name="arrow-left" class="h-4 w-4" style="duotone" />
+            Voltar à secretaria
+        </a>
+
+        <x-ui.lideres::hero
+            title="Atas publicadas"
+            eyebrow="Painel de líderes · Secretaria"
+            description="Atas aprovadas e publicadas pela secretaria." />
+
+        @include('secretaria::painel-operacional.partials.lider-minutes-index-inner')
+    </x-ui.lideres::page-shell>
 @endsection

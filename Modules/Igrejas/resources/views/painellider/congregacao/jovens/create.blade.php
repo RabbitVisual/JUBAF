@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', 'Adicionar jovem')
 
@@ -9,14 +9,13 @@
     <span class="text-emerald-700 dark:text-emerald-300">Novo jovem</span>
 @endsection
 
-@section('content')
-<div class="mx-auto max-w-2xl space-y-8">
-    <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Adicionar jovem à congregação</h1>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            Será criada uma conta com o papel <strong>Jovem JUBAF</strong> na mesma igreja que a tua conta. O e-mail deve ser único no sistema.
-        </p>
-    </div>
+@section('lideres_content')
+<x-ui.lideres::page-shell class="mx-auto max-w-2xl space-y-8">
+    <x-ui.lideres::hero
+        variant="surface"
+        eyebrow="Congregação"
+        title="Adicionar jovem à congregação"
+        description="Será criada uma conta com o papel Jovem JUBAF na mesma igreja que a tua conta. O e-mail deve ser único no sistema." />
 
     <form method="post" action="{{ route('lideres.congregacao.jovens.store') }}" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 space-y-5">
         @csrf
@@ -81,7 +80,7 @@
             <a href="{{ route('lideres.congregacao.index') }}" class="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">Cancelar</a>
         </div>
     </form>
-</div>
+</x-ui.lideres::page-shell>
 
 @push('scripts')
 <script>

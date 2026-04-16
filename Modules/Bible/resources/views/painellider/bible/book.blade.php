@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('painellider::layouts.lideres')
 
 @section('title', $book->name . ' - ' . $version->name)
 
@@ -11,7 +11,8 @@
     <span class="text-slate-600 dark:text-slate-300">{{ $book->name }}</span>
 @endsection
 
-@section('content')
+@section('lideres_content')
+    <x-ui.lideres::page-shell noPadding class="w-full max-w-none !mx-0 !space-y-0 !pb-0">
     <div class="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors pb-12">
 
         <!-- Sticky Header -->
@@ -86,5 +87,6 @@
 
         </div>
     </div>
+    </x-ui.lideres::page-shell>
 @endsection
 

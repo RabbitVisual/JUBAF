@@ -1,20 +1,23 @@
 <?php
 
+use App\Http\Controllers\Profile\DataChangeRequestController;
+use App\Models\Devotional;
 use Illuminate\Support\Facades\Route;
+use Modules\Avisos\App\Http\Controllers\AvisosPainelController;
 use Modules\Bible\App\Http\Controllers\InterlinearController;
 use Modules\Bible\App\Http\Controllers\PainelJovens\FavoriteController as BibleFavoriteController;
 use Modules\Bible\App\Http\Controllers\PainelJovens\JovensPanelBibleController;
 use Modules\Bible\App\Http\Controllers\PainelJovens\JovensPanelPlanReaderController;
 use Modules\Bible\App\Http\Controllers\PainelJovens\JovensPanelReadingPlanController;
-use Modules\Igrejas\App\Http\Controllers\PainelJovens\MinhaIgrejaController;
-use Modules\Avisos\App\Http\Controllers\AvisosPainelController;
 use Modules\Blog\App\Http\Controllers\BlogPainelController;
+use Modules\Calendario\App\Http\Controllers\ParticipationController;
+use Modules\Igrejas\App\Http\Controllers\PainelJovens\MinhaIgrejaController;
 use Modules\PainelJovens\App\Http\Controllers\ChatController;
 use Modules\PainelJovens\App\Http\Controllers\DashboardController;
-use Modules\PainelJovens\App\Http\Controllers\NotificacoesController;
-use App\Http\Controllers\Profile\DataChangeRequestController;
-use Modules\PainelJovens\App\Http\Controllers\ProfileController;
 use Modules\PainelJovens\App\Http\Controllers\DevotionalController;
+use Modules\PainelJovens\App\Http\Controllers\NotificacoesController;
+use Modules\PainelJovens\App\Http\Controllers\ProfileController;
+use Modules\PainelJovens\App\Http\Controllers\WalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,11 +32,13 @@ Route::prefix('jovens')->name('jovens.')->middleware(['auth', 'role:jovens', 'jo
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/solicitar-dados-sensiveis', [DataChangeRequestController::class, 'store'])->name('profile.sensitive-data-request.store');
+    Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/perfil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/perfil/solicitar-dados-sensiveis', [DataChangeRequestController::class, 'store'])->name('profile.sensitive-data-request.store');
+    Route::permanentRedirect('profile', 'perfil');
+    Route::permanentRedirect('profile/solicitar-dados-sensiveis', 'perfil/solicitar-dados-sensiveis');
 
-    if (class_exists(\App\Models\Devotional::class)) {
+    if (class_exists(Devotional::class)) {
         Route::get('/devocionais', [DevotionalController::class, 'index'])->name('devotionals.index');
         Route::get('/devocionais/{devotional:slug}', [DevotionalController::class, 'show'])->name('devotionals.show');
     }
@@ -102,9 +107,16 @@ Route::prefix('jovens')->name('jovens.')->middleware(['auth', 'role:jovens', 'jo
     }
 
     if (module_enabled('Calendario')) {
-        Route::prefix('calendario')->name('calendario.')->middleware(['permission:calendario.participate'])->group(function () {
-            require module_path('Calendario', 'routes/participation.php');
+        Route::prefix('eventos')->name('eventos.')->middleware(['permission:calendario.participate'])->group(function () {
+            require module_path('Calendario', 'routes/participation-jovens.php');
         });
+        Route::middleware(['permission:calendario.participate'])->group(function (): void {
+            Route::permanentRedirect('calendario', 'eventos');
+            Route::permanentRedirect('calendario/eventos/{event}', 'eventos/{event}');
+            Route::post('calendario/eventos/{event}/inscrever', [ParticipationController::class, 'register']);
+            Route::post('calendario/eventos/{event}/cancelar', [ParticipationController::class, 'cancel']);
+        });
+        Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     }
 
     if (module_enabled('Talentos')) {

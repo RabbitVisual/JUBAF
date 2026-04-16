@@ -159,6 +159,13 @@ Os nomes exatos dos middlewares e políticas podem variar; a fonte de verdade é
 - **Igrejas ↔ Avisos / utilizadores:** audiência e vínculos por congregação quando modelados nas tabelas e políticas.
 - **Notificacoes:** pode ser disparada a partir de eventos noutros módulos (via jobs/listeners conforme implementação).
 
+### Utilizador, congregação e papéis (módulo Igrejas)
+
+- **Entidade congregação:** `Modules\Igrejas\App\Models\Church` (`igrejas_churches`), com `pastor_user_id` e `unijovem_leader_user_id` como referências oficiais na ficha.
+- **`users.church_id`:** igreja principal do utilizador (jovem, líder ou pastor). Ao gravar a ficha da igreja, `ChurchLeadershipSync` alinha o `church_id` do líder Unijovem e o pivot `user_churches` (papéis `pastor` / `lider_unijovem` no pivot).
+- **Papéis Spatie:** no painel `/lideres`, quem tem o papel **`lider`** e **`church_id`** preenchido pode **cadastrar jovens** na congregação (gate `igrejasProvisionYouth`); a permissão `igrejas.jovens.provision` continua no seeder para relatórios/RBAC explícito. O papel `lider` deve estar alinhado com `unijovem_leader_user_id` na ficha da igreja.
+- **Evento:** `Modules\Igrejas\App\Events\LeaderAssignedToChurch` é disparado quando um pastor ou líder Unijovem **passa a estar** vinculado a uma congregação via `ChurchService` / pedidos aprovados (e continua a ser usado no fluxo de alteração de utilizador em `App\Services\Admin\UserService`).
+
 Não existe um “fluxo único” tipo demanda→ordem de serviço; o grafo de dependências é **por funcionalidade** e **por papel**.
 
 ---

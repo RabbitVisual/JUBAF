@@ -127,7 +127,7 @@
 </style>
 @endpush
 
-@section('content')
+@section('jovens_content')
 <div class="bible-reader-container" id="reader-root">
 
     <!-- TOP NAVIGATION -->
@@ -153,7 +153,7 @@
                 @if($day->title)
                     <h1 class="sacred-title mb-2">{{ $day->title }}</h1>
                 @endif
-                <p class="italic text-slate-500 text-sm">Escrituras Sagradas</p>
+                <p class="italic text-gray-500 text-sm">Escrituras Sagradas</p>
             </div>
 
             <div class="space-y-16">
@@ -296,7 +296,7 @@
                             @endif
                         @endforeach
                     </div>
-                    <p class="italic text-slate-500 text-sm mt-4">Leitura Física (Bíblia de Papel)</p>
+                    <p class="italic text-gray-500 text-sm mt-4">Leitura Física (Bíblia de Papel)</p>
                 </div>
 
                 <div class="text-6xl md:text-8xl font-black font-mono text-[var(--sacred-red)] dark:text-[var(--sacred-gold)] tracking-wider" x-text="formattedTime">
@@ -386,7 +386,7 @@
 
             <div class="w-px h-6 bg-white/20 mx-1"></div>
 
-            <button id="cancel-selection" class="text-slate-400 p-2">
+            <button id="cancel-selection" class="text-gray-400 p-2">
                 <x-icon name="x" class="w-5 h-5" />
             </button>
         </div>

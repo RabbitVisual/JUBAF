@@ -30,6 +30,7 @@ final class ChurchChangeRequestProcessor
                     $church = Church::create($data);
                     $church->refresh();
                     ChurchLeadershipSync::syncFromChurch($church);
+                    ChurchLeadershipSync::dispatchLeaderAssignedEventsForChurch($church, null, null);
                     $request->forceFill(['church_id' => $church->id])->save();
                     break;
 
@@ -38,9 +39,16 @@ final class ChurchChangeRequestProcessor
                     if (! $church) {
                         throw ValidationException::withMessages(['church' => ['Igreja não encontrada.']]);
                     }
+                    $previousUnijovemLeaderId = $church->unijovem_leader_user_id;
+                    $previousPastorUserId = $church->pastor_user_id;
                     $church->update(static::onlyChurchFillable($payload));
                     $church->refresh();
                     ChurchLeadershipSync::syncFromChurch($church);
+                    ChurchLeadershipSync::dispatchLeaderAssignedEventsForChurch(
+                        $church,
+                        $previousUnijovemLeaderId,
+                        $previousPastorUserId
+                    );
                     break;
 
                 case ChurchChangeRequest::TYPE_LEADERSHIP_CHANGE:
@@ -48,11 +56,18 @@ final class ChurchChangeRequestProcessor
                     if (! $church) {
                         throw ValidationException::withMessages(['church' => ['Igreja não encontrada.']]);
                     }
+                    $previousUnijovemLeaderId = $church->unijovem_leader_user_id;
+                    $previousPastorUserId = $church->pastor_user_id;
                     $church->update(static::onlyChurchFillable($payload, [
                         'pastor_user_id', 'unijovem_leader_user_id',
                     ]));
                     $church->refresh();
                     ChurchLeadershipSync::syncFromChurch($church);
+                    ChurchLeadershipSync::dispatchLeaderAssignedEventsForChurch(
+                        $church,
+                        $previousUnijovemLeaderId,
+                        $previousPastorUserId
+                    );
                     break;
 
                 case ChurchChangeRequest::TYPE_DEACTIVATE:

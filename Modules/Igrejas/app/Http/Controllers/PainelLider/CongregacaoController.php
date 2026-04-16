@@ -5,7 +5,6 @@ namespace Modules\Igrejas\App\Http\Controllers\PainelLider;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Modules\Igrejas\App\Models\Church;
 
 class CongregacaoController extends Controller
 {
@@ -23,6 +22,7 @@ class CongregacaoController extends Controller
         $jovens = User::query()
             ->role('jovens')
             ->where('church_id', $user->church_id)
+            ->with(['provisionedBy:id,name,first_name,last_name'])
             ->orderBy('name')
             ->paginate(20);
 
